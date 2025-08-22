@@ -20,7 +20,7 @@ const initialState: FriendsState = {
 
 export const fetchFriendsThunk = createAsyncThunk(
   'user/fetchFriendsThunk',
-  async (_: void) => {
+  async () => {
     const url = `${SERVER_HOST}/friends`
     return fetch(url).then(res => res.json())
   }
