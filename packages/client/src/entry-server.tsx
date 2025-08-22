@@ -15,7 +15,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import {
   createContext,
   createFetchRequest,
-  createUrl
+  createUrl,
 } from './entry-server.utils'
 import { reducer } from './store'
 import { routes } from './routes'
@@ -42,7 +42,11 @@ export const render = async (req: ExpressRequest) => {
     throw new Error('Страница не найдена!')
   }
 
-  const [{route: { fetchData }}] = foundRoutes
+  const [
+    {
+      route: { fetchData },
+    },
+  ] = foundRoutes
 
   try {
     await fetchData({
@@ -59,14 +63,16 @@ export const render = async (req: ExpressRequest) => {
   const router = createStaticRouter(dataRoutes, context)
   const sheet = new ServerStyleSheet()
   try {
-    const html = ReactDOM.renderToString(sheet.collectStyles(
-      <Provider store={store}>
-        <StaticRouterProvider router={router} context={context} />
-      </Provider>
-    ));
-    const styleTags = sheet.getStyleTags();
+    const html = ReactDOM.renderToString(
+      sheet.collectStyles(
+        <Provider store={store}>
+          <StaticRouterProvider router={router} context={context} />
+        </Provider>
+      )
+    )
+    const styleTags = sheet.getStyleTags()
 
-    const helmet = Helmet.renderStatic();
+    const helmet = Helmet.renderStatic()
 
     return {
       html,
