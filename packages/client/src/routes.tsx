@@ -3,6 +3,7 @@ import { AppDispatch, RootState } from './store'
 import { initMainPage, MainPage } from './pages/Main'
 import { initFriendsPage, FriendsPage } from './pages/FriendsPage'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
+import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
 
 export type PageInitContext = {
   clientToken?: string
@@ -19,6 +20,7 @@ export const routes = [
     path: '/',
     Component: MainPage,
     fetchData: initMainPage,
+    errorElement: <RouteErrorFallback />,
   },
   {
     path: '/friends',
