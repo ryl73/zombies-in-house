@@ -9,6 +9,7 @@ import { GamePage, initGamePage } from './pages/GamePage'
 import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
+import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
 
 export type PageInitContext = {
   clientToken?: string
@@ -20,7 +21,14 @@ export type PageInitArgs = {
   ctx: PageInitContext
 }
 
-export const routes = [
+type Route = {
+  path: string
+  Component: React.ComponentType
+  fetchData: (args: PageInitArgs) => Promise<unknown>
+  errorElement?: React.ReactNode
+}
+
+export const routes: Route[] = [
   {
     path: '/',
     Component: MainPage,
@@ -67,3 +75,8 @@ export const routes = [
     fetchData: initNotFoundPage,
   },
 ]
+
+const errorFallback = <RouteErrorFallback />
+routes.forEach(route => {
+  route.errorElement = errorFallback
+})
