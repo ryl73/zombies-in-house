@@ -1,3 +1,5 @@
+import { Helmet } from 'react-helmet'
+import { PageInitArgs } from '../routes'
 import { BoardComponent } from '../components/Board/BoardComponent'
 import { useEffect, useState } from 'react'
 import Game from '../game/engine/Game'
@@ -20,10 +22,17 @@ export const GamePage = () => {
   }
 
   return (
-    <div style={{ position: 'relative' }}>
-      <BoardImage src="/images/board.jpg" alt="board" />
-      <BoardComponent game={game} />
-      {game.players[game.currentPlayerIndex] && <Hud game={game} />}
+    <div>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Игра</title>
+        <meta name="description" content="Страница игры" />
+      </Helmet>
+      <div style={{ position: 'relative' }}>
+        <BoardImage src="/images/board.jpg" alt="board" />
+        <BoardComponent game={game} />
+        {game.players[game.currentPlayerIndex] && <Hud game={game} />}
+      </div>
     </div>
   )
 }
@@ -35,3 +44,7 @@ const BoardImage = styled.img`
   width: 1557px;
   aspect-ratio: 1;
 `
+
+export const initGamePage = async (_args: PageInitArgs) => {
+  return Promise.resolve()
+}
