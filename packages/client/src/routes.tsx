@@ -21,12 +21,18 @@ export type PageInitArgs = {
   ctx: PageInitContext
 }
 
-export const routes = [
+type Route = {
+  path: string
+  Component: React.ComponentType
+  fetchData: (args: PageInitArgs) => Promise<unknown>
+  errorElement?: React.ReactNode
+}
+
+export const routes: Route[] = [
   {
     path: '/',
     Component: MainPage,
     fetchData: initMainPage,
-    errorElement: <RouteErrorFallback />,
   },
   {
     path: '/signin',
@@ -69,3 +75,8 @@ export const routes = [
     fetchData: initNotFoundPage,
   },
 ]
+
+const errorFallback = <RouteErrorFallback />
+routes.forEach(route => {
+  route.errorElement = errorFallback
+})
