@@ -19,8 +19,8 @@ export const SigninPage = () => {
         <meta name="description" content="Страница логина" />
       </Helmet>
       <PageContainer>
+        <Header className="font-secondary">ВХОД</Header>
         <Form onSubmit={handleSubmit}>
-          <Header className="font-secondary">ВХОД</Header>
           <Input id="login" type="text" placeholder="Логин" />
           <Input id="password" type="password" placeholder="Пароль" />
           <Button type="submit">ВОЙТИ</Button>
