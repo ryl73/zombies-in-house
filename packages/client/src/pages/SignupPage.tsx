@@ -1,8 +1,16 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import styled from 'styled-components'
+import { Form } from '../styles/Form'
+import { PageContainer } from '../styles/PageContainer'
+import { Input } from '../styles/Input'
+import { Button } from '../styles/Buttons'
+import { ThemedHeader } from '../styles/ThemedHeader'
 
 export const SignupPage = () => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+  }
+
   return (
     <div>
       <Helmet>
@@ -10,16 +18,23 @@ export const SignupPage = () => {
         <title>Регистрация</title>
         <meta name="description" content="Страница регистрации" />
       </Helmet>
-      <SignupForm>
-        <input type="text" placeholder="Почта" />
-        <input type="text" placeholder="Логин" />
-        <input type="text" placeholder="Имя" />
-        <input type="text" placeholder="Фамилия" />
-        <input type="text" placeholder="Телефон" />
-        <input type="password" placeholder="Пароль" />
-        <input type="password" placeholder="Повторите пароль" />
-        <button type="submit">Войти</button>
-      </SignupForm>
+      <PageContainer>
+        <ThemedHeader>РЕГИСТРАЦИЯ</ThemedHeader>
+        <Form onSubmit={handleSubmit}>
+          <Input id="email" type="text" placeholder="Почта" />
+          <Input id="login" type="text" placeholder="Логин" />
+          <Input id="first_name" type="text" placeholder="Имя" />
+          <Input id="second_name" type="text" placeholder="Фамилия" />
+          <Input id="phone" type="text" placeholder="Телефон" />
+          <Input id="password" type="password" placeholder="Пароль" />
+          <Input
+            id="password_repeat"
+            type="password"
+            placeholder="Повторите пароль"
+          />
+          <Button type="submit">Войти</Button>
+        </Form>
+      </PageContainer>
     </div>
   )
 }
@@ -27,16 +42,3 @@ export const SignupPage = () => {
 export const initSignupPage = async (_args: PageInitArgs) => {
   return Promise.resolve()
 }
-
-const SignupForm = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 300px;
-  margin: 0 auto;
-
-  input,
-  button {
-    padding: 0.5rem;
-  }
-`
