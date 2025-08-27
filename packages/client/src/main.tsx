@@ -5,6 +5,7 @@ import { Provider } from 'react-redux'
 import { store } from './store'
 import { routes } from './routes'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
+import './index.css'
 
 const router = createBrowserRouter(routes)
 

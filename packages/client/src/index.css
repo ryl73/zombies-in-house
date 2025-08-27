@@ -1,0 +1,25 @@
+:root {
+  --color-primary: #f7f4f3;
+  --color-bg-primary: #0b1727;
+  --color-button-primary: #823329;
+  --color-green-100: #d3e4dc;
+  --color-green-200: #1d333b;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  font-size: 18px;
+  line-height: 24px;
+  margin: 0;
+}
+
+input,
+button,
+select,
+textarea {
+  font: inherit;
+}
+
+.font-secondary {
+  font-family: 'Rubik Wet Paint', cursive;
+}
