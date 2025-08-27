@@ -1,10 +1,10 @@
 import { Helmet } from 'react-helmet'
-import styled from 'styled-components'
 import { PageInitArgs } from '../routes'
 import { Form } from '../styles/Form'
 import { PageContainer } from '../styles/PageContainer'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
+import { ThemedHeader } from '../styles/ThemedHeader'
 
 export const SignupPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,7 +19,7 @@ export const SignupPage = () => {
         <meta name="description" content="Страница регистрации" />
       </Helmet>
       <PageContainer>
-        <Header className="font-secondary">РЕГИСТРАЦИЯ</Header>
+        <ThemedHeader>РЕГИСТРАЦИЯ</ThemedHeader>
         <Form onSubmit={handleSubmit}>
           <Input id="email" type="text" placeholder="Почта" />
           <Input id="login" type="text" placeholder="Логин" />
@@ -42,10 +42,3 @@ export const SignupPage = () => {
 export const initSignupPage = async (_args: PageInitArgs) => {
   return Promise.resolve()
 }
-
-const Header = styled.h1`
-  text-align: center;
-  color: var(--color-primary);
-  font-size: 64px;
-  line-height: 64px;
-`
