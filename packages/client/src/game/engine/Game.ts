@@ -41,6 +41,13 @@ const ZombieMap: Record<
   boss: { className: Zombie, count: 1 },
 }
 
+export type canFightType =
+  | 'coldWeapon'
+  | 'gunWeapon'
+  | 'grenade'
+  | 'launcher'
+  | null
+
 export default class Game {
   static playerCount = 2
 
@@ -49,7 +56,7 @@ export default class Game {
   public items: Item[] = []
   public zombies: Zombie[] = []
   public turn = 1
-  public canFight: 'coldWeapon' | 'gunWeapon' | null = null
+  public canFight: canFightType = null
 
   currentPlayerIndex = 0
 
@@ -58,7 +65,7 @@ export default class Game {
     this._createCharacters()
     this._createItems()
     this._createZombies()
-    this.moveStage()
+    this.moveStage().then()
   }
 
   private _createBoard() {
@@ -92,13 +99,8 @@ export default class Game {
         const randomX = getRandomInt(0, 11)
         const randomY = getRandomInt(0, 11)
 
-        if (randomX === randomY && (randomX === 0 || randomX === 11)) {
-          i--
-          continue
-        }
-
         const cell = this.board.getCell(randomX, randomY)
-        if (!cell.empty) {
+        if (!cell.empty || cell.type === 'start') {
           i--
           continue
         }
@@ -120,13 +122,8 @@ export default class Game {
         const randomX = getRandomInt(0, 11)
         const randomY = getRandomInt(0, 11)
 
-        if (randomX === randomY && (randomX === 0 || randomX === 11)) {
-          i--
-          continue
-        }
-
         const cell = this.board.getCell(randomX, randomY)
-        if (!cell.empty) {
+        if (!cell.empty || cell.type === 'start') {
           i--
           continue
         }
@@ -149,80 +146,101 @@ export default class Game {
       return 'lost'
     }
 
-    // if (zombiesLeft === 0) {
-    //   this.status = 'won'
-    // }
+    const carCells = this.board.cells.flat().filter(cell => cell.type === 'car')
+    const keyItem = this.items.find(item => (item.type = 'key'))
+    const gasolineItem = this.items.find(item => (item.type = 'gasoline'))
+
+    if (
+      keyItem?.cell &&
+      carCells.includes(keyItem.cell) &&
+      gasolineItem?.cell &&
+      carCells.includes(gasolineItem.cell)
+    ) {
+      return 'won'
+    }
+
     return 'playing'
   }
 
-  endTurn() {
+  async endTurn() {
     const status = this.checkGameStatus()
     if (status === 'lost') {
       window.alert('You lost!')
       return
     }
 
-    // if (status === 'win') {
-    //   window.alert('You win!')
-    //   return
-    // }
+    if (status === 'won') {
+      window.alert('You win!')
+      return
+    }
 
     this.currentPlayerIndex =
       (this.currentPlayerIndex + 1) % this.players.length
     this.turn += 1
     const currentPlayer = this.players[this.currentPlayerIndex]
 
-    this.board.cells.forEach(row => {
-      row.forEach(cell => {
-        cell.canMove = false
-      })
-    })
+    this.resetCanMoveCells()
 
     store.dispatch(forceUpdate())
 
     if (!currentPlayer.isZombie) {
-      this.moveStage()
+      await this.moveStage(true)
+    } else {
+      if (this.zombies.every(zombie => !zombie.opened)) {
+        await this.endTurn()
+      }
     }
   }
 
-  findAllPaths(start: Cell, board: Board, maxMoves: number): Cell[][] {
+  findAllPaths(
+    start: Cell,
+    board: Board,
+    moveCount: number,
+    maxMoveCount: number,
+    isZombieTurn = false
+  ): Cell[] {
     const rows = board.cells.length
     const cols = board.cells[0].length
 
-    const results: Cell[][] = []
+    const results: Cell[] = []
 
     function canMove(
       current: Cell,
       next: Cell,
       dir: { dx: number; dy: number }
     ): boolean {
-      if (dir.dx === 1) return !current.walls.right && !next.walls.left
-      if (dir.dx === -1) return !current.walls.left && !next.walls.right
-      if (dir.dy === 1) return !current.walls.bottom && !next.walls.top
-      if (dir.dy === -1) return !current.walls.top && !next.walls.bottom
+      if (dir.dx === 1) return !current.walls.bottom && !next.walls.top
+      if (dir.dx === -1) return !current.walls.top && !next.walls.bottom
+      if (dir.dy === 1) return !current.walls.right && !next.walls.left
+      if (dir.dy === -1) return !current.walls.left && !next.walls.right
       return false
     }
 
     const directions = [
-      { dx: 1, dy: 0 }, // вправо
-      { dx: -1, dy: 0 }, // влево
-      { dx: 0, dy: 1 }, // вниз
-      { dx: 0, dy: -1 }, // вверх
+      { dx: 1, dy: 0 },
+      { dx: -1, dy: 0 },
+      { dx: 0, dy: 1 },
+      { dx: 0, dy: -1 },
     ]
 
-    function dfs(
-      current: Cell,
-      path: Cell[],
-      steps: number,
-      visited: Set<string>
-    ) {
-      if (steps > maxMoves) return
-
-      if (steps > 0) {
-        results.push([...path])
-      }
-
+    function dfs(current: Cell, steps: number, visited: Set<number>) {
       for (const dir of directions) {
+        if (steps === moveCount || steps === maxMoveCount) {
+          if (!isZombieTurn && current.players.length === 0) {
+            results.push(current)
+          }
+          if (isZombieTurn && !current.zombie) {
+            results.push(current)
+          }
+          if (maxMoveCount <= moveCount) {
+            return
+          } else {
+            if (steps === maxMoveCount) {
+              return
+            }
+          }
+        }
+
         const nx = current.x + dir.dx
         const ny = current.y + dir.dy
 
@@ -231,42 +249,45 @@ export default class Game {
         const nextCell = board.getCell(nx, ny)
         if (!nextCell) continue
 
-        // проверяем стены
         if (!canMove(current, nextCell, dir)) continue
-
-        // запрещаем ходить по другим игрокам
-        if (nextCell.players.length > 0) continue
 
         const key = nextCell.id
         if (visited.has(key)) continue
 
-        visited.add(key)
-        path.push(nextCell)
+        const isZombie = nextCell.zombie
+        const isItems = nextCell.items.length > 0
+        const isPlayer = nextCell.players.length > 0
 
-        // если там есть зомби или предмет —
-        // можно встать, но дальше не идём
-        const hasZombie = nextCell.zombie
-        const hasItem = nextCell.items && nextCell.items.length > 0
-
-        if (hasZombie || hasItem) {
-          results.push([...path])
-        } else {
-          dfs(nextCell, path, steps + 1, visited)
+        // если на клетке предмет или зомби → стоп
+        if (!isZombieTurn && (isZombie || isItems)) {
+          results.push(nextCell)
+          continue
         }
 
-        path.pop()
+        if (isZombieTurn && isPlayer) {
+          results.push(nextCell)
+          continue
+        }
+
+        visited.add(key)
+        dfs(nextCell, steps + 1, visited)
         visited.delete(key)
       }
     }
 
-    dfs(start, [start], 0, new Set([start.id]))
+    dfs(start, 0, new Set([start.id]))
 
     return results
   }
 
-  moveStage() {
+  async moveStage(isTurnStart = false) {
     const currentPlayer = this.players[this.currentPlayerIndex]
-    const { moveCount } = PinWheel.spin()
+    if (isTurnStart && currentPlayer.cell?.zombie) {
+      await this.fightStage()
+      return
+    }
+    const { moveCount } = await PinWheel.spin()
+    let maxMoveCount = moveCount
     console.log(moveCount)
     if (!currentPlayer.cell) return
 
@@ -276,38 +297,50 @@ export default class Game {
       })
     })
 
+    if (currentPlayer.type === 'max') {
+      maxMoveCount++
+    }
+    if (currentPlayer.isZombie && currentPlayer.cell.zombie) {
+      if (currentPlayer.cell.zombie.type === 'ordinary') {
+        maxMoveCount--
+        if (maxMoveCount === 0) {
+          await this.moveStage()
+        }
+      }
+      if (currentPlayer.cell.zombie.type === 'dog') {
+        maxMoveCount++
+      }
+    }
+
     const availableCells = this.findAllPaths(
       currentPlayer.cell,
       this.board,
-      moveCount
+      moveCount,
+      maxMoveCount,
+      currentPlayer.isZombie
     )
 
-    availableCells.forEach(row => {
-      row.forEach(cell => {
-        cell.canMove = true
-      })
+    availableCells.forEach(cell => {
+      cell.canMove = true
     })
     store.dispatch(forceUpdate())
   }
 
-  fightStage() {
-    const { action } = PinWheel.spin()
+  async fightStage(): Promise<'lost' | 'win'> {
+    this.resetCanMoveCells()
+    let fightStatus: 'lost' | 'win' = 'lost'
+    const { action } = await PinWheel.spin()
     console.log(action)
     const currentPlayer = this.players[this.currentPlayerIndex]
 
-    this.board.cells.forEach(row => {
-      row.forEach(cell => {
-        cell.canMove = false
-      })
-    })
-
     switch (action) {
       case 'run': {
-        this.moveStage()
+        await this.moveStage()
         break
       }
       case 'bite': {
         currentPlayer.lifeCount--
+        store.dispatch(forceUpdate())
         if (currentPlayer.lifeCount === 0) {
           currentPlayer.items.forEach(item => {
             currentPlayer.cell?.addItem(item)
@@ -316,44 +349,57 @@ export default class Game {
           currentPlayer.cell?.removePlayer(currentPlayer)
           currentPlayer.cell = null
           currentPlayer.isZombie = true
-          this.endTurn()
+          await this.endTurn()
         } else {
-          this.fightStage()
+          await this.fightStage()
         }
         break
       }
       case 'closeFight': {
         const defendWeapons = currentPlayer.items.filter(
-          item => item.type === 'coldWeapon' || item.type === 'grenade'
+          item => item.type === 'coldWeapon'
         )
 
         if (defendWeapons.length === 0) {
-          this.fightStage()
+          await this.fightStage()
         } else {
           this.canFight = 'coldWeapon'
+          fightStatus = 'win'
         }
+        store.dispatch(forceUpdate())
         break
       }
       case 'shoot': {
         const defendWeapons = currentPlayer.items.filter(
-          item => item.type === 'gunWeapon' || item.type === 'grenade'
+          item => item.type === 'gunWeapon'
         )
 
         if (defendWeapons.length === 0) {
-          this.fightStage()
+          await this.fightStage()
         } else {
           this.canFight = 'gunWeapon'
+          fightStatus = 'win'
         }
+        store.dispatch(forceUpdate())
         break
       }
     }
     store.dispatch(forceUpdate())
+    return fightStatus
   }
 
-  winFight(player: Player) {
+  resetCanMoveCells() {
+    this.board.cells.forEach(row => {
+      row.forEach(cell => {
+        cell.canMove = false
+      })
+    })
+  }
+
+  async winFight(player: Player) {
     player.cell?.removeZombie()
     this.zombies.filter(zombie => zombie.id !== player.cell?.zombie?.id)
     this.canFight = null
-    this.endTurn()
+    await this.endTurn()
   }
 }

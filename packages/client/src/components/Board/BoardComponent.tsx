@@ -1,53 +1,95 @@
-import { FC, Fragment } from 'react'
+import { FC, Fragment, useState } from 'react'
 import styled from 'styled-components'
 import { CellComponent } from './CellComponent'
 import { Cell } from '../../game/models/Cell'
 import Game from '../../game/engine/Game'
+import Zombie from '../../game/models/Zombie'
+import { Player } from '../../game/models/Player'
 
 type Props = {
   game: Game
 }
 
 export const BoardComponent: FC<Props> = ({ game }) => {
-  const handleClick = (cell: Cell) => {
+  const [isZombieMove, setIsZombieMove] = useState<boolean>(false)
+
+  const handleClick = async (cell: Cell) => {
     const currentPlayer = game.players[game.currentPlayerIndex]
+
     if (currentPlayer.isZombie) {
-      if (cell.zombie && cell.zombie.opened) {
+      if (cell.zombie && cell.zombie.opened && !isZombieMove) {
         currentPlayer.cell = cell
-        game.moveStage()
+        setIsZombieMove(true)
+        await game.moveStage()
+      } else {
+        if (!cell.canMove) return
+
+        setIsZombieMove(false)
+        const playerZombie = currentPlayer.cell?.zombie
+        if (playerZombie) {
+          currentPlayer.cell?.moveZombie(playerZombie, cell)
+          await game.endTurn()
+        }
       }
     } else {
       if (!cell.canMove) return
 
-      if (!cell.empty) {
-        currentPlayer.cell?.movePlayer(currentPlayer, cell)
-        if (cell.zombie) {
-          cell.zombie.opened = true
-          game.fightStage()
+      currentPlayer.cell?.movePlayer(currentPlayer, cell)
+
+      if (cell.zombie) {
+        cell.zombie.opened = true
+        if (currentPlayer.items.find(item => item.type === 'grenade')) {
+          game.canFight = 'grenade'
+          return
         }
-        if (cell.items.length > 0) {
-          cell.items.forEach(item => {
-            currentPlayer.pickItem(item)
-          })
-          cell.removeAllItems()
-          game.endTurn()
+
+        if (
+          currentPlayer.items.find(item => item.type === 'launcher') &&
+          cell.zombie.type === 'boss'
+        ) {
+          game.canFight = 'launcher'
+          return
         }
-      } else {
-        currentPlayer.cell?.movePlayer(currentPlayer, cell)
-        if (cell.type === 'car') {
-          const keyOrGasoline = currentPlayer.items.filter(
-            item => item.type === 'key' || item.type === 'gasoline'
-          )
-          if (keyOrGasoline.length > 0) {
-            keyOrGasoline.forEach(item => {
-              item.cell = cell
-              cell.addItem(item)
-              currentPlayer.useItem(item)
-            })
+        const fightStatus = await game.fightStage()
+
+        if (fightStatus === 'win') {
+          if (cell.items.length > 0) {
+            for (const item of cell.items) {
+              if (item.type === 'key' && item.cell?.type === 'car') {
+                continue
+              }
+              currentPlayer.pickItem(item)
+              cell.removeItem(item)
+            }
           }
         }
-        game.endTurn()
+        return
       }
+
+      if (cell.items.length > 0) {
+        for (const item of cell.items) {
+          if (item.type === 'key' && item.cell?.type === 'car') {
+            continue
+          }
+          currentPlayer.pickItem(item)
+          cell.removeItem(item)
+        }
+      }
+
+      if (cell.type === 'car') {
+        const keyOrGasoline = currentPlayer.items.filter(
+          item => item.type === 'key' || item.type === 'gasoline'
+        )
+        if (keyOrGasoline.length > 0) {
+          keyOrGasoline.forEach(item => {
+            item.cell = cell
+            cell.addItem(item)
+            currentPlayer.useItem(item)
+          })
+        }
+      }
+
+      await game.endTurn()
     }
   }
 
@@ -71,5 +113,5 @@ const Grid = styled.div`
   border-collapse: collapse;
   grid-template-columns: repeat(12, 100px);
   gap: 2px;
-  padding: 174px 0 174px 167px;
+  padding: 174px 0 0 167px;
 `

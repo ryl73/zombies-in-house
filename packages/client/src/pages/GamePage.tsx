@@ -22,18 +22,20 @@ export const GamePage = () => {
   }
 
   return (
-    <div>
+    <>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Игра</title>
         <meta name="description" content="Страница игры" />
       </Helmet>
-      <div style={{ position: 'relative' }}>
-        <BoardImage src="/images/board.jpg" alt="board" />
-        <BoardComponent game={game} />
-        {game.players[game.currentPlayerIndex] && <Hud game={game} />}
-      </div>
-    </div>
+      <main>
+        <Wrapper>
+          <BoardImage src="/images/board.jpg" alt="board" />
+          <BoardComponent game={game} />
+          {game.players[game.currentPlayerIndex] && <Hud game={game} />}
+        </Wrapper>
+      </main>
+    </>
   )
 }
 
@@ -43,6 +45,13 @@ const BoardImage = styled.img`
   z-index: 0;
   width: 1557px;
   aspect-ratio: 1;
+`
+
+const Wrapper = styled.div`
+  margin: 0 auto;
+  max-width: 1557px;
+  display: flex;
+  flex-direction: column;
 `
 
 export const initGamePage = async (_args: PageInitArgs) => {

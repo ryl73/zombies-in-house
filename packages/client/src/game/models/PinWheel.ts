@@ -23,7 +23,9 @@ const pinWheelFields: Record<string, PinWheelResult> = {
 }
 
 class PinWheel {
-  public spin(): PinWheelResult {
+  public async spin(): Promise<PinWheelResult> {
+    await new Promise(resolve => setTimeout(resolve, 1000))
+
     const keys = Array.from(Object.keys(pinWheelFields).map(key => Number(key)))
     const min = Math.min(...keys)
     const max = Math.max(...keys)

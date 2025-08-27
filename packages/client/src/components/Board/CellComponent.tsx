@@ -14,14 +14,14 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
       $canMove={cell.canMove}
       onClick={() => click(cell)}>
       {cell.items.map(item => (
-        <Card key={item.id}>{item.opened ? item.name : ''}</Card>
+        <Card key={item.id}>{item.opened ? item.name : item.name}</Card>
       ))}
       {cell.players.map(player => (
         <PlayerCard key={player.id}>{player.name}</PlayerCard>
       ))}
       {cell.zombie && (
         <Card key={cell.zombie.id}>
-          {cell.zombie.opened ? cell.zombie.name : ''}
+          {cell.zombie.opened ? cell.zombie.name : cell.zombie.name}
         </Card>
       )}
       {cell.canMove && <Dot />}
@@ -56,7 +56,7 @@ const Card = styled.div`
 `
 
 const PlayerCard = styled(Card)`
-  z-index: 2;
+  z-index: 1;
   background-color: darkgray;
 `
 
@@ -65,5 +65,5 @@ const Dot = styled.div`
   height: 20px;
   border-radius: 50%;
   background-color: black;
-  z-index: 1;
+  z-index: 2;
 `

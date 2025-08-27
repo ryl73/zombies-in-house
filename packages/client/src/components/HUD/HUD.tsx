@@ -10,8 +10,33 @@ type Props = {
 export const Hud: FC<Props> = ({ game }) => {
   const player = game.players[game.currentPlayerIndex]
 
-  const clickHandler = (item: Item) => {
-    item.use(game, player)
+  const clickHandler = async (item: Item) => {
+    await item.use(game, player)
+  }
+
+  const spinPinWheel = async () => {
+    if (game.canFight === 'grenade') {
+      game.canFight = null
+      await game.fightStage()
+    }
+  }
+
+  const isAnimation = (item: Item) => {
+    if (game.canFight) {
+      if (game.canFight === 'coldWeapon' && item.type === 'coldWeapon') {
+        return true
+      }
+      if (game.canFight === 'gunWeapon' && item.type === 'gunWeapon') {
+        return true
+      }
+      if (game.canFight === 'grenade' && item.type === 'grenade') {
+        return true
+      }
+      if (game.canFight === 'launcher' && item.type === 'launcher') {
+        return true
+      }
+    }
+    return false
   }
 
   return (
@@ -21,15 +46,15 @@ export const Hud: FC<Props> = ({ game }) => {
       <Items>
         {player.items.map(item => (
           <Card
-            $animation={
-              !!game.canFight &&
-              (game.canFight === item.type || item.type === 'grenade')
-            }
+            $animation={isAnimation(item)}
             key={item.id}
             onClick={() => clickHandler(item)}>
             {item.name}
           </Card>
         ))}
+        {game.canFight === 'grenade' && (
+          <button onClick={spinPinWheel}>Spin pinwheel</button>
+        )}
       </Items>
     </HudWrapper>
   )
@@ -37,14 +62,18 @@ export const Hud: FC<Props> = ({ game }) => {
 
 const HudWrapper = styled.div`
   position: fixed;
-  left: 20px;
-  width: calc(100% - 40px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 60px);
+  max-width: 1000px;
   bottom: 20px;
-  padding: 20px;
+  padding: 10px;
   display: flex;
   justify-content: space-around;
+  align-items: center;
   z-index: 999;
   background-color: white;
+  border-radius: 10px;
 `
 
 const Items = styled.div`
@@ -66,8 +95,8 @@ const Card = styled.div<{ $animation?: boolean }>`
   align-items: center;
   justify-content: center;
   background-color: gray;
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
   border-radius: 10px;
   ${props =>
     props.$animation &&

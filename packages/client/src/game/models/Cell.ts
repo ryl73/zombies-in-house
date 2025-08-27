@@ -1,8 +1,10 @@
 import { Item } from './Item'
 import { Player } from './Player'
 import Zombie from './Zombie'
+import { store } from '../../store'
+import { forceUpdate } from '../../slices/gameSlice'
 
-export type CellType = 'car' | 'plankPlace'
+export type CellType = 'car' | 'plankPlace' | 'start'
 
 export class Cell {
   x: number
@@ -40,8 +42,9 @@ export class Cell {
     }
   }
 
-  removeAllItems() {
-    this.items = []
+  removeItem(item: Item) {
+    this.items = this.items.filter(i => i !== item)
+    this.checkIsEmpty()
   }
 
   addPlayer(player: Player) {
@@ -62,16 +65,26 @@ export class Cell {
 
   removeZombie() {
     this.zombie = null
+    this.checkIsEmpty()
   }
 
   removePlayer(player: Player) {
     this.players = this.players.filter(p => p !== player)
+    this.checkIsEmpty()
   }
 
   movePlayer(player: Player, target: Cell) {
     if (!this.players.includes(player)) return // игрок должен быть в этой клетке
     this.removePlayer(player)
     target.addPlayer(player)
+    store.dispatch(forceUpdate())
+  }
+
+  moveZombie(zombie: Zombie, target: Cell) {
+    if (this.zombie !== zombie) return // игрок должен быть в этой клетке
+    this.removeZombie()
+    target.addZombie(zombie)
+    store.dispatch(forceUpdate())
   }
 
   setWalls(top: boolean, right: boolean, bottom: boolean, left: boolean) {
@@ -83,5 +96,11 @@ export class Cell {
 
   setType(type: CellType) {
     this.type = type
+  }
+
+  checkIsEmpty() {
+    if (!!this.items.length && !!this.players.length && !this.zombie) {
+      this.empty = true
+    }
   }
 }

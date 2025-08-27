@@ -41,7 +41,7 @@ export class Item {
     this.type = type
   }
 
-  use(game: Game, player: Player) {
+  async use(game: Game, player: Player) {
     switch (this.type) {
       case 'medkit': {
         player.useItem(this)
@@ -54,20 +54,27 @@ export class Item {
       }
       case 'grenade': {
         if (player.cell?.zombie) {
-          game.winFight(player)
+          await game.winFight(player)
+          player.useItem(this)
+        }
+        break
+      }
+      case 'launcher': {
+        if (player.cell?.zombie && player.cell?.zombie.type === 'boss') {
+          await game.winFight(player)
           player.useItem(this)
         }
         break
       }
       case 'coldWeapon': {
         if (player.cell?.zombie) {
-          game.winFight(player)
+          await game.winFight(player)
         }
         break
       }
       case 'gunWeapon': {
         if (player.cell?.zombie) {
-          game.winFight(player)
+          await game.winFight(player)
         }
         break
       }
