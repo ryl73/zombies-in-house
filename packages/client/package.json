@@ -47,5 +47,8 @@
     "ts-jest": "^28.0.8",
     "typescript": "^4.8.2"
   },
+  "resolutions": {
+    "commander": "7.2.0"
+  },
   "license": "MIT"
 }
