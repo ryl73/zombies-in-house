@@ -23,7 +23,6 @@ const SigninSchema = Yup.object().shape({
 
 export const SigninPage = () => {
   const onSubmit = (values: { login: string; password: string }) => {
-    //log
     console.log(values)
   }
 
