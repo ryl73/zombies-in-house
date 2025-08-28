@@ -6,13 +6,13 @@ import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
 import * as z from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { validation } from '../utils/validation'
 import { ErrorMessage } from '../styles/Errors'
 
 const schema = z.object({
   login: z.string().regex(validation.login.pattern, validation.login.message),
+
   password: z
     .string()
     .min(8, 'Пароль должен быть больше 8 символов')
@@ -26,14 +26,30 @@ export const SigninPage = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<Schema>({
-    resolver: zodResolver(schema),
     mode: 'onBlur',
   })
 
-  const onSubmit = (data: Schema): void => {
-    console.log(data)
+  const onSubmit = (data: Schema) => {
+    try {
+      schema.parse(data)
+      console.log(data)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        err.issues.forEach(issue => {
+          if (issue.path[0]) {
+            setError(issue.path[0] as keyof Schema, {
+              type: 'manual',
+              message: issue.message,
+            })
+          }
+        })
+      } else {
+        console.error('Unexpected error', err)
+      }
+    }
   }
 
   return (

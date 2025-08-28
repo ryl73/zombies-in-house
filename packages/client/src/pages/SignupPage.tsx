@@ -7,7 +7,6 @@ import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
 import * as z from 'zod'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { validation } from '../utils/validation'
 import { ErrorMessage } from '../styles/Errors'
 
@@ -52,14 +51,30 @@ export const SignupPage = () => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<Schema>({
-    resolver: zodResolver(schema),
     mode: 'onBlur',
   })
 
   const onSubmit = (data: Schema) => {
-    console.log(data)
+    try {
+      schema.parse(data)
+      console.log(data)
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        err.issues.forEach(issue => {
+          if (issue.path[0]) {
+            setError(issue.path[0] as keyof Schema, {
+              type: 'manual',
+              message: issue.message,
+            })
+          }
+        })
+      } else {
+        console.error('Unexpected error', err)
+      }
+    }
   }
 
   return (
