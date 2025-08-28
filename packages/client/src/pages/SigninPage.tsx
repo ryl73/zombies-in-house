@@ -5,54 +5,35 @@ import { Form } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import { useEffect, useRef, useState } from 'react'
-import FormValidator from '../utils/formValidator'
-import { ValidationResult } from '../types/types'
+import * as z from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { validation } from '../utils/validation'
+import { ErrorMessage } from '../styles/Errors'
 
-type ValidFields = {
-  login: ValidationResult
-  password: ValidationResult
-}
+const schema = z.object({
+  login: z.string().regex(validation.login.pattern, validation.login.message),
+  password: z
+    .string()
+    .min(8, 'Пароль должен быть больше 8 символов')
+    .max(40, 'Пароль должен быть не более 40 символов')
+    .regex(validation.password.pattern, validation.password.message),
+})
+
+type Schema = z.infer<typeof schema>
 
 export const SigninPage = () => {
-  const validatorRef = useRef<FormValidator | null>(null)
-  const formRef = useRef<HTMLFormElement | null>(null)
-  const [validFields, setValidFields] = useState<ValidFields>({
-    login: { valid: true },
-    password: { valid: true },
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Schema>({
+    resolver: zodResolver(schema),
+    mode: 'onBlur',
   })
-  const [loginValue, setLoginValue] = useState('')
-  const [passValue, setPassValue] = useState('')
 
-  useEffect(() => {
-    validatorRef.current = new FormValidator(formRef)
-  }, [])
-
-  const handleLoginValueChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setLoginValue(e.target.value)
-  }
-
-  const handlePassValueChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ): void => {
-    setPassValue(e.target.value)
-  }
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>): void => {
-    if (!validatorRef.current) return
-    const input = e.target
-    const validatedInput = validatorRef.current.validateInput(input)
-    setTimeout(() => {
-      setValidFields(prev => ({ ...prev, [input.name]: validatedInput }))
-    }, 0)
-  }
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault()
-    if (!validatorRef.current) return
-    const validatedForm = validatorRef.current.validateForm()
+  const onSubmit = (data: Schema): void => {
+    console.log(data)
   }
 
   return (
@@ -64,27 +45,23 @@ export const SigninPage = () => {
       </Helmet>
       <PageContainer>
         <ThemedHeader>ВХОД</ThemedHeader>
-        <Form ref={formRef} onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit(onSubmit)}>
           <Input
             id="login"
             type="text"
-            name="login"
             placeholder="Логин"
-            value={loginValue}
-            onChange={handleLoginValueChange}
-            onBlur={handleBlur}
+            {...register('login')}
           />
-          {!validFields.login.valid && <p>{validFields.login.error}</p>}
+          {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
           <Input
             id="password"
             type="password"
-            name="password"
             placeholder="Пароль"
-            value={passValue}
-            onChange={handlePassValueChange}
-            onBlur={handleBlur}
+            {...register('password')}
           />
-          {!validFields.password.valid && <p>{validFields.password.error}</p>}
+          {errors.password && (
+            <ErrorMessage>{errors.password.message}</ErrorMessage>
+          )}
           <Button type="submit">ВОЙТИ</Button>
         </Form>
       </PageContainer>
