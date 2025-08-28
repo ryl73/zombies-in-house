@@ -1,55 +1,29 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
 import { PageContainer } from '../styles/PageContainer'
-import { Form } from '../styles/Form'
+import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
-import { validation } from '../utils/validation'
+import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
+import { Formik, Field } from 'formik'
+import { validation } from '../utils/validation'
 
-const schema = z.object({
-  login: z.string().regex(validation.login.pattern, validation.login.message),
-
-  password: z
-    .string()
+const SigninSchema = Yup.object().shape({
+  login: Yup.string()
+    .matches(validation.login.pattern, validation.login.message)
+    .required('Логин обязателен'),
+  password: Yup.string()
     .min(8, 'Пароль должен быть больше 8 символов')
     .max(40, 'Пароль должен быть не более 40 символов')
-    .regex(validation.password.pattern, validation.password.message),
+    .matches(validation.password.pattern, validation.password.message)
+    .required('Пароль обязателен'),
 })
 
-type Schema = z.infer<typeof schema>
-
 export const SigninPage = () => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<Schema>({
-    mode: 'onBlur',
-  })
-
-  const onSubmit = (data: Schema) => {
-    try {
-      schema.parse(data)
-      console.log(data)
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        err.issues.forEach(issue => {
-          if (issue.path[0]) {
-            setError(issue.path[0] as keyof Schema, {
-              type: 'manual',
-              message: issue.message,
-            })
-          }
-        })
-      } else {
-        console.error('Unexpected error', err)
-      }
-    }
+  const onSubmit = (values: { login: string; password: string }) => {
+    console.log(values)
   }
 
   return (
@@ -61,25 +35,32 @@ export const SigninPage = () => {
       </Helmet>
       <PageContainer>
         <ThemedHeader>ВХОД</ThemedHeader>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            id="login"
-            type="text"
-            placeholder="Логин"
-            {...register('login')}
-          />
-          {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
-          <Input
-            id="password"
-            type="password"
-            placeholder="Пароль"
-            {...register('password')}
-          />
-          {errors.password && (
-            <ErrorMessage>{errors.password.message}</ErrorMessage>
+        <Formik
+          initialValues={{ login: '', password: '' }}
+          validationSchema={SigninSchema}
+          onSubmit={onSubmit}>
+          {({ errors, touched, handleSubmit }) => (
+            <StyledForm onSubmit={handleSubmit}>
+              <Field as={Input} id="login" name="login" placeholder="Логин" />
+              {errors.login && touched.login && (
+                <ErrorMessage>{errors.login}</ErrorMessage>
+              )}
+
+              <Field
+                as={Input}
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Пароль"
+              />
+              {errors.password && touched.password && (
+                <ErrorMessage>{errors.password}</ErrorMessage>
+              )}
+
+              <Button type="submit">ВОЙТИ</Button>
+            </StyledForm>
           )}
-          <Button type="submit">ВОЙТИ</Button>
-        </Form>
+        </Formik>
       </PageContainer>
     </>
   )

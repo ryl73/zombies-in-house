@@ -1,80 +1,58 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { Form } from '../styles/Form'
 import { PageContainer } from '../styles/PageContainer'
+import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import * as z from 'zod'
-import { useForm } from 'react-hook-form'
-import { validation } from '../utils/validation'
 import { ErrorMessage } from '../styles/Errors'
+import { Formik, Field } from 'formik'
+import * as Yup from 'yup'
+import { validation } from '../utils/validation'
 
-const schema = z
-  .object({
-    email: z.string().regex(validation.email.pattern, validation.email.message),
-    login: z
-      .string()
-      .min(3, 'Логин должен быть не менее 3 символов')
-      .max(20, 'Логин должен быть не более 20 символов')
-      .regex(validation.login.pattern, validation.login.message),
-    first_name: z
-      .string()
-      .regex(validation.name.pattern, validation.name.message),
-    second_name: z
-      .string()
-      .regex(validation.name.pattern, validation.name.message),
-    phone: z
-      .string()
-      .min(10, 'Номер телефона должен содержать не менее 10 цифр')
-      .max(15, 'Номер телефона не должен быть более 15 цифр')
-      .regex(validation.phone.pattern, validation.phone.message),
-    password: z
-      .string()
-      .min(8, 'Пароль должен быть не менее 8 символов')
-      .max(40, 'Пароль должен быть не более 40 символов')
-      .regex(validation.password.pattern, validation.password.message),
-    password_repeat: z
-      .string()
-      .min(8, 'Пароль должен быть не менее 8 символов')
-      .max(40, 'Пароль должен быть не более 40 символов')
-      .regex(validation.password.pattern, validation.password.message),
-  })
-  .refine(data => data.password === data.password_repeat, {
-    message: 'Пароли должны совпадать',
-    path: ['password_repeat'],
-  })
+type FormValues = {
+  login: string
+  email: string
+  first_name: string
+  second_name: string
+  phone: string
+  password: string
+  password_repeat: string
+}
 
-type Schema = z.infer<typeof schema>
+const SignupSchema = Yup.object().shape({
+  email: Yup.string()
+    .matches(validation.email.pattern, validation.email.message)
+    .required('Почта обязательна'),
+  login: Yup.string()
+    .min(3, 'Логин должен быть не менее 3 символов')
+    .max(20, 'Логин должен быть не более 20 символов')
+    .matches(validation.login.pattern, validation.login.message)
+    .required('Логин обязателен'),
+  first_name: Yup.string()
+    .matches(validation.name.pattern, validation.name.message)
+    .required('Имя обязательно'),
+  second_name: Yup.string()
+    .matches(validation.name.pattern, validation.name.message)
+    .required('Фамилия обязательна'),
+  phone: Yup.string()
+    .min(10, 'Номер телефона должен содержать не менее 10 цифр')
+    .max(15, 'Номер телефона не должен быть более 15 цифр')
+    .matches(validation.phone.pattern, validation.phone.message)
+    .required('Телефон обязателен'),
+  password: Yup.string()
+    .min(8, 'Пароль должен быть не менее 8 символов')
+    .max(40, 'Пароль должен быть не более 40 символов')
+    .matches(validation.password.pattern, validation.password.message)
+    .required('Пароль обязателен'),
+  password_repeat: Yup.string()
+    .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
+    .required('Повторите пароль'),
+})
 
 export const SignupPage = () => {
-  const {
-    register,
-    handleSubmit,
-    setError,
-    formState: { errors },
-  } = useForm<Schema>({
-    mode: 'onBlur',
-  })
-
-  const onSubmit = (data: Schema) => {
-    try {
-      schema.parse(data)
-      console.log(data)
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        err.issues.forEach(issue => {
-          if (issue.path[0]) {
-            setError(issue.path[0] as keyof Schema, {
-              type: 'manual',
-              message: issue.message,
-            })
-          }
-        })
-      } else {
-        console.error('Unexpected error', err)
-      }
-    }
+  const onSubmit = (values: FormValues) => {
+    console.log(values)
   }
 
   return (
@@ -86,66 +64,69 @@ export const SignupPage = () => {
       </Helmet>
       <PageContainer>
         <ThemedHeader>РЕГИСТРАЦИЯ</ThemedHeader>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Input
-            id="email"
-            type="text"
-            placeholder="Почта"
-            {...register('email')}
-          />
-          {errors.email && <ErrorMessage>{errors.email.message}</ErrorMessage>}
-          <Input
-            id="login"
-            type="text"
-            placeholder="Логин"
-            {...register('login')}
-          />
-          {errors.login && <ErrorMessage>{errors.login.message}</ErrorMessage>}
-          <Input
-            id="first_name"
-            type="text"
-            placeholder="Имя"
-            {...register('first_name')}
-          />
-          {errors.first_name && (
-            <ErrorMessage>{errors.first_name.message}</ErrorMessage>
+        <Formik
+          initialValues={{
+            email: '',
+            login: '',
+            first_name: '',
+            second_name: '',
+            phone: '',
+            password: '',
+            password_repeat: '',
+          }}
+          validationSchema={SignupSchema}
+          onSubmit={onSubmit}>
+          {({ errors, touched, handleSubmit }) => (
+            <StyledForm onSubmit={handleSubmit}>
+              <Field as={Input} name="email" placeholder="Почта" />
+              {errors.email && touched.email && (
+                <ErrorMessage>{errors.email}</ErrorMessage>
+              )}
+
+              <Field as={Input} name="login" placeholder="Логин" />
+              {errors.login && touched.login && (
+                <ErrorMessage>{errors.login}</ErrorMessage>
+              )}
+
+              <Field as={Input} name="first_name" placeholder="Имя" />
+              {errors.first_name && touched.first_name && (
+                <ErrorMessage>{errors.first_name}</ErrorMessage>
+              )}
+
+              <Field as={Input} name="second_name" placeholder="Фамилия" />
+              {errors.second_name && touched.second_name && (
+                <ErrorMessage>{errors.second_name}</ErrorMessage>
+              )}
+
+              <Field as={Input} name="phone" placeholder="Телефон" />
+              {errors.phone && touched.phone && (
+                <ErrorMessage>{errors.phone}</ErrorMessage>
+              )}
+
+              <Field
+                as={Input}
+                name="password"
+                type="password"
+                placeholder="Пароль"
+              />
+              {errors.password && touched.password && (
+                <ErrorMessage>{errors.password}</ErrorMessage>
+              )}
+
+              <Field
+                as={Input}
+                name="password_repeat"
+                type="password"
+                placeholder="Повторите пароль"
+              />
+              {errors.password_repeat && touched.password_repeat && (
+                <ErrorMessage>{errors.password_repeat}</ErrorMessage>
+              )}
+
+              <Button type="submit">Зарегистрироваться</Button>
+            </StyledForm>
           )}
-          <Input
-            id="second_name"
-            type="text"
-            placeholder="Фамилия"
-            {...register('second_name')}
-          />
-          {errors.second_name && (
-            <ErrorMessage>{errors.second_name.message}</ErrorMessage>
-          )}
-          <Input
-            id="phone"
-            type="text"
-            placeholder="Телефон"
-            {...register('phone')}
-          />
-          {errors.phone && <ErrorMessage>{errors.phone.message}</ErrorMessage>}
-          <Input
-            id="password"
-            type="password"
-            placeholder="Пароль"
-            {...register('password')}
-          />
-          {errors.password && (
-            <ErrorMessage>{errors.password.message}</ErrorMessage>
-          )}
-          <Input
-            id="password_repeat"
-            type="password"
-            placeholder="Повторите пароль"
-            {...register('password_repeat')}
-          />
-          {errors.password_repeat && (
-            <ErrorMessage>{errors.password_repeat.message}</ErrorMessage>
-          )}
-          <Button type="submit">Войти</Button>
-        </Form>
+        </Formik>
       </PageContainer>
     </div>
   )
