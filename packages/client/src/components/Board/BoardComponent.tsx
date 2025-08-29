@@ -1,78 +1,91 @@
-import { FC, Fragment, useState } from 'react'
+import { Fragment, useState } from 'react'
 import styled from 'styled-components'
 import { CellComponent } from './CellComponent'
 import { Cell } from '../../game/models/Cell'
-import Game from '../../game/engine/Game'
-import Zombie from '../../game/models/Zombie'
-import { Player } from '../../game/models/Player'
+import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
+import {
+  endTurn,
+  fightStage,
+  movePlayer,
+  moveStage,
+  moveZombie,
+  pickItem,
+  setCanFight,
+  setCurrentPlayerIndex,
+  setItemCell,
+  setPlayerCell,
+  setZombieOpen,
+  useItem,
+} from '../../slices/gameSlice'
 
-type Props = {
-  game: Game
-}
+export const BoardComponent = () => {
+  const dispatch = useAppDispatch()
 
-export const BoardComponent: FC<Props> = ({ game }) => {
+  const { board, players, currentPlayerIndex, zombies, items } = useAppSelector(
+    state => state.game
+  )
+
+  const currentPlayer = players[currentPlayerIndex]
+
   const [isZombieMove, setIsZombieMove] = useState<boolean>(false)
 
   const handleClick = async (cell: Cell) => {
-    const currentPlayer = game.players[game.currentPlayerIndex]
+    const zombieOnCell = zombies.find(zombie => zombie.cellId === cell.id)
+    const itemsOnCell = items.filter(item => item.cellId === cell.id)
+    const playersOnCell = players.filter(player => player.cellId === cell.id)
 
     if (currentPlayer.isZombie) {
-      if (cell.zombie && cell.zombie.opened && !isZombieMove) {
-        currentPlayer.cell = cell
+      if (zombieOnCell && zombieOnCell.opened && !isZombieMove) {
+        dispatch(setPlayerCell(cell.id))
         setIsZombieMove(true)
-        await game.moveStage()
+        await dispatch(moveStage())
       } else {
         if (!cell.canMove) return
 
         setIsZombieMove(false)
-        const playerZombie = currentPlayer.cell?.zombie
-        if (playerZombie) {
-          currentPlayer.cell?.moveZombie(playerZombie, cell)
-          await game.endTurn()
+        dispatch(moveZombie(cell.id))
+        if (playersOnCell.length > 0) {
+          const playerOnCellIndex = players.findIndex(
+            player => player.id === playersOnCell[0].id
+          )
+          if (playerOnCellIndex !== -1) {
+            dispatch(setCurrentPlayerIndex(playerOnCellIndex))
+            await dispatch(fightStage())
+            return
+          }
         }
+        await dispatch(endTurn())
       }
     } else {
       if (!cell.canMove) return
 
-      currentPlayer.cell?.movePlayer(currentPlayer, cell)
+      dispatch(movePlayer(cell.id))
 
-      if (cell.zombie) {
-        cell.zombie.opened = true
+      if (zombieOnCell) {
+        dispatch(setZombieOpen(zombieOnCell.id))
+
         if (currentPlayer.items.find(item => item.type === 'grenade')) {
-          game.canFight = 'grenade'
+          dispatch(setCanFight('grenade'))
           return
         }
 
         if (
           currentPlayer.items.find(item => item.type === 'launcher') &&
-          cell.zombie.type === 'boss'
+          zombieOnCell.type === 'boss'
         ) {
-          game.canFight = 'launcher'
+          dispatch(setCanFight('launcher'))
           return
         }
-        const fightStatus = await game.fightStage()
-
-        if (fightStatus === 'win') {
-          if (cell.items.length > 0) {
-            for (const item of cell.items) {
-              if (item.type === 'key' && item.cell?.type === 'car') {
-                continue
-              }
-              currentPlayer.pickItem(item)
-              cell.removeItem(item)
-            }
-          }
-        }
+        await dispatch(fightStage())
         return
       }
 
-      if (cell.items.length > 0) {
-        for (const item of cell.items) {
-          if (item.type === 'key' && item.cell?.type === 'car') {
+      if (itemsOnCell.length > 0) {
+        for (const item of itemsOnCell) {
+          if (item.type === 'key' && cell.type === 'car') {
             continue
           }
-          currentPlayer.pickItem(item)
-          cell.removeItem(item)
+          dispatch(pickItem(item.id))
         }
       }
 
@@ -82,20 +95,19 @@ export const BoardComponent: FC<Props> = ({ game }) => {
         )
         if (keyOrGasoline.length > 0) {
           keyOrGasoline.forEach(item => {
-            item.cell = cell
-            cell.addItem(item)
-            currentPlayer.useItem(item)
+            dispatch(setItemCell({ itemId: item.id, cellId: cell.id }))
+            dispatch(useItem(item.id))
           })
         }
       }
 
-      await game.endTurn()
+      await dispatch(endTurn())
     }
   }
 
   return (
     <Grid>
-      {game.board.cells.map((row, index) => (
+      {board?.cells.map((row, index) => (
         <Fragment key={index}>
           {row.map(cell => (
             <CellComponent cell={cell} key={cell.id} click={handleClick} />

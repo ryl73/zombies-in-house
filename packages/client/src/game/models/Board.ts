@@ -1,5 +1,5 @@
-import { Cell } from './Cell'
-
+import { Cell, createCell, setCellWalls } from './Cell'
+import { GameState } from '../../slices/gameSlice'
 /*
   1 - top wall
   2 - right wall
@@ -37,36 +37,142 @@ const boardObjectsMatrix = [
   [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
 
-export class Board {
-  cells: Cell[][] = []
+export type Board = {
+  cells: Cell[][]
+}
 
-  public initialCells() {
-    for (let i = 0; i < boardWallsMatrix.length; i++) {
-      const row: Cell[] = []
-      for (let j = 0; j < boardWallsMatrix[0].length; j++) {
-        const value = boardWallsMatrix[i][j]
-        const valueObject = boardObjectsMatrix[i][j]
-        const cell = new Cell(i, j, true)
-        if (valueObject === 2) {
-          cell.setType('car')
-        }
+export function createBoard(): Board {
+  return {
+    cells: [],
+  }
+}
 
-        if (valueObject === 1) {
-          cell.setType('start')
-        }
-        cell.setWalls(
-          (value & 1) !== 0,
-          (value & 2) !== 0,
-          (value & 4) !== 0,
-          (value & 8) !== 0
-        )
-        row.push(cell)
+export function initCells(board: Board): Board {
+  const cells: Cell[][] = []
+  for (let i = 0; i < boardWallsMatrix.length; i++) {
+    const row: Cell[] = []
+    for (let j = 0; j < boardWallsMatrix[0].length; j++) {
+      const value = boardWallsMatrix[i][j]
+      const valueObject = boardObjectsMatrix[i][j]
+      const cell = createCell(i, j, true)
+      if (valueObject === 2) {
+        cell.type = 'car'
       }
-      this.cells.push(row)
+
+      if (valueObject === 1) {
+        cell.type = 'start'
+      }
+      setCellWalls(
+        cell,
+        (value & 1) !== 0,
+        (value & 2) !== 0,
+        (value & 4) !== 0,
+        (value & 8) !== 0
+      )
+      row.push(cell)
+    }
+    cells.push(row)
+  }
+
+  return {
+    ...board,
+    cells,
+  }
+}
+
+export function findAllPaths(
+  start: Cell,
+  game: GameState,
+  moveCount: number,
+  maxMoveCount: number,
+  isZombieTurn = false
+): Cell[] {
+  const rows = game.board.cells.length
+  const cols = game.board.cells[0].length
+
+  const results: Cell[] = []
+
+  function canMove(
+    current: Cell,
+    next: Cell,
+    dir: { dx: number; dy: number }
+  ): boolean {
+    if (dir.dx === 1) return !current.walls.bottom && !next.walls.top
+    if (dir.dx === -1) return !current.walls.top && !next.walls.bottom
+    if (dir.dy === 1) return !current.walls.right && !next.walls.left
+    if (dir.dy === -1) return !current.walls.left && !next.walls.right
+    return false
+  }
+
+  const directions = [
+    { dx: 1, dy: 0 },
+    { dx: -1, dy: 0 },
+    { dx: 0, dy: 1 },
+    { dx: 0, dy: -1 },
+  ]
+
+  function dfs(current: Cell, steps: number, visited: Set<number>) {
+    const playersOnCell = game.players.filter(p => p.cellId === current.id)
+    const zombieOnCell = game.zombies.find(z => z.cellId === current.id)
+
+    for (const dir of directions) {
+      if (steps === moveCount || steps === maxMoveCount) {
+        if (!isZombieTurn && playersOnCell.length === 0) {
+          results.push(current)
+        }
+        if (isZombieTurn && !zombieOnCell) {
+          results.push(current)
+        }
+        if (maxMoveCount <= moveCount) {
+          return
+        } else {
+          if (steps === maxMoveCount) {
+            return
+          }
+        }
+      }
+
+      const nx = current.x + dir.dx
+      const ny = current.y + dir.dy
+
+      if (nx < 0 || ny < 0 || nx >= cols || ny >= rows) continue
+
+      const nextCell = game.board.cells[nx][ny]
+      if (!nextCell) continue
+
+      const playersOnNextCell = game.players.filter(
+        p => p.cellId === nextCell.id
+      )
+      const zombieOnNextCell = game.zombies.find(z => z.cellId === nextCell.id)
+      const itemsOnNextCell = game.items.filter(i => i.cellId === nextCell.id)
+
+      if (!canMove(current, nextCell, dir)) continue
+
+      const key = nextCell.id
+      if (visited.has(key)) continue
+
+      const isZombie = !!zombieOnNextCell
+      const isItems = itemsOnNextCell.length > 0
+      const isPlayer = playersOnNextCell.length > 0
+
+      // если на клетке предмет или зомби → стоп
+      if (!isZombieTurn && (isZombie || isItems)) {
+        results.push(nextCell)
+        continue
+      }
+
+      if (isZombieTurn && isPlayer) {
+        results.push(nextCell)
+        continue
+      }
+
+      visited.add(key)
+      dfs(nextCell, steps + 1, visited)
+      visited.delete(key)
     }
   }
 
-  getCell(x: number, y: number): Cell {
-    return this.cells[x][y]
-  }
+  dfs(start, 0, new Set([start.id]))
+
+  return results
 }

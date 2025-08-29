@@ -1,28 +1,33 @@
-import { Cell } from './Cell'
-
 export type ZombieType = 'ordinary' | 'dog' | 'spider' | 'boss'
 
 type ZombieProps = {
-  cell: Cell
+  cellId: number
   type: ZombieType
   image: string
   name: string
 }
 
-export default class Zombie {
-  cell: Cell
+export type Zombie = {
+  cellId: number | null
   type: ZombieType
   id: number
   name: string
   image: string
   opened: boolean
+}
 
-  constructor({ cell, type, image, name }: ZombieProps) {
-    this.cell = cell
-    this.type = type
-    this.id = Math.random()
-    this.name = name
-    this.image = image
-    this.opened = false
+export function createZombie({
+  cellId,
+  type,
+  image,
+  name,
+}: ZombieProps): Zombie {
+  return {
+    cellId,
+    type,
+    image,
+    name,
+    id: Math.random(),
+    opened: false,
   }
 }

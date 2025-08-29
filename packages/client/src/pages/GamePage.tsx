@@ -1,25 +1,21 @@
 import { Helmet } from 'react-helmet'
-import { PageInitArgs } from '../routes'
 import { BoardComponent } from '../components/Board/BoardComponent'
-import { useEffect, useState } from 'react'
-import Game from '../game/engine/Game'
+import { useEffect } from 'react'
 import { Hud } from '../components/HUD/HUD'
-import { useAppSelector } from '../hooks/useApp'
+import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 import styled from 'styled-components'
+import { startGame } from '../slices/gameSlice'
 
 export const GamePage = () => {
-  const [game, setGame] = useState(new Game())
-  const version = useAppSelector(state => state.game.version)
+  const dispatch = useAppDispatch()
+
+  const { players, currentPlayerIndex } = useAppSelector(state => state.game)
+
+  const currentPlayer = players[currentPlayerIndex]
 
   useEffect(() => {
-    restart()
-  }, [])
-
-  function restart() {
-    const newGame = new Game()
-    newGame.start()
-    setGame(newGame)
-  }
+    dispatch(startGame())
+  }, [dispatch])
 
   return (
     <>
@@ -31,8 +27,8 @@ export const GamePage = () => {
       <main>
         <Wrapper>
           <BoardImage src="/images/board.jpg" alt="board" />
-          <BoardComponent game={game} />
-          {game.players[game.currentPlayerIndex] && <Hud game={game} />}
+          <BoardComponent />
+          {currentPlayer && <Hud />}
         </Wrapper>
       </main>
     </>
@@ -54,6 +50,6 @@ const Wrapper = styled.div`
   flex-direction: column;
 `
 
-export const initGamePage = async (_args: PageInitArgs) => {
+export const initGamePage = async () => {
   return Promise.resolve()
 }

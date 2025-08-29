@@ -1,106 +1,47 @@
-import { Item } from './Item'
-import { Player } from './Player'
-import Zombie from './Zombie'
-import { store } from '../../store'
-import { forceUpdate } from '../../slices/gameSlice'
-
 export type CellType = 'car' | 'plankPlace' | 'start'
 
-export class Cell {
+export type Cell = {
+  id: number
   x: number
   y: number
   available: boolean
   canMove: boolean
   empty: boolean
-  items: Item[] = []
-  players: Player[] = []
-  zombie: Zombie | null = null
-  id: number
   type?: CellType
-  walls: { top: boolean; right: boolean; bottom: boolean; left: boolean }
+  walls: {
+    top: boolean
+    right: boolean
+    left: boolean
+    bottom: boolean
+  }
+}
 
-  constructor(x: number, y: number, available: boolean) {
-    this.x = x
-    this.y = y
-    this.available = available
-    this.canMove = false
-    this.empty = true
-    this.id = Math.random()
-    this.walls = {
+export function createCell(x: number, y: number, available: boolean): Cell {
+  return {
+    x,
+    y,
+    available,
+    canMove: false,
+    empty: true,
+    id: Math.random(),
+    walls: {
       top: false,
       right: false,
       bottom: false,
       left: false,
-    }
+    },
   }
+}
 
-  addItem(item: Item) {
-    if (!this.items.includes(item)) {
-      this.items.push(item)
-      item.cell = this
-      this.empty = false
-    }
-  }
-
-  removeItem(item: Item) {
-    this.items = this.items.filter(i => i !== item)
-    this.checkIsEmpty()
-  }
-
-  addPlayer(player: Player) {
-    if (!this.players.includes(player)) {
-      this.players.push(player)
-      player.cell = this
-      this.empty = false
-    }
-  }
-
-  addZombie(zombie: Zombie) {
-    if (!this.zombie) {
-      this.zombie = zombie
-      zombie.cell = this
-      this.empty = false
-    }
-  }
-
-  removeZombie() {
-    this.zombie = null
-    this.checkIsEmpty()
-  }
-
-  removePlayer(player: Player) {
-    this.players = this.players.filter(p => p !== player)
-    this.checkIsEmpty()
-  }
-
-  movePlayer(player: Player, target: Cell) {
-    if (!this.players.includes(player)) return // игрок должен быть в этой клетке
-    this.removePlayer(player)
-    target.addPlayer(player)
-    store.dispatch(forceUpdate())
-  }
-
-  moveZombie(zombie: Zombie, target: Cell) {
-    if (this.zombie !== zombie) return // игрок должен быть в этой клетке
-    this.removeZombie()
-    target.addZombie(zombie)
-    store.dispatch(forceUpdate())
-  }
-
-  setWalls(top: boolean, right: boolean, bottom: boolean, left: boolean) {
-    this.walls.top = top
-    this.walls.right = right
-    this.walls.bottom = bottom
-    this.walls.left = left
-  }
-
-  setType(type: CellType) {
-    this.type = type
-  }
-
-  checkIsEmpty() {
-    if (!!this.items.length && !!this.players.length && !this.zombie) {
-      this.empty = true
-    }
+export function setCellWalls(
+  cell: Cell,
+  top: boolean,
+  right: boolean,
+  bottom: boolean,
+  left: boolean
+): Cell {
+  return {
+    ...cell,
+    walls: { top, right, bottom, left },
   }
 }

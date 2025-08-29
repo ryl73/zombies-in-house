@@ -1,38 +1,94 @@
-import { FC } from 'react'
 import styled, { css, keyframes } from 'styled-components'
 import { Item } from '../../game/models/Item'
-import Game from '../../game/engine/Game'
+import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
+import {
+  addPlayerLifeCount,
+  fightStage,
+  setCanFight,
+  useItem,
+  winFight,
+} from '../../slices/gameSlice'
 
-type Props = {
-  game: Game
-}
+export const Hud = () => {
+  const dispatch = useAppDispatch()
 
-export const Hud: FC<Props> = ({ game }) => {
-  const player = game.players[game.currentPlayerIndex]
+  const { players, currentPlayerIndex, canFight, zombies } = useAppSelector(
+    state => state.game
+  )
+
+  const player = players[currentPlayerIndex]
 
   const clickHandler = async (item: Item) => {
-    await item.use(game, player)
+    const zombieOnCell = zombies.find(
+      zombie => zombie.cellId === player.cellId && zombie.cellId !== null
+    )
+
+    switch (item.type) {
+      case 'medkit': {
+        dispatch(useItem(item.id))
+        if (player.type === 'nastya') {
+          dispatch(addPlayerLifeCount(2))
+          break
+        }
+        dispatch(addPlayerLifeCount(1))
+        break
+      }
+      case 'grenade': {
+        if (zombieOnCell) {
+          dispatch(useItem(item.id))
+          dispatch(winFight())
+        }
+        break
+      }
+      case 'launcher': {
+        if (zombieOnCell && zombieOnCell.type === 'boss') {
+          dispatch(useItem(item.id))
+          dispatch(winFight())
+        }
+        break
+      }
+      case 'coldWeapon': {
+        if (zombieOnCell) {
+          dispatch(winFight())
+        }
+        break
+      }
+      case 'gunWeapon': {
+        if (zombieOnCell) {
+          dispatch(winFight())
+        }
+        break
+      }
+      case 'plank': {
+        // if (currentCell?.type === 'plankPlace') {
+        // player.cell.addItem(this)
+        // this.cell = player.cell
+        // dispatch(useItem(item.id))
+        // }
+        break
+      }
+    }
   }
 
   const spinPinWheel = async () => {
-    if (game.canFight === 'grenade') {
-      game.canFight = null
-      await game.fightStage()
+    if (canFight === 'grenade') {
+      dispatch(setCanFight(null))
+      dispatch(fightStage())
     }
   }
 
   const isAnimation = (item: Item) => {
-    if (game.canFight) {
-      if (game.canFight === 'coldWeapon' && item.type === 'coldWeapon') {
+    if (canFight) {
+      if (canFight === 'coldWeapon' && item.type === 'coldWeapon') {
         return true
       }
-      if (game.canFight === 'gunWeapon' && item.type === 'gunWeapon') {
+      if (canFight === 'gunWeapon' && item.type === 'gunWeapon') {
         return true
       }
-      if (game.canFight === 'grenade' && item.type === 'grenade') {
+      if (canFight === 'grenade' && item.type === 'grenade') {
         return true
       }
-      if (game.canFight === 'launcher' && item.type === 'launcher') {
+      if (canFight === 'launcher' && item.type === 'launcher') {
         return true
       }
     }
@@ -52,7 +108,7 @@ export const Hud: FC<Props> = ({ game }) => {
             {item.name}
           </Card>
         ))}
-        {game.canFight === 'grenade' && (
+        {canFight === 'grenade' && (
           <button onClick={spinPinWheel}>Spin pinwheel</button>
         )}
       </Items>

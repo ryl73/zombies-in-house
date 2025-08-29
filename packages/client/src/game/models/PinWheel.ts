@@ -22,21 +22,17 @@ const pinWheelFields: Record<string, PinWheelResult> = {
   '4': { action: PINWHEEL_STATE_MAP.SHOOT, moveCount: 4 },
 }
 
-class PinWheel {
-  public async spin(): Promise<PinWheelResult> {
-    await new Promise(resolve => setTimeout(resolve, 1000))
+export async function spinPinWheel() {
+  await new Promise(resolve => setTimeout(resolve, 1000))
 
-    const keys = Array.from(Object.keys(pinWheelFields).map(key => Number(key)))
-    const min = Math.min(...keys)
-    const max = Math.max(...keys)
+  const keys = Array.from(Object.keys(pinWheelFields).map(key => Number(key)))
+  const min = Math.min(...keys)
+  const max = Math.max(...keys)
 
-    const nextRandom = randomGenerator(min, max)
+  const nextRandom = randomGenerator(min, max)
 
-    const randomNumber = nextRandom()
-    if (randomNumber === null) return pinWheelFields['1']
+  const randomNumber = nextRandom()
+  if (randomNumber === null) return pinWheelFields['1']
 
-    return pinWheelFields[randomNumber.toString()]
-  }
+  return pinWheelFields[randomNumber.toString()]
 }
-
-export default new PinWheel()

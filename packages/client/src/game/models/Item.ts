@@ -1,9 +1,3 @@
-import { Cell } from './Cell'
-import { Player } from './Player'
-import Game from '../engine/Game'
-import { store } from '../../store'
-import { forceUpdate } from '../../slices/gameSlice'
-
 export type ItemType =
   | 'coldWeapon'
   | 'gunWeapon'
@@ -15,78 +9,37 @@ export type ItemType =
   | 'gasoline'
 
 export type ItemProps = {
-  cell?: Cell
+  cellId?: number | null
   name: string
   image: string
   type: ItemType
-  ownerId?: number | null
 }
 
-export class Item {
-  cell?: Cell
+export type Item = {
+  cellId: number | null
   name: string
   image: string
   opened: boolean
   id: number
-  ownerId: number | null
   type: ItemType
+}
 
-  constructor({ image, name, cell, type, ownerId = null }: ItemProps) {
-    this.name = name
-    this.image = image
-    this.opened = false
-    this.id = Math.random()
-    this.ownerId = ownerId
-    this.cell = cell
-    this.type = type
+export function createItem({
+  image,
+  name,
+  type,
+  cellId = null,
+}: ItemProps): Item {
+  return {
+    cellId,
+    name,
+    image,
+    type,
+    opened: false,
+    id: Math.random(),
   }
+}
 
-  async use(game: Game, player: Player) {
-    switch (this.type) {
-      case 'medkit': {
-        player.useItem(this)
-        if (player.type === 'nastya') {
-          player.lifeCount += 2
-          break
-        }
-        player.lifeCount++
-        break
-      }
-      case 'grenade': {
-        if (player.cell?.zombie) {
-          await game.winFight(player)
-          player.useItem(this)
-        }
-        break
-      }
-      case 'launcher': {
-        if (player.cell?.zombie && player.cell?.zombie.type === 'boss') {
-          await game.winFight(player)
-          player.useItem(this)
-        }
-        break
-      }
-      case 'coldWeapon': {
-        if (player.cell?.zombie) {
-          await game.winFight(player)
-        }
-        break
-      }
-      case 'gunWeapon': {
-        if (player.cell?.zombie) {
-          await game.winFight(player)
-        }
-        break
-      }
-      case 'plank': {
-        if (player.cell?.type === 'plankPlace') {
-          player.cell.addItem(this)
-          this.cell = player.cell
-          player.useItem(this)
-        }
-        break
-      }
-    }
-    store.dispatch(forceUpdate())
-  }
+export function getItemById(items: Item[], itemId: number): Item | undefined {
+  return items.find(item => item.id === itemId)
 }

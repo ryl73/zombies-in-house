@@ -1,68 +1,73 @@
-import { Item } from './Item'
-import { Cell } from './Cell'
+import { createItem, Item } from './Item'
 
 export type PlayerType = 'sasha' | 'nastya' | 'max' | 'nadya' | 'boris'
 
-export type PlayerProps = {
-  cell: Cell | null
+export type Player = {
+  cellId: number | null
   name: string
   image: string
   lifeCount: number
-  items?: Item[]
+  items: Item[]
+  type: PlayerType
+  id: number
+  isZombie: boolean
+}
+
+export type PlayerProps = {
+  cellId: number
+  lifeCount: number
+  name: string
+  image: string
   type: PlayerType
 }
 
-export class Player {
-  cell: Cell | null
-  lifeCount: number
-  name: string
-  image: string
-  id: number
-  isZombie: boolean
-  type: PlayerType
-  items: Item[] = []
-
-  constructor({ cell, lifeCount, name, image, type }: PlayerProps) {
-    this.cell = cell
-    this.lifeCount = lifeCount
-    this.name = name
-    this.id = Math.random()
-    this.image = image
-    this.isZombie = false
-    this.type = type
-    this.setSpecialties()
+export function createPlayer({
+  cellId,
+  lifeCount,
+  name,
+  image,
+  type,
+}: PlayerProps): Player {
+  const player = {
+    cellId,
+    lifeCount,
+    name,
+    image,
+    type,
+    items: [],
+    id: Math.random(),
+    isZombie: false,
   }
 
-  pickItem(item: Item) {
-    this.items.push(item)
-    item.ownerId = this.id
+  return setPlayerSpecialties(player)
+}
+
+export function pickPlayerItem(player: Player, item: Item): Player {
+  return {
+    ...player,
+    items: player.items.includes(item) ? player.items : [...player.items, item],
   }
+}
 
-  useItem(itemToUse: Item) {
-    this.items = this.items.filter(item => item.id !== itemToUse.id)
-  }
+function setPlayerSpecialties(player: Player): Player {
+  switch (player.type) {
+    case 'sasha': {
+      const knife = createItem({
+        image: '',
+        type: 'coldWeapon',
+        name: 'knife',
+      })
+      return pickPlayerItem(player, knife)
+    }
 
-  setSpecialties() {
-    switch (this.type) {
-      case 'sasha': {
-        const knife = new Item({
-          image: '',
-          type: 'coldWeapon',
-          name: 'knife',
-        })
-        this.pickItem(knife)
-        break
-      }
-
-      case 'nadya': {
-        const handgun = new Item({
-          image: '',
-          type: 'gunWeapon',
-          name: 'handgun',
-        })
-        this.pickItem(handgun)
-        break
-      }
+    case 'nadya': {
+      const handgun = createItem({
+        image: '',
+        type: 'gunWeapon',
+        name: 'handgun',
+      })
+      return pickPlayerItem(player, handgun)
     }
   }
+  return player
 }
