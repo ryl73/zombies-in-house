@@ -32,16 +32,3 @@ export function createCell(x: number, y: number, available: boolean): Cell {
     },
   }
 }
-
-export function setCellWalls(
-  cell: Cell,
-  top: boolean,
-  right: boolean,
-  bottom: boolean,
-  left: boolean
-): Cell {
-  return {
-    ...cell,
-    walls: { top, right, bottom, left },
-  }
-}

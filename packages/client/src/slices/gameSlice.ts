@@ -13,11 +13,11 @@ import { createItem, Item, ItemType } from '../game/models/Item'
 import { RootState } from '../store'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
-  1: { lifeCount: 3, name: 'Саша', image: '', type: 'sasha' },
-  2: { lifeCount: 5, name: 'Борис', image: '', type: 'boris' },
-  3: { lifeCount: 3, name: 'Макс', image: '', type: 'max' },
-  4: { lifeCount: 3, name: 'Надя', image: '', type: 'nadya' },
-  5: { lifeCount: 3, name: 'Настя', image: '', type: 'nastya' },
+  1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
+  2: { lifeCount: 5, name: 'Борис', type: 'boris' },
+  3: { lifeCount: 3, name: 'Макс', type: 'max' },
+  4: { lifeCount: 3, name: 'Надя', type: 'nadya' },
+  5: { lifeCount: 3, name: 'Настя', type: 'nastya' },
 }
 
 const ItemsMap: Record<string, { count: number; type: ItemType }> = {
@@ -340,7 +340,6 @@ export const gameSlice = createSlice({
           }
 
           const item = createItem({
-            image: '',
             name,
             cellId: cell.id,
             type: value.type,
@@ -364,7 +363,6 @@ export const gameSlice = createSlice({
           }
 
           const zombie = createZombie({
-            image: '',
             name: type,
             cellId: cell.id,
             type: type as ZombieType,

@@ -8,6 +8,7 @@ import {
   useItem,
   winFight,
 } from '../../slices/gameSlice'
+import { Card, CardImage } from '../Board/CellComponent'
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
@@ -97,15 +98,24 @@ export const Hud = () => {
 
   return (
     <HudWrapper>
-      <div>{player.name}</div>
-      <div>{player.lifeCount}</div>
+      <div>
+        <CardWrapper>
+          <HudCard>
+            <CardImage src={player.image} alt={player.name} />
+          </HudCard>
+          {player.name}
+        </CardWrapper>
+        {Array.from({ length: player.lifeCount }, (_, i) => (
+          <LifeImage src="/images/game/cards/life.png" alt="life" key={i} />
+        ))}
+      </div>
       <Items>
         {player.items.map(item => (
           <Card
             $animation={isAnimation(item)}
             key={item.id}
             onClick={() => clickHandler(item)}>
-            {item.name}
+            <CardImage src={item.image} alt={item.name} />
           </Card>
         ))}
         {canFight === 'grenade' && (
@@ -123,9 +133,9 @@ const HudWrapper = styled.div`
   width: calc(100% - 60px);
   max-width: 1000px;
   bottom: 20px;
-  padding: 10px;
+  padding: 10px 32px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   z-index: 999;
   background-color: white;
@@ -137,26 +147,19 @@ const Items = styled.div`
   gap: 20px;
 `
 
-const ripple = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+const CardWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
 `
 
-const Card = styled.div<{ $animation?: boolean }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: gray;
+const HudCard = styled(Card)`
+  width: 70px;
+  height: 70px;
+`
+
+const LifeImage = styled.img`
   width: 50px;
   height: 50px;
-  border-radius: 10px;
-  ${props =>
-    props.$animation &&
-    css`
-      animation: ${ripple} 1s infinite ease-in-out;
-    `}
 `

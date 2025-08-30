@@ -26,7 +26,7 @@ export const GamePage = () => {
       </Helmet>
       <main>
         <Wrapper>
-          <BoardImage src="/images/board.jpg" alt="board" />
+          <BoardImage src="/images/game/board.jpg" alt="board" />
           <BoardComponent />
           {currentPlayer && <Hud />}
         </Wrapper>

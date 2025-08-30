@@ -3,7 +3,6 @@ export type ZombieType = 'ordinary' | 'dog' | 'spider' | 'boss'
 type ZombieProps = {
   cellId: number
   type: ZombieType
-  image: string
   name: string
 }
 
@@ -16,16 +15,11 @@ export type Zombie = {
   opened: boolean
 }
 
-export function createZombie({
-  cellId,
-  type,
-  image,
-  name,
-}: ZombieProps): Zombie {
+export function createZombie({ cellId, type, name }: ZombieProps): Zombie {
   return {
     cellId,
     type,
-    image,
+    image: `/images/game/cards/zombies/${type}.png`,
     name,
     id: Math.random(),
     opened: false,

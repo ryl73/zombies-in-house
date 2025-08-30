@@ -11,7 +11,6 @@ export type ItemType =
 export type ItemProps = {
   cellId?: number | null
   name: string
-  image: string
   type: ItemType
 }
 
@@ -24,16 +23,11 @@ export type Item = {
   type: ItemType
 }
 
-export function createItem({
-  image,
-  name,
-  type,
-  cellId = null,
-}: ItemProps): Item {
+export function createItem({ name, type, cellId = null }: ItemProps): Item {
   return {
     cellId,
     name,
-    image,
+    image: `/images/game/cards/items/${name}.png`,
     type,
     opened: false,
     id: Math.random(),

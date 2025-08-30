@@ -125,5 +125,5 @@ const Grid = styled.div`
   border-collapse: collapse;
   grid-template-columns: repeat(12, 100px);
   gap: 2px;
-  padding: 174px 0 0 167px;
+  padding: 174px 0 200px 167px;
 `

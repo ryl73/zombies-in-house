@@ -1,4 +1,4 @@
-import { Cell, createCell, setCellWalls } from './Cell'
+import { Cell, createCell } from './Cell'
 import { GameState } from '../../slices/gameSlice'
 /*
   1 - top wall
@@ -62,13 +62,12 @@ export function initCells(board: Board): Board {
       if (valueObject === 1) {
         cell.type = 'start'
       }
-      setCellWalls(
-        cell,
-        (value & 1) !== 0,
-        (value & 2) !== 0,
-        (value & 4) !== 0,
-        (value & 8) !== 0
-      )
+      cell.walls = {
+        top: (value & 1) !== 0,
+        right: (value & 2) !== 0,
+        bottom: (value & 4) !== 0,
+        left: (value & 8) !== 0,
+      }
       row.push(cell)
     }
     cells.push(row)

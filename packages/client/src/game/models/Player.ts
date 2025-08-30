@@ -17,7 +17,6 @@ export type PlayerProps = {
   cellId: number
   lifeCount: number
   name: string
-  image: string
   type: PlayerType
 }
 
@@ -25,14 +24,13 @@ export function createPlayer({
   cellId,
   lifeCount,
   name,
-  image,
   type,
 }: PlayerProps): Player {
   const player = {
     cellId,
     lifeCount,
     name,
-    image,
+    image: `/images/game/cards/characters/${type}.png`,
     type,
     items: [],
     id: Math.random(),
@@ -53,7 +51,6 @@ function setPlayerSpecialties(player: Player): Player {
   switch (player.type) {
     case 'sasha': {
       const knife = createItem({
-        image: '',
         type: 'coldWeapon',
         name: 'knife',
       })
@@ -62,7 +59,6 @@ function setPlayerSpecialties(player: Player): Player {
 
     case 'nadya': {
       const handgun = createItem({
-        image: '',
         type: 'gunWeapon',
         name: 'handgun',
       })

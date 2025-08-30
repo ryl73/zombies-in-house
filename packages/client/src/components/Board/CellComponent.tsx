@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 import { Cell } from '../../game/models/Cell'
 import { useAppSelector } from '../../hooks/useApp'
 
@@ -43,23 +43,37 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
         {items
           .filter(item => item.cellId === cell.id)
           .map(item => (
-            <Card $isOpen={isOpen} key={item.id}>
-              {item.opened ? item.name : item.name}
-            </Card>
+            <CardWrapper $isOpen={isOpen} key={item.id}>
+              <Card $isOpen={isOpen}>
+                {item.opened ? (
+                  <CardImage src={item.image} alt={item.name} />
+                ) : (
+                  ''
+                )}
+              </Card>
+            </CardWrapper>
           ))}
         {players
           .filter(player => player.cellId === cell.id && !player.isZombie)
           .map(player => (
-            <PlayerCard $isOpen={isOpen} key={player.id}>
-              {player.name}
-            </PlayerCard>
+            <CardWrapper $isOpen={isOpen} key={player.id}>
+              <PlayerCard $isOpen={isOpen}>
+                <CardImage src={player.image} alt={player.name} />
+              </PlayerCard>
+            </CardWrapper>
           ))}
         {zombies
           .filter(zombie => zombie.cellId === cell.id)
           .map(zombie => (
-            <Card $isOpen={isOpen} key={zombie.id}>
-              {zombie.opened ? zombie.name : zombie.name}
-            </Card>
+            <CardWrapper $isOpen={isOpen} key={zombie.id}>
+              <Card $isOpen={isOpen}>
+                {zombie.opened ? (
+                  <CardImage src={zombie.image} alt={zombie.name} />
+                ) : (
+                  ''
+                )}
+              </Card>
+            </CardWrapper>
           ))}
       </CellBlockCard>
       {cell.canMove && <Dot />}
@@ -97,7 +111,7 @@ const CellBlockCard = styled.div<{
     `}
 `
 
-const Card = styled.div<{
+const CardWrapper = styled.div<{
   $isOpen?: boolean
 }>`
   position: ${props => (props.$isOpen ? 'static' : 'absolute')};
@@ -108,13 +122,30 @@ const Card = styled.div<{
       left: 50%;
       transform: translate(-50%, -50%);
     `};
+`
+
+export const Card = styled.div<{
+  $isOpen?: boolean
+  $animation?: boolean
+}>`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: gray;
+  background-color: rgb(255, 255, 192);
   width: 98px;
   height: 98px;
-  border-radius: 10px;
+  border-radius: 20px;
+  ${props =>
+    props.$animation &&
+    css`
+      animation: ${ripple} 1s infinite ease-in-out;
+    `}
+`
+
+export const CardImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
 `
 
 const PlayerCard = styled(Card)`
@@ -128,4 +159,13 @@ const Dot = styled.div`
   border-radius: 50%;
   background-color: black;
   z-index: 2;
+`
+
+const ripple = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 `
