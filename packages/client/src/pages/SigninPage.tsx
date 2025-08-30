@@ -5,10 +5,20 @@ import { Form } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
+import { signIn, type SignInRequest } from '../api/LoginAPI'
+import { FormEvent } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const SigninPage = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const navigate = useNavigate()
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    const login = formData.get('login') as string
+    const password = formData.get('password') as string
+    const requestData: SignInRequest = { login, password }
+    await signIn(requestData)
+    navigate('/')
   }
 
   return (
@@ -21,8 +31,8 @@ export const SigninPage = () => {
       <PageContainer>
         <ThemedHeader>ВХОД</ThemedHeader>
         <Form onSubmit={handleSubmit}>
-          <Input id="login" type="text" placeholder="Логин" />
-          <Input id="password" type="password" placeholder="Пароль" />
+          <Input name="login" type="text" placeholder="Логин" />
+          <Input name="password" type="password" placeholder="Пароль" />
           <Button type="submit">ВОЙТИ</Button>
         </Form>
       </PageContainer>

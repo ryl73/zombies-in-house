@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.5",
     "@types/react-helmet": "^6.1.7",
+    "axios": "^1.11.0",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.0.2",
     "eslint-config-prettier": "^8.5.0",
