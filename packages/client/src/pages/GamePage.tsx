@@ -1,19 +1,55 @@
 import { Helmet } from 'react-helmet'
-import { PageInitArgs } from '../routes'
+import { BoardComponent } from '../components/Board/BoardComponent'
+import { useEffect } from 'react'
+import { Hud } from '../components/HUD/HUD'
+import { useAppDispatch, useAppSelector } from '../hooks/useApp'
+import styled from 'styled-components'
+import { startGame } from '../slices/gameSlice'
 
 export const GamePage = () => {
+  const dispatch = useAppDispatch()
+
+  const { players, currentPlayerIndex } = useAppSelector(state => state.game)
+
+  const currentPlayer = players[currentPlayerIndex]
+
+  useEffect(() => {
+    dispatch(startGame())
+  }, [dispatch])
+
   return (
-    <div>
+    <>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Игра</title>
         <meta name="description" content="Страница игры" />
       </Helmet>
-      <div>Игра</div>
-    </div>
+      <main>
+        <Wrapper>
+          <BoardImage src="/images/game/board.jpg" alt="board" />
+          <BoardComponent />
+          {currentPlayer && <Hud />}
+        </Wrapper>
+      </main>
+    </>
   )
 }
 
-export const initGamePage = async (_args: PageInitArgs) => {
+const BoardImage = styled.img`
+  display: block;
+  position: absolute;
+  z-index: 0;
+  width: 1557px;
+  aspect-ratio: 1;
+`
+
+const Wrapper = styled.div`
+  margin: 0 auto;
+  max-width: 1557px;
+  display: flex;
+  flex-direction: column;
+`
+
+export const initGamePage = async () => {
   return Promise.resolve()
 }
