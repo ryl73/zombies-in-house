@@ -1,10 +1,9 @@
-export const randomGenerator = (min: number, max: number) => {
+export function* randomGenerator(min: number, max: number) {
   const numbers = Array.from({ length: max - min + 1 }, (_, i) => i + min)
 
-  return function getNext() {
-    if (numbers.length === 0) return null
+  while (numbers.length > 0) {
     const index = Math.floor(Math.random() * numbers.length)
-    return numbers.splice(index, 1)[0]
+    yield numbers.splice(index, 1)[0]
   }
 }
 

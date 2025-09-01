@@ -103,6 +103,27 @@ export function findAllPaths(
     return false
   }
 
+  function isBlockingCell(nextCell: Cell, isZombieTurn: boolean) {
+    const zombieOnNextCell = game.zombies.find(z => z.cellId === nextCell.id)
+    const playersOnNextCell = game.players.filter(p => p.cellId === nextCell.id)
+    const itemsOnNextCell = game.items.filter(i => i.cellId === nextCell.id)
+
+    const isZombie = !!zombieOnNextCell
+    const isItems = itemsOnNextCell.length > 0
+    const isPlayer = playersOnNextCell.length > 0
+
+    if (!isZombieTurn && (isZombie || isItems)) {
+      results.push(nextCell)
+      return true
+    }
+
+    if (isZombieTurn && isPlayer) {
+      results.push(nextCell)
+      return true
+    }
+    return false
+  }
+
   const directions = [
     { dx: 1, dy: 0 },
     { dx: -1, dy: 0 },
@@ -116,18 +137,15 @@ export function findAllPaths(
 
     for (const dir of directions) {
       if (steps === moveCount || steps === maxMoveCount) {
-        if (!isZombieTurn && playersOnCell.length === 0) {
+        if (
+          (!isZombieTurn && playersOnCell.length === 0) ||
+          (isZombieTurn && !zombieOnCell)
+        ) {
           results.push(current)
         }
-        if (isZombieTurn && !zombieOnCell) {
-          results.push(current)
-        }
-        if (maxMoveCount <= moveCount) {
+
+        if (steps === maxMoveCount || moveCount >= maxMoveCount) {
           return
-        } else {
-          if (steps === maxMoveCount) {
-            return
-          }
         }
       }
 
@@ -139,31 +157,12 @@ export function findAllPaths(
       const nextCell = game.board.cells[nx][ny]
       if (!nextCell) continue
 
-      const playersOnNextCell = game.players.filter(
-        p => p.cellId === nextCell.id
-      )
-      const zombieOnNextCell = game.zombies.find(z => z.cellId === nextCell.id)
-      const itemsOnNextCell = game.items.filter(i => i.cellId === nextCell.id)
-
       if (!canMove(current, nextCell, dir)) continue
 
       const key = nextCell.id
       if (visited.has(key)) continue
 
-      const isZombie = !!zombieOnNextCell
-      const isItems = itemsOnNextCell.length > 0
-      const isPlayer = playersOnNextCell.length > 0
-
-      // если на клетке предмет или зомби → стоп
-      if (!isZombieTurn && (isZombie || isItems)) {
-        results.push(nextCell)
-        continue
-      }
-
-      if (isZombieTurn && isPlayer) {
-        results.push(nextCell)
-        continue
-      }
+      if (isBlockingCell(nextCell, isZombieTurn)) continue
 
       visited.add(key)
       dfs(nextCell, steps + 1, visited)

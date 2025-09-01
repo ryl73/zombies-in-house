@@ -13,18 +13,24 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
 
   const [isOpen, setIsOpen] = useState(false)
 
-  const mouseOverHandler = (cell: Cell) => {
-    const zombieOnCell = zombies.filter(
-      zombie => zombie.cellId === cell.id && zombie.opened
-    )
-    const itemsOnCell = items.filter(
-      item => item.cellId === cell.id && item.opened
-    )
-    const playersOnCell = players.filter(player => player.cellId === cell.id)
+  const zombieOnCell = zombies.filter(z => z.cellId === cell.id)
+  const itemsOnCell = items.filter(i => i.cellId === cell.id)
+  const playersOnCell = players.filter(p => p.cellId === cell.id)
 
-    const objectsOnCell = [...zombieOnCell, ...itemsOnCell, ...playersOnCell]
+  const objectsOnCell = [
+    ...zombieOnCell,
+    ...itemsOnCell,
+    ...playersOnCell.filter(p => !p.isZombie),
+  ]
 
-    if (objectsOnCell.length > 1 && cell) {
+  const openedObjects = [
+    ...zombieOnCell.filter(z => z.opened),
+    ...itemsOnCell.filter(i => i.opened),
+    ...playersOnCell.filter(p => !p.isZombie),
+  ]
+
+  const mouseOverHandler = () => {
+    if (openedObjects.length > 1 && cell) {
       setIsOpen(true)
     }
   }
@@ -37,44 +43,23 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
     <CellBlock
       $isOpen={isOpen}
       onClick={() => click(cell)}
-      onMouseOver={() => mouseOverHandler(cell)}
+      onMouseOver={mouseOverHandler}
       onMouseLeave={mouseLeaveHandler}>
       <CellBlockCard $isOpen={isOpen}>
-        {items
-          .filter(item => item.cellId === cell.id)
-          .map(item => (
-            <CardWrapper $isOpen={isOpen} key={item.id}>
-              <Card $isOpen={isOpen}>
-                {item.opened ? (
-                  <CardImage src={item.image} alt={item.name} />
-                ) : (
-                  ''
+        {objectsOnCell.map(object => {
+          const isPlayer = !('opened' in object)
+          const isVisible = isPlayer || object.opened
+
+          return (
+            <CardWrapper $isOpen={isOpen} key={object.id}>
+              <Card $isOpen={isOpen} $isPlayer={isPlayer}>
+                {isVisible && (
+                  <CardImage src={object.image} alt={object.name} />
                 )}
               </Card>
             </CardWrapper>
-          ))}
-        {players
-          .filter(player => player.cellId === cell.id && !player.isZombie)
-          .map(player => (
-            <CardWrapper $isOpen={isOpen} key={player.id}>
-              <PlayerCard $isOpen={isOpen}>
-                <CardImage src={player.image} alt={player.name} />
-              </PlayerCard>
-            </CardWrapper>
-          ))}
-        {zombies
-          .filter(zombie => zombie.cellId === cell.id)
-          .map(zombie => (
-            <CardWrapper $isOpen={isOpen} key={zombie.id}>
-              <Card $isOpen={isOpen}>
-                {zombie.opened ? (
-                  <CardImage src={zombie.image} alt={zombie.name} />
-                ) : (
-                  ''
-                )}
-              </Card>
-            </CardWrapper>
-          ))}
+          )
+        })}
       </CellBlockCard>
       {cell.canMove && <Dot />}
     </CellBlock>
@@ -126,6 +111,7 @@ const CardWrapper = styled.div<{
 
 export const Card = styled.div<{
   $isOpen?: boolean
+  $isPlayer?: boolean
   $animation?: boolean
 }>`
   display: flex;
@@ -140,6 +126,7 @@ export const Card = styled.div<{
     css`
       animation: ${ripple} 1s infinite ease-in-out;
     `}
+  z-index: ${props => (props.$isPlayer ? '1' : '0')};
 `
 
 export const CardImage = styled.img`
@@ -148,17 +135,12 @@ export const CardImage = styled.img`
   border-radius: 20px;
 `
 
-const PlayerCard = styled(Card)`
-  z-index: 1;
-  background-color: darkgray;
-`
-
 const Dot = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 50%;
   background-color: black;
-  z-index: 2;
+  z-index: 3;
 `
 
 const ripple = keyframes`

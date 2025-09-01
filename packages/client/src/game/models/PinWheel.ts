@@ -31,8 +31,8 @@ export async function spinPinWheel() {
 
   const nextRandom = randomGenerator(min, max)
 
-  const randomNumber = nextRandom()
-  if (randomNumber === null) return pinWheelFields['1']
+  const result = nextRandom.next()
+  if (result.done) return pinWheelFields['1']
 
-  return pinWheelFields[randomNumber.toString()]
+  return pinWheelFields[result.value.toString()]
 }

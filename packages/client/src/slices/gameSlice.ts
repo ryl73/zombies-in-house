@@ -11,6 +11,7 @@ import { getRandomInt, randomGenerator } from '../utils/random'
 import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
 import { RootState } from '../store'
+import { Cell } from '../game/models/Cell'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
@@ -58,6 +59,8 @@ export interface GameState {
   currentPlayerIndex: number
   canFight: CanFightType
   status: 'idle' | 'playing' | 'won' | 'lost'
+  isZombieMove: boolean
+  isProcessing: boolean
 }
 
 const initialState: GameState = {
@@ -69,6 +72,8 @@ const initialState: GameState = {
   currentPlayerIndex: 0,
   canFight: null,
   status: 'idle',
+  isZombieMove: false,
+  isProcessing: false,
 }
 
 const getCurrentPlayer = (game: GameState) =>
@@ -85,6 +90,9 @@ const getZombieById = (game: GameState, id: number) =>
 
 const getZombieByCellId = (game: GameState, cellId: number) =>
   game.zombies.find(zombie => zombie.cellId === cellId)
+
+const hasPlayerItem = (game: GameState, itemType: ItemType) =>
+  getCurrentPlayer(game).items.find(i => i.type === itemType)
 
 // ----------- Async actions (thunks) ----------------
 
@@ -290,6 +298,190 @@ export const endTurn = createAsyncThunk(
   }
 )
 
+export const usePlayerItem = createAsyncThunk(
+  'game/usePlayerItem',
+  async (item: Item, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+    if (game.isProcessing) return
+
+    dispatch(gameSlice.actions.setIsProcessing(true))
+
+    const player = getCurrentPlayer(game)
+
+    const zombieOnCell = game.zombies.find(
+      zombie => zombie.cellId === player.cellId
+    )
+
+    switch (item.type) {
+      case 'medkit': {
+        dispatch(gameSlice.actions.useItem(item.id))
+        if (player.type === 'nastya') {
+          dispatch(gameSlice.actions.addPlayerLifeCount(2))
+          break
+        }
+        dispatch(gameSlice.actions.addPlayerLifeCount(1))
+        break
+      }
+      case 'grenade': {
+        if (zombieOnCell) {
+          dispatch(gameSlice.actions.useItem(item.id))
+          await dispatch(winFight())
+        }
+        break
+      }
+      case 'launcher': {
+        if (zombieOnCell && zombieOnCell.type === 'boss') {
+          dispatch(gameSlice.actions.useItem(item.id))
+          await dispatch(winFight())
+        }
+        break
+      }
+      case 'coldWeapon':
+      case 'gunWeapon': {
+        if (zombieOnCell) {
+          await dispatch(winFight())
+        }
+        break
+      }
+
+      case 'plank': {
+        // if (currentCell?.type === 'plankPlace') {
+        // player.cell.addItem(this)
+        // this.cell = player.cell
+        // dispatch(useItem(item.id))
+        // }
+        break
+      }
+    }
+
+    dispatch(gameSlice.actions.setIsProcessing(false))
+  }
+)
+
+export const handleCellClick = createAsyncThunk(
+  'game/handleCellClick',
+  async (cell: Cell, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+
+    if (game.isProcessing) return
+
+    dispatch(gameSlice.actions.setIsProcessing(true))
+
+    if (getCurrentPlayer(game).isZombie) {
+      await dispatch(handleZombieCellClick(cell))
+    } else {
+      await dispatch(handlePlayerCellClick(cell))
+    }
+
+    dispatch(gameSlice.actions.setIsProcessing(false))
+  }
+)
+
+const handleZombieCellClick = createAsyncThunk(
+  'game/handleZombieCellClick',
+  async (cell: Cell, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+
+    const zombieOnCell = game.zombies.find(zombie => zombie.cellId === cell.id)
+    const playersOnCell = game.players.filter(
+      player => player.cellId === cell.id
+    )
+
+    if (zombieOnCell && zombieOnCell.opened && !game.isZombieMove) {
+      dispatch(gameSlice.actions.setPlayerCell(cell.id))
+      dispatch(gameSlice.actions.setIsZombieMove(true))
+      await dispatch(moveStage())
+    } else {
+      if (!cell.canMove) return
+
+      dispatch(gameSlice.actions.setIsZombieMove(false))
+      dispatch(gameSlice.actions.moveZombie(cell.id))
+
+      if (playersOnCell.length === 0) {
+        await dispatch(endTurn())
+        return
+      }
+
+      const playerOnCellIndex = game.players.findIndex(
+        player => player.id === playersOnCell[0].id
+      )
+
+      if (playerOnCellIndex === -1) return
+
+      dispatch(gameSlice.actions.setCurrentPlayerIndex(playerOnCellIndex))
+      await dispatch(fightStage())
+    }
+  }
+)
+
+const handlePlayerCellClick = createAsyncThunk(
+  'game/handlePlayerCellClick',
+  async (cell: Cell, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+
+    const zombieOnCell = game.zombies.find(zombie => zombie.cellId === cell.id)
+    const itemsOnCell = game.items.filter(item => item.cellId === cell.id)
+
+    if (!cell.canMove) return
+
+    dispatch(gameSlice.actions.movePlayer(cell.id))
+
+    if (zombieOnCell) {
+      dispatch(gameSlice.actions.setZombieOpen(zombieOnCell.id))
+
+      if (hasPlayerItem(game, 'grenade')) {
+        dispatch(gameSlice.actions.setCanFight('grenade'))
+        return
+      }
+
+      if (hasPlayerItem(game, 'launcher') && zombieOnCell.type === 'boss') {
+        dispatch(gameSlice.actions.setCanFight('launcher'))
+        return
+      }
+
+      await dispatch(fightStage())
+      return
+    }
+
+    if (itemsOnCell.length > 0) {
+      for (const item of itemsOnCell) {
+        if (item.type === 'key' && cell.type === 'car') {
+          continue
+        }
+        dispatch(gameSlice.actions.pickItem(item.id))
+      }
+    }
+
+    if (cell.type === 'car') {
+      const keyOrGasoline = getCurrentPlayer(game).items.filter(
+        item => item.type === 'key' || item.type === 'gasoline'
+      )
+      if (keyOrGasoline.length > 0) {
+        keyOrGasoline.forEach(item => {
+          dispatch(
+            gameSlice.actions.setItemCell({ itemId: item.id, cellId: cell.id })
+          )
+          dispatch(gameSlice.actions.useItem(item.id))
+        })
+      }
+    }
+
+    await dispatch(endTurn())
+  }
+)
+
+export const manualSpinPinWheel = createAsyncThunk(
+  'game/manualSpinPinWheel',
+  async (_, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+
+    if (game.canFight === 'grenade') {
+      dispatch(gameSlice.actions.setCanFight(null))
+      await dispatch(fightStage())
+    }
+  }
+)
+
 // ----------- Slice ----------------
 
 export const gameSlice = createSlice({
@@ -305,6 +497,8 @@ export const gameSlice = createSlice({
       state.currentPlayerIndex = 0
       state.canFight = null
       state.status = 'playing'
+      state.isZombieMove = false
+      state.isProcessing = false
     },
 
     createCharacters(state) {
@@ -314,12 +508,12 @@ export const gameSlice = createSlice({
       const nextRandom = randomGenerator(min, max)
 
       for (let i = 0; i < 2; i++) {
-        const randomNumber = nextRandom()
-        if (randomNumber === null) break
+        const result = nextRandom.next()
+        if (result.done) break
 
         const startCell = state.board.cells[11][0]
         const player = createPlayer({
-          ...CharacterMap[randomNumber],
+          ...CharacterMap[result.value],
           cellId: startCell.id,
         })
         startCell.empty = false
@@ -489,21 +683,16 @@ export const gameSlice = createSlice({
     setPlayerCell(state, action: PayloadAction<number>) {
       getCurrentPlayer(state).cellId = action.payload
     },
+
+    setIsZombieMove(state, action: PayloadAction<boolean>) {
+      state.isZombieMove = action.payload
+    },
+
+    setIsProcessing(state, action: PayloadAction<boolean>) {
+      state.isProcessing = action.payload
+    },
   },
 })
-
-export const {
-  setCurrentPlayerIndex,
-  setPlayerCell,
-  setCanFight,
-  movePlayer,
-  moveZombie,
-  setZombieOpen,
-  pickItem,
-  useItem,
-  setItemCell,
-  addPlayerLifeCount,
-} = gameSlice.actions
 
 export default gameSlice.reducer
 
