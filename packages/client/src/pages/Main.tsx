@@ -14,6 +14,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+// import { AppError, ErrorCode } from '../utils/errorHandling'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -192,5 +193,7 @@ export const MainPage = () => {
 }
 
 export const initMainPage = async (_args: PageInitArgs) => {
+  // Для тестирования раскомментировать это и импорты:
+  // throw new AppError('Серверная ошибка', ErrorCode.SERVER_ERROR)
   return Promise.resolve()
 }
