@@ -9,7 +9,6 @@ import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
 import { validation } from '../utils/validation'
-
 const SigninSchema = Yup.object().shape({
   login: Yup.string()
     .matches(validation.login.pattern, validation.login.message)

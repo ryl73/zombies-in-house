@@ -11,6 +11,7 @@ import {
 } from 'react-router-dom/server'
 import { matchRoutes } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
+import { ServerStyleSheets, ThemeProvider } from '@material-ui/core/styles' // Добавлен ServerStyleSheets
 
 import {
   createContext,
@@ -21,6 +22,7 @@ import { reducer } from './store'
 import { routes } from './routes'
 import './index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
+import { theme } from './theme/theme'
 
 export const render = async (req: ExpressRequest) => {
   const { query, dataRoutes } = createStaticHandler(routes)
@@ -60,27 +62,40 @@ export const render = async (req: ExpressRequest) => {
 
   store.dispatch(setPageHasBeenInitializedOnServer(true))
 
+  // Создаем коллекторы стилей для Material-UI и styled-components
+  const materialSheets = new ServerStyleSheets()
+  const styledComponentsSheet = new ServerStyleSheet()
+
   const router = createStaticRouter(dataRoutes, context)
-  const sheet = new ServerStyleSheet()
+
   try {
     const html = ReactDOM.renderToString(
-      sheet.collectStyles(
-        <Provider store={store}>
-          <StaticRouterProvider router={router} context={context} />
-        </Provider>
+      materialSheets.collect(
+        // Собираем стили Material-UI
+        styledComponentsSheet.collectStyles(
+          // Собираем стили styled-components
+          <ThemeProvider theme={theme}>
+            <Provider store={store}>
+              <StaticRouterProvider router={router} context={context} />
+            </Provider>
+          </ThemeProvider>
+        )
       )
     )
-    const styleTags = sheet.getStyleTags()
+
+    // Получаем стили из обеих библиотек
+    const materialCss = materialSheets.toString()
+    const styledComponentsTags = styledComponentsSheet.getStyleTags()
 
     const helmet = Helmet.renderStatic()
 
     return {
       html,
       helmet,
-      styleTags,
+      styleTags: `<style id="jss-server-side">${materialCss}</style>${styledComponentsTags}`,
       initialState: store.getState(),
     }
   } finally {
-    sheet.seal()
+    styledComponentsSheet.seal()
   }
 }
