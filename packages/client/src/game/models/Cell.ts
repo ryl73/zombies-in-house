@@ -4,9 +4,8 @@ export type Cell = {
   id: number
   x: number
   y: number
-  available: boolean
-  canMove: boolean
-  empty: boolean
+  isTraversable: boolean
+  isEmpty: boolean
   type?: CellType
   walls: {
     top: boolean
@@ -16,13 +15,12 @@ export type Cell = {
   }
 }
 
-export function createCell(x: number, y: number, available: boolean): Cell {
+export function createCell(x: number, y: number): Cell {
   return {
     x,
     y,
-    available,
-    canMove: false,
-    empty: true,
+    isTraversable: false,
+    isEmpty: true,
     id: Math.random(),
     walls: {
       top: false,

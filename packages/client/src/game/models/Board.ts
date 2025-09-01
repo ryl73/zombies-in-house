@@ -54,7 +54,7 @@ export function initCells(board: Board): Board {
     for (let j = 0; j < boardWallsMatrix[0].length; j++) {
       const value = boardWallsMatrix[i][j]
       const valueObject = boardObjectsMatrix[i][j]
-      const cell = createCell(i, j, true)
+      const cell = createCell(i, j)
       if (valueObject === 2) {
         cell.type = 'car'
       }

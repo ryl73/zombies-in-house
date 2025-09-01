@@ -392,7 +392,7 @@ const handleZombieCellClick = createAsyncThunk(
       dispatch(gameSlice.actions.setIsZombieMove(true))
       await dispatch(moveStage())
     } else {
-      if (!cell.canMove) return
+      if (!cell.isTraversable) return
 
       dispatch(gameSlice.actions.setIsZombieMove(false))
       dispatch(gameSlice.actions.moveZombie(cell.id))
@@ -422,7 +422,7 @@ const handlePlayerCellClick = createAsyncThunk(
     const zombieOnCell = game.zombies.find(zombie => zombie.cellId === cell.id)
     const itemsOnCell = game.items.filter(item => item.cellId === cell.id)
 
-    if (!cell.canMove) return
+    if (!cell.isTraversable) return
 
     dispatch(gameSlice.actions.movePlayer(cell.id))
 
@@ -516,7 +516,7 @@ export const gameSlice = createSlice({
           ...CharacterMap[result.value],
           cellId: startCell.id,
         })
-        startCell.empty = false
+        startCell.isEmpty = false
         state.players.push(player)
       }
     },
@@ -528,7 +528,7 @@ export const gameSlice = createSlice({
           const randomY = getRandomInt(0, 11)
 
           const cell = state.board.cells[randomX][randomY]
-          if (!cell.empty || cell.type === 'start') {
+          if (!cell.isEmpty || cell.type === 'start') {
             i--
             continue
           }
@@ -538,7 +538,7 @@ export const gameSlice = createSlice({
             cellId: cell.id,
             type: value.type,
           })
-          cell.empty = false
+          cell.isEmpty = false
           state.items.push(item)
         }
       })
@@ -551,7 +551,7 @@ export const gameSlice = createSlice({
           const randomY = getRandomInt(0, 11)
 
           const cell = state.board.cells[randomX][randomY]
-          if (!cell.empty || cell.type === 'start') {
+          if (!cell.isEmpty || cell.type === 'start') {
             i--
             continue
           }
@@ -561,7 +561,7 @@ export const gameSlice = createSlice({
             cellId: cell.id,
             type: type as ZombieType,
           })
-          cell.empty = false
+          cell.isEmpty = false
           state.zombies.push(zombie)
         }
       })
@@ -569,7 +569,7 @@ export const gameSlice = createSlice({
 
     setCanMoveCells(state, action: PayloadAction<number[]>) {
       state.board.cells.flat().forEach(cell => {
-        cell.canMove = action.payload.includes(cell.id)
+        cell.isTraversable = action.payload.includes(cell.id)
       })
     },
 
@@ -588,7 +588,7 @@ export const gameSlice = createSlice({
     resetCanMoveCells(state) {
       state.board.cells.forEach(row => {
         row.forEach(cell => {
-          cell.canMove = false
+          cell.isTraversable = false
         })
       })
     },

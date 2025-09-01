@@ -61,7 +61,7 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
           )
         })}
       </CellBlockCard>
-      {cell.canMove && <Dot />}
+      {cell.isTraversable && <Dot />}
     </CellBlock>
   )
 }
