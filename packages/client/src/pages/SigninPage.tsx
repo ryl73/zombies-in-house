@@ -1,14 +1,28 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
 import { PageContainer } from '../styles/PageContainer'
-import { Form } from '../styles/Form'
+import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
+import * as Yup from 'yup'
+import { ErrorMessage } from '../styles/Errors'
+import { Formik, Field } from 'formik'
+import { validation } from '../utils/validation'
+const SigninSchema = Yup.object().shape({
+  login: Yup.string()
+    .matches(validation.login.pattern, validation.login.message)
+    .required('Логин обязателен'),
+  password: Yup.string()
+    .min(8, 'Пароль должен быть больше 8 символов')
+    .max(40, 'Пароль должен быть не более 40 символов')
+    .matches(validation.password.pattern, validation.password.message)
+    .required('Пароль обязателен'),
+})
 
 export const SigninPage = () => {
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const onSubmit = (values: { login: string; password: string }) => {
+    console.log(values)
   }
 
   return (
@@ -20,11 +34,32 @@ export const SigninPage = () => {
       </Helmet>
       <PageContainer>
         <ThemedHeader>ВХОД</ThemedHeader>
-        <Form onSubmit={handleSubmit}>
-          <Input id="login" type="text" placeholder="Логин" />
-          <Input id="password" type="password" placeholder="Пароль" />
-          <Button type="submit">ВОЙТИ</Button>
-        </Form>
+        <Formik
+          initialValues={{ login: '', password: '' }}
+          validationSchema={SigninSchema}
+          onSubmit={onSubmit}>
+          {({ errors, touched, handleSubmit }) => (
+            <StyledForm onSubmit={handleSubmit}>
+              <Field as={Input} id="login" name="login" placeholder="Логин" />
+              {errors.login && touched.login && (
+                <ErrorMessage>{errors.login}</ErrorMessage>
+              )}
+
+              <Field
+                as={Input}
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Пароль"
+              />
+              {errors.password && touched.password && (
+                <ErrorMessage>{errors.password}</ErrorMessage>
+              )}
+
+              <Button type="submit">ВОЙТИ</Button>
+            </StyledForm>
+          )}
+        </Formik>
       </PageContainer>
     </>
   )
