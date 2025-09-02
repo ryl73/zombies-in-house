@@ -11,7 +11,6 @@ import { theme } from './theme/theme'
 
 const router = createBrowserRouter(routes)
 
-// Удаляем серверные стили после гидратации
 const jssStyles = document.getElementById('jss-server-side')
 if (jssStyles) {
   jssStyles.parentElement?.removeChild(jssStyles)
