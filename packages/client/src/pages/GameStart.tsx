@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet'
-import { Header } from '../components/Header'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
@@ -47,11 +46,8 @@ export const GameStart = () => {
     <Box style={{ backgroundColor: theme.palette.background.default }}>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>Главная</title>
-        <meta
-          name="description"
-          content="Главная страница с информацией о пользователе"
-        />
+        <title>Начало игры</title>
+        <meta name="description" content="Экран для того чтобы начать игру" />
       </Helmet>
 
       <Box className={classes.firstScreen}>
