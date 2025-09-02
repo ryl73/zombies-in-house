@@ -1,23 +1,59 @@
 import apiClient from './APIClient'
 
-export interface SignInRequest {
+export type SimpleResponse = {
+  response?: string
+}
+
+export type SignInRequest = {
   login: string
   password: string
 }
 
-export interface SignInResponse {
-  reason: string
+export type SignUpRequest = {
+  first_name: string
+  second_name: string
+  login: string
+  email: string
+  password: string
+  phone: string
 }
 
-export const signIn = async (data: SignInRequest): Promise<SignInResponse> => {
-  const response = await apiClient.post<SignInResponse>('/auth/signin', data)
+export type SignUpResponse = {
+  id?: number
+} & SimpleResponse
+
+export type UserResponse = {
+  id: number
+  first_name: string
+  second_name: string
+  display_name: string
+  phone: string
+  login: string
+  avatar: string
+  email: string
+}
+
+export const signIn = async (data: SignInRequest): Promise<SimpleResponse> => {
+  const response = await apiClient.post<SimpleResponse>('/auth/signin', data)
   if (response.status >= 200 && response.status < 300)
     localStorage.setItem('isAuthenticated', 'true')
   return response.data
 }
 
-export const logout = async (): Promise<SignInResponse> => {
-  const response = await apiClient.post<SignInResponse>('/auth/logout')
+export const logout = async (): Promise<SimpleResponse> => {
+  const response = await apiClient.post<SimpleResponse>('/auth/logout')
   localStorage.removeItem('isAuthenticated')
+  return response.data
+}
+
+export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
+  const response = await apiClient.post<SignUpResponse>('/auth/signup', data)
+  if (response.status >= 200 && response.status < 300)
+    localStorage.setItem('isAuthenticated', 'true')
+  return response.data
+}
+
+export const getUser = async (): Promise<UserResponse> => {
+  const response = await apiClient.get<UserResponse>('/user')
   return response.data
 }
