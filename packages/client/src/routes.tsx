@@ -7,6 +7,7 @@ import { initSigninPage, SigninPage } from './pages/SigninPage'
 import { initSignupPage, SignupPage } from './pages/SignupPage'
 import { initProfilePage, ProfilePage } from './pages/ProfilePage'
 import { GamePage, initGamePage } from './pages/GamePage'
+import { GameStart, initGameStart } from './pages/GameStart'
 import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
@@ -54,6 +55,11 @@ export const routes: Route[] = [
     path: '/game',
     Component: GamePage,
     fetchData: initGamePage,
+  },
+  {
+    path: '/game-start',
+    Component: GameStart,
+    fetchData: initGameStart,
   },
   {
     path: '/leaderboard',
