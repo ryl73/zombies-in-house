@@ -2,6 +2,7 @@ import { AppDispatch, RootState } from './store'
 
 import { initMainPage, MainPage } from './pages/Main'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
+import { ServerErrorPage, initServerErrorPage } from './pages/ServerErrorPage'
 import { initSigninPage, SigninPage } from './pages/SigninPage'
 import { initSignupPage, SignupPage } from './pages/SignupPage'
 import { initProfilePage, ProfilePage } from './pages/ProfilePage'
@@ -68,6 +69,16 @@ export const routes: Route[] = [
     path: '/forum/topic',
     Component: ForumTopicPage,
     fetchData: initForumTopicPage,
+  },
+  {
+    path: '/404',
+    Component: NotFoundPage,
+    fetchData: initNotFoundPage,
+  },
+  {
+    path: '/500',
+    Component: ServerErrorPage,
+    fetchData: initServerErrorPage,
   },
   {
     path: '*',
