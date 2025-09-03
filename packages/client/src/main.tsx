@@ -8,6 +8,7 @@ import { routes } from './routes'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
 import './index.css'
 import { theme } from './theme/theme'
+import { startServiceWorker } from './serviceWorkers'
 
 const router = createBrowserRouter(routes)
 
@@ -27,3 +28,5 @@ ReactDOM.hydrateRoot(
     </Provider>
   </ThemeProvider>
 )
+
+startServiceWorker()
