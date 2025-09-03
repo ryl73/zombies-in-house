@@ -5,6 +5,9 @@ import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
+import { signIn, type SignInRequest } from '../api/LoginAPI'
+import { useNavigate } from 'react-router-dom'
+
 import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
@@ -21,8 +24,11 @@ const SigninSchema = Yup.object().shape({
 })
 
 export const SigninPage = () => {
+  const navigate = useNavigate()
   const onSubmit = (values: { login: string; password: string }) => {
-    console.log(values)
+    const requestData: SignInRequest = { login, password }
+    await signIn(requestData)
+    navigate('/')
   }
 
   return (

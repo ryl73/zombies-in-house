@@ -5,6 +5,8 @@ import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
+import { signup, SignUpRequest } from '../api/LoginAPI'
+import { useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
@@ -51,8 +53,19 @@ const SignupSchema = Yup.object().shape({
 })
 
 export const SignupPage = () => {
+  const navigate = useNavigate()
   const onSubmit = (values: FormValues) => {
-    console.log(values)
+    const { email, login, first_name, second_name, phone, password } = values;
+    const requestData: SignUpRequest = {
+      email,
+      login,
+      first_name,
+      second_name,
+      phone,
+      password,
+    }
+    await signup(requestData)
+    navigate('/')
   }
 
   return (
