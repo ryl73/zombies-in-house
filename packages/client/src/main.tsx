@@ -9,8 +9,6 @@ import './index.css'
 import Router from './Router'
 import { theme } from './theme/theme'
 
-const router = createBrowserRouter(routes)
-
 const jssStyles = document.getElementById('jss-server-side')
 if (jssStyles) {
   jssStyles.parentElement?.removeChild(jssStyles)
