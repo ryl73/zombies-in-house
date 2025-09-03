@@ -1,5 +1,5 @@
 import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { MainPage } from './pages/Main'
 import { SigninPage } from './pages/SigninPage'
 import { SignupPage } from './pages/SignupPage'
@@ -76,8 +76,6 @@ function Router() {
           </ProtectedRoute>
         }
       />
-
-      <Route path="/" element={<Navigate to="/signin" replace />} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

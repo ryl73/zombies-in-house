@@ -35,8 +35,7 @@ export type UserResponse = {
 
 export const signIn = async (data: SignInRequest): Promise<SimpleResponse> => {
   const response = await apiClient.post<SimpleResponse>('/auth/signin', data)
-  if (response.status >= 200 && response.status < 300)
-    localStorage.setItem('isAuthenticated', 'true')
+  localStorage.setItem('isAuthenticated', 'true')
   return response.data
 }
 
@@ -48,8 +47,7 @@ export const logout = async (): Promise<SimpleResponse> => {
 
 export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
   const response = await apiClient.post<SignUpResponse>('/auth/signup', data)
-  if (response.status >= 200 && response.status < 300)
-    localStorage.setItem('isAuthenticated', 'true')
+  localStorage.setItem('isAuthenticated', 'true')
   return response.data
 }
 
