@@ -54,8 +54,8 @@ const SignupSchema = Yup.object().shape({
 
 export const SignupPage = () => {
   const navigate = useNavigate()
-  const onSubmit = (values: FormValues) => {
-    const { email, login, first_name, second_name, phone, password } = values;
+  const onSubmit = async (values: FormValues) => {
+    const { email, login, first_name, second_name, phone, password } = values
     const requestData: SignUpRequest = {
       email,
       login,

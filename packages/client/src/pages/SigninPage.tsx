@@ -7,11 +7,11 @@ import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
 import { signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
-
 import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
 import { validation } from '../utils/validation'
+
 const SigninSchema = Yup.object().shape({
   login: Yup.string()
     .matches(validation.login.pattern, validation.login.message)
@@ -25,8 +25,12 @@ const SigninSchema = Yup.object().shape({
 
 export const SigninPage = () => {
   const navigate = useNavigate()
-  const onSubmit = (values: { login: string; password: string }) => {
-    const requestData: SignInRequest = { login, password }
+  const onSubmit = async (values: { login: string; password: string }) => {
+    const { login, password } = values
+    const requestData: SignInRequest = {
+      login,
+      password,
+    }
     await signIn(requestData)
     navigate('/')
   }
