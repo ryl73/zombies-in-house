@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Box, TextField, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import * as Yup from 'yup'
+import { validation } from '../../utils/validation'
 
 const useStyles = makeStyles(theme => ({
   form: {
@@ -16,6 +17,7 @@ const useStyles = makeStyles(theme => ({
 const CommentSchema = Yup.object().shape({
   content: Yup.string()
     .required('Комментарий не может быть пустым')
+    .matches(validation.notEmpty.pattern, validation.notEmpty.message)
     .min(5, 'Комментарий должен содержать минимум 5 символов'),
 })
 

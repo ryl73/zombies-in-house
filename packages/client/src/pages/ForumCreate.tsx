@@ -16,6 +16,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { ArrowBack } from '@material-ui/icons'
 import * as Yup from 'yup'
+import { validation } from '../utils/validation'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -44,8 +45,12 @@ const useStyles = makeStyles(theme => ({
 }))
 
 const TopicCreateSchema = Yup.object().shape({
-  title: Yup.string().required('Заголовок обязателен'),
-  content: Yup.string().required('Содержание обязательно'),
+  title: Yup.string()
+    .required('Заголовок обязателен')
+    .matches(validation.notEmpty.pattern, validation.notEmpty.message),
+  content: Yup.string()
+    .required('Содержание обязательно')
+    .matches(validation.notEmpty.pattern, validation.notEmpty.message),
 })
 
 export const ForumCreatePage = () => {
