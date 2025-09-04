@@ -10,6 +10,7 @@ import { ForumPage } from './pages/ForumPage'
 import { NotFoundPage } from './pages/NotFound'
 import { ProtectedRoute } from './components/Routes/ProtectedRoute'
 import { OnlyPublicRoute } from './components/Routes/OnlyPublicRoute'
+import { GameEnd } from './pages/GameEnd'
 
 function Router() {
   return (
@@ -73,6 +74,15 @@ function Router() {
         element={
           <ProtectedRoute>
             <ForumPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/game-end"
+        element={
+          <ProtectedRoute>
+            <GameEnd />
           </ProtectedRoute>
         }
       />
