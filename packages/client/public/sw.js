@@ -1,24 +1,29 @@
 const CACHE_NAME = 'game-cache-v1'
 
-const URLS = [
-  '/',
-  '/index.html',
-  '/images/landing-first-screen.webp',
-  '/images/game/board.jpg',
-]
-
 this.addEventListener('install', event => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache')
-        return cache.addAll(URLS)
+    (async () => {
+      const cache = await caches.open(CACHE_NAME)
+
+      const initialUrls = ['/', '/vite.svg']
+
+      const manifestRes = await fetch('/manifest.json')
+      const manifest = await manifestRes.json()
+
+      const manifestUrls = Object.values(manifest).flatMap(entry => {
+        const assets = [entry.file]
+        if (entry.css) assets.push(...entry.css)
+        if (entry.assets) assets.push(...entry.assets)
+        return assets.map(p => '/' + p)
       })
-      .catch(err => {
-        console.log(err)
-        throw err
-      })
+
+      const imagesRes = await fetch('/images.json')
+      const images = await imagesRes.json()
+
+      const allUrls = [...initialUrls, ...manifestUrls, ...images]
+      const uniqueUrls = new Set(allUrls)
+      await cache.addAll(uniqueUrls)
+    })()
   )
   self.skipWaiting()
 })
@@ -30,7 +35,6 @@ this.addEventListener('activate', event => {
       await Promise.all(
         keys.map(key => {
           if (key !== CACHE_NAME) {
-            console.log('Deleting old cache:', key)
             return caches.delete(key)
           }
         })
