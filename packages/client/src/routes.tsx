@@ -12,6 +12,7 @@ import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
 import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
+import { GameEnd, initGameEnd } from './pages/GameEnd'
 
 export type PageInitContext = {
   clientToken?: string
@@ -56,10 +57,15 @@ export const routes: Route[] = [
     Component: GamePage,
     fetchData: initGamePage,
   },
-  {
+  {      
     path: '/game-start',
     Component: GameStart,
     fetchData: initGameStart,
+  },
+  {
+    path: '/game-end',
+    Component: GameEnd,
+    fetchData: initGameEnd,
   },
   {
     path: '/leaderboard',
