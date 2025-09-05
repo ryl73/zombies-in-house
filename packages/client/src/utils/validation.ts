@@ -21,4 +21,8 @@ export const validation = {
     pattern: /^\+?(?:\D*\d){10,15}\D*$/,
     message: 'Телефон от 10 до 15 цифр, может начинаться с +',
   },
+  notEmpty: {
+    pattern: /^(?!\s*$).+/,
+    message: 'Сообщение не должно быть пустым',
+  },
 }
