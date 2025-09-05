@@ -14,6 +14,8 @@ import {
   useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import { logout } from '../api/LoginAPI'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -61,6 +63,7 @@ const useStyles = makeStyles(theme => ({
 
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
+  const navigate = useNavigate()
   const theme = useTheme()
   const classes = useStyles()
 
@@ -184,6 +187,17 @@ export const MainPage = () => {
             color="primary"
             className={classes.readyButton}>
             Я готов!
+          </Button>
+          <Button
+            component={Link}
+            onClick={() => {
+              logout().then(() => navigate('/signin'))
+            }}
+            to="/signin"
+            variant="contained"
+            color="primary"
+            className={classes.readyButton}>
+            Выход
           </Button>
         </Box>
       </Container>

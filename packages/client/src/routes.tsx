@@ -2,14 +2,17 @@ import { AppDispatch, RootState } from './store'
 
 import { initMainPage, MainPage } from './pages/Main'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
+import { ServerErrorPage, initServerErrorPage } from './pages/ServerErrorPage'
 import { initSigninPage, SigninPage } from './pages/SigninPage'
 import { initSignupPage, SignupPage } from './pages/SignupPage'
 import { initProfilePage, ProfilePage } from './pages/ProfilePage'
 import { GamePage, initGamePage } from './pages/GamePage'
+import { GameStart, initGameStart } from './pages/GameStart'
 import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
 import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
+import { GameEnd, initGameEnd } from './pages/GameEnd'
 
 export type PageInitContext = {
   clientToken?: string
@@ -55,6 +58,16 @@ export const routes: Route[] = [
     fetchData: initGamePage,
   },
   {
+    path: '/game-start',
+    Component: GameStart,
+    fetchData: initGameStart,
+  },
+  {
+    path: '/game-end',
+    Component: GameEnd,
+    fetchData: initGameEnd,
+  },
+  {
     path: '/leaderboard',
     Component: LeaderboardPage,
     fetchData: initLeaderboardPage,
@@ -68,6 +81,16 @@ export const routes: Route[] = [
     path: '/forum/topic',
     Component: ForumTopicPage,
     fetchData: initForumTopicPage,
+  },
+  {
+    path: '/404',
+    Component: NotFoundPage,
+    fetchData: initNotFoundPage,
+  },
+  {
+    path: '/500',
+    Component: ServerErrorPage,
+    fetchData: initServerErrorPage,
   },
   {
     path: '*',
