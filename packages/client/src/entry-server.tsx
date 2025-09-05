@@ -75,14 +75,12 @@ export const render = async (req: ExpressRequest) => {
         // Собираем стили Material-UI
         styledComponentsSheet.collectStyles(
           // Собираем стили styled-components
-          <>
+          <ThemeProvider theme={theme}>
             <CssBaseline />
-            <ThemeProvider theme={theme}>
-              <Provider store={store}>
-                <StaticRouterProvider router={router} context={context} />
-              </Provider>
-            </ThemeProvider>
-          </>
+            <Provider store={store}>
+              <StaticRouterProvider router={router} context={context} />
+            </Provider>
+          </ThemeProvider>
         )
       )
     )
