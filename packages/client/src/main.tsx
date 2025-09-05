@@ -18,12 +18,12 @@ if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
 }
 
 function Main() {
-  // React.useEffect(() => {
-  //   const jssStyles = document.getElementById('jss-server-side')
-  //   if (jssStyles) {
-  //     jssStyles.parentElement?.removeChild(jssStyles)
-  //   }
-  // }, [])
+  React.useEffect(() => {
+    const jssStyles = document.getElementById('jss-server-side')
+    if (jssStyles) {
+      jssStyles.parentElement?.removeChild(jssStyles)
+    }
+  }, [])
 
   return (
     <ThemeProvider theme={theme}>
