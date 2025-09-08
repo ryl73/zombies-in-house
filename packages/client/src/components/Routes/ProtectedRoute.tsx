@@ -1,15 +1,16 @@
-import React from 'react'
 import { Navigate } from 'react-router-dom'
+import { isUserLoggedIn } from '../../slices/userSlice'
+import { useSelector } from 'react-redux'
 
 interface ProtectedRouteProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated')
-  if (!isAuthenticated) {
-    return <Navigate to="/signin" replace />
-  } else {
+export const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
+  const isLoggedIn = useSelector(isUserLoggedIn)
+  if (isLoggedIn) {
     return <>{children}</>
+  } else {
+    return <Navigate to="/signin" replace />
   }
 }

@@ -5,34 +5,44 @@ import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import { signIn, type SignInRequest } from '../api/LoginAPI'
+import { getUser, signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
-import { validation } from '../utils/validation'
+import { LoginSchema, PasswordSchema } from '../utils/validation'
+import { useNotification } from '../hooks/useNotification'
+import { useDispatch } from 'react-redux'
+import { setUser } from '../slices/userSlice'
 
 const SigninSchema = Yup.object().shape({
-  login: Yup.string()
-    .matches(validation.login.pattern, validation.login.message)
-    .required('Логин обязателен'),
-  password: Yup.string()
-    .min(8, 'Пароль должен быть больше 8 символов')
-    .max(40, 'Пароль должен быть не более 40 символов')
-    .matches(validation.password.pattern, validation.password.message)
-    .required('Пароль обязателен'),
+  login: LoginSchema,
+  password: PasswordSchema,
 })
 
 export const SigninPage = () => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { showError } = useNotification()
   const onSubmit = async (values: { login: string; password: string }) => {
     const { login, password } = values
     const requestData: SignInRequest = {
       login,
       password,
     }
-    await signIn(requestData)
-    navigate('/')
+    signIn(requestData)
+      .then(() =>
+        getUser().then(u => {
+          dispatch(setUser(u))
+          navigate('/')
+        })
+      )
+      .catch(err => {
+        const errorMassage = err.response?.data?.reason
+          ? err.response.data?.reason
+          : 'Ошибка при входе'
+        showError(errorMassage)
+      })
   }
 
   return (

@@ -23,6 +23,7 @@ import { routes } from './routes'
 import './index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
 import { theme } from './theme/theme'
+import { NotificationProvider } from './hooks/useNotification'
 
 export const render = async (req: ExpressRequest) => {
   const { query, dataRoutes } = createStaticHandler(routes)
@@ -76,7 +77,9 @@ export const render = async (req: ExpressRequest) => {
           // Собираем стили styled-components
           <ThemeProvider theme={theme}>
             <Provider store={store}>
-              <StaticRouterProvider router={router} context={context} />
+              <NotificationProvider>
+                <StaticRouterProvider router={router} context={context} />
+              </NotificationProvider>
             </Provider>
           </ThemeProvider>
         )

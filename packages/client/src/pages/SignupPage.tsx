@@ -10,7 +10,15 @@ import { useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
 import * as Yup from 'yup'
-import { validation } from '../utils/validation'
+import {
+  LoginSchema,
+  NameSchema,
+  PasswordSchema,
+  PhoneSchema,
+  EmailSchema,
+  RepeatPasswordSchema,
+} from '../utils/validation'
+import { useNotification } from '../hooks/useNotification'
 
 type FormValues = {
   login: string
@@ -23,37 +31,18 @@ type FormValues = {
 }
 
 const SignupSchema = Yup.object().shape({
-  email: Yup.string()
-    .matches(validation.email.pattern, validation.email.message)
-    .required('Почта обязательна'),
-  login: Yup.string()
-    .min(3, 'Логин должен быть не менее 3 символов')
-    .max(20, 'Логин должен быть не более 20 символов')
-    .matches(validation.login.pattern, validation.login.message)
-    .required('Логин обязателен'),
-  first_name: Yup.string()
-    .matches(validation.name.pattern, validation.name.message)
-    .required('Имя обязательно'),
-  second_name: Yup.string()
-    .matches(validation.name.pattern, validation.name.message)
-    .required('Фамилия обязательна'),
-  phone: Yup.string()
-    .min(10, 'Номер телефона должен содержать не менее 10 цифр')
-    .max(15, 'Номер телефона не должен быть более 15 цифр')
-    .matches(validation.phone.pattern, validation.phone.message)
-    .required('Телефон обязателен'),
-  password: Yup.string()
-    .min(8, 'Пароль должен быть не менее 8 символов')
-    .max(40, 'Пароль должен быть не более 40 символов')
-    .matches(validation.password.pattern, validation.password.message)
-    .required('Пароль обязателен'),
-  password_repeat: Yup.string()
-    .oneOf([Yup.ref('password')], 'Пароли должны совпадать')
-    .required('Повторите пароль'),
+  email: EmailSchema,
+  login: LoginSchema,
+  first_name: NameSchema('Имя обязательно'),
+  second_name: NameSchema('Фамилия обязательна'),
+  phone: PhoneSchema,
+  password: PasswordSchema,
+  password_repeat: RepeatPasswordSchema('password'),
 })
 
 export const SignupPage = () => {
   const navigate = useNavigate()
+  const { showError } = useNotification()
   const onSubmit = async (values: FormValues) => {
     const { email, login, first_name, second_name, phone, password } = values
     const requestData: SignUpRequest = {
@@ -64,8 +53,14 @@ export const SignupPage = () => {
       phone,
       password,
     }
-    await signup(requestData)
-    navigate('/')
+    signup(requestData)
+      .then(() => navigate('/'))
+      .catch(error => {
+        const errorMassage = error.response?.data?.reason
+          ? error.response.data?.reason
+          : 'Ошибка при регистрации'
+        showError(errorMassage)
+      })
   }
 
   return (

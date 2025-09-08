@@ -1,4 +1,6 @@
 import axios from 'axios'
+import { clearUser } from '../slices/userSlice'
+import { logout } from './LoginAPI'
 
 const USER_IN_SYSTEM = 'User already in system'
 
@@ -15,14 +17,14 @@ apiClient.interceptors.response.use(
       window.location.pathname !== '/signin'
     ) {
       // если не авторизован, то делаем редирект на страницу логина
-      localStorage.removeItem('isAuthenticated')
+      clearUser()
       window.location.replace('/signin')
     } else if (
       error.response?.status === 400 &&
       error.response?.data.reason === USER_IN_SYSTEM
     ) {
-      localStorage.setItem('isAuthenticated', 'true')
-      window.location.replace('/')
+      // делаем выход, если пользователь попал в ловушку "User already in system"
+      logout()
     }
     return Promise.reject(error)
   }

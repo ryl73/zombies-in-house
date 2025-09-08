@@ -6,8 +6,9 @@ import { ThemeProvider } from '@material-ui/core/styles'
 import { store } from './store'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
 import './index.css'
-import Router from './Router'
 import { theme } from './theme/theme'
+import { NotificationProvider } from './hooks/useNotification'
+import App from './App'
 
 const jssStyles = document.getElementById('jss-server-side')
 if (jssStyles) {
@@ -18,9 +19,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <ThemeProvider theme={theme}>
     <Provider store={store}>
       <AppErrorBoundary>
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
+        <NotificationProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </NotificationProvider>
       </AppErrorBoundary>
     </Provider>
   </ThemeProvider>
