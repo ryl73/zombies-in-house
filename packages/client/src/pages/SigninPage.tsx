@@ -5,7 +5,7 @@ import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import { getUser, signIn, type SignInRequest } from '../api/UserAPI'
+import { signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
 import { ErrorMessage } from '../styles/Errors'
@@ -14,6 +14,7 @@ import { LoginSchema, PasswordSchema } from '../utils/validation'
 import { useNotification } from '../hooks/useNotification'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../slices/userSlice'
+import { getUser } from '../api/UserAPI'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,

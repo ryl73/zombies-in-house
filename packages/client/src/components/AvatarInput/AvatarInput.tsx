@@ -5,6 +5,7 @@ import { changeAvatar } from '../../api/UserAPI'
 import { useSelector } from 'react-redux'
 import { selectUser } from '../../slices/userSlice'
 import notFoundImage from '../../assets/notfound.webp'
+import { useNotification } from '../../hooks/useNotification'
 
 //визуал аватара будет изменёт согласно другой задаче
 const useStyles = makeStyles(theme => ({
@@ -26,6 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 export const AvatarInput = () => {
   const classes = useStyles()
+  const { showError } = useNotification()
   const userData = useSelector(selectUser)
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -44,7 +46,12 @@ export const AvatarInput = () => {
     if (file) {
       const formData = new FormData()
       formData.append('avatar', file)
-      changeAvatar(formData)
+      changeAvatar(formData).catch(err => {
+        const errorMassage = err.response?.data?.reason
+          ? err.response.data?.reason
+          : 'Ошибка при смене пароля'
+        showError(errorMassage)
+      })
       const reader = new FileReader()
       reader.onloadend = () => {
         setPreview(reader.result as string)
