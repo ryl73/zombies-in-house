@@ -15,7 +15,7 @@ import {
   useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { logout } from '../api/LoginAPI'
+import { logout } from '../api/UserAPI'
 import { useNavigate } from 'react-router-dom'
 import { clearUser, isUserLoggedIn } from '../slices/userSlice'
 import { useSelector, useDispatch } from 'react-redux'

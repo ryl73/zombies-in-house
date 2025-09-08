@@ -1,7 +1,7 @@
 import { Form as StyledForm } from '../../styles/Form'
 import React from 'react'
 import { Input } from '../../styles/Input'
-import { changePassword, ChangePasswordRequest } from '../../api/LoginAPI'
+import { changePassword, ChangePasswordRequest } from '../../api/UserAPI'
 import * as Yup from 'yup'
 import { ErrorMessage } from '../../styles/Errors'
 import { Formik, Field } from 'formik'

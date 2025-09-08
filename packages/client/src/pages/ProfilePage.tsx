@@ -5,6 +5,7 @@ import { PageContainer } from '../styles/PageContainer'
 import { ChangePasswordForm } from '../components/ChangePasswordForm/ChangePasswordForm'
 import { Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
+import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 
 export const ProfilePage = () => {
   return (
@@ -16,6 +17,7 @@ export const ProfilePage = () => {
       </Helmet>
       <PageContainer>
         <ThemedHeader>Профиль</ThemedHeader>
+        <AvatarInput />
         <ChangeProfileForm />
         <Typography variant="h2" component="h2" align="center" gutterBottom>
           Смена пароля

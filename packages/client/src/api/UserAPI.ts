@@ -84,3 +84,12 @@ export const changeUser = async (
   setUser(response.data)
   return response.data
 }
+
+export const changeAvatar = async (data: FormData): Promise<UserResponse> => {
+  const response = await apiClient.put<UserResponse>(
+    '/user/profile/avatar',
+    data
+  )
+  setUser(response.data)
+  return response.data
+}

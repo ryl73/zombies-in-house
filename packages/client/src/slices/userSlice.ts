@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { getUser, UserResponse } from '../api/LoginAPI'
+import { getUser, UserResponse } from '../api/UserAPI'
 
 export interface UserState {
   data: UserResponse | null

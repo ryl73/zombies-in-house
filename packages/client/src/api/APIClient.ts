@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { clearUser } from '../slices/userSlice'
-import { logout } from './LoginAPI'
+import { logout } from './UserAPI'
 
 const USER_IN_SYSTEM = 'User already in system'
 
