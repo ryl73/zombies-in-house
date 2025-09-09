@@ -15,6 +15,7 @@ export default defineConfig({
   },
   build: {
     outDir: path.join(__dirname, 'dist/client'),
+    manifest: true,
   },
   ssr: {
     format: 'cjs',
