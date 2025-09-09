@@ -5,7 +5,7 @@ import { Form as StyledForm } from '../styles/Form'
 import { Input } from '../styles/Input'
 import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
-import { signup, SignUpRequest } from '../api/LoginAPI'
+import { signup } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '../styles/Errors'
 import { Formik, Field } from 'formik'
@@ -43,17 +43,15 @@ const SignupSchema = Yup.object().shape({
 export const SignupPage = () => {
   const navigate = useNavigate()
   const { showError } = useNotification()
-  const onSubmit = async (values: FormValues) => {
-    const { email, login, first_name, second_name, phone, password } = values
-    const requestData: SignUpRequest = {
-      email,
-      login,
-      first_name,
-      second_name,
-      phone,
-      password,
-    }
-    signup(requestData)
+  const onSubmit = async ({
+    email,
+    login,
+    first_name,
+    second_name,
+    phone,
+    password,
+  }: FormValues) => {
+    signup({ email, login, first_name, second_name, phone, password })
       .then(() => navigate('/'))
       .catch(error => {
         const errorMassage = error.response?.data?.reason

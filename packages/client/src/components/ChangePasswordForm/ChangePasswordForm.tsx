@@ -17,11 +17,13 @@ const ChangePasswordSchema = Yup.object().shape({
 
 export const ChangePasswordForm = () => {
   const { showSuccess, showError } = useNotification()
-  const onSubmit = async (values: {
+  const onSubmit = async ({
+    newPassword,
+    password,
+  }: {
     newPassword: string
     password: string
   }) => {
-    const { newPassword, password } = values
     const requestData: ChangePasswordRequest = {
       oldPassword: password,
       newPassword,

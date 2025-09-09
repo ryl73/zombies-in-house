@@ -1,13 +1,13 @@
 import { Navigate } from 'react-router-dom'
 import { isUserLoggedIn } from '../../slices/userSlice'
-import { useSelector } from 'react-redux'
+import { useAppSelector } from '../../hooks/useApp'
 
 interface ProtectedRouteProps {
   children: ReactNode
 }
 
 export const OnlyPublicRoute: FC<ProtectedRouteProps> = ({ children }) => {
-  const isLoggedIn = useSelector(isUserLoggedIn)
+  const isLoggedIn = useAppSelector(isUserLoggedIn)
   if (isLoggedIn) {
     return <Navigate to="/" replace />
   } else {

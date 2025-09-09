@@ -18,7 +18,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { clearUser, isUserLoggedIn } from '../slices/userSlice'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { useAppSelector } from '../hooks/useApp'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -67,7 +68,7 @@ const useStyles = makeStyles(theme => ({
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
   const dispatch = useDispatch()
-  const isLoggedIn = useSelector(isUserLoggedIn)
+  const isLoggedIn = useAppSelector(isUserLoggedIn)
   const navigate = useNavigate()
   const theme = useTheme()
   const classes = useStyles()

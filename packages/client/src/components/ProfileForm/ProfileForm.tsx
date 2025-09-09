@@ -13,8 +13,8 @@ import {
 } from '../../utils/validation'
 import { Button } from '../../styles/Buttons'
 import { useNotification } from '../../hooks/useNotification'
-import { useSelector } from 'react-redux'
 import { selectUser } from '../../slices/userSlice'
+import { useAppSelector } from '../../hooks/useApp'
 
 const ChangeProfileSchema = Yup.object().shape({
   login: LoginSchema,
@@ -26,26 +26,9 @@ const ChangeProfileSchema = Yup.object().shape({
 
 export const ChangeProfileForm = () => {
   const { showSuccess, showError } = useNotification()
-  const userData = useSelector(selectUser)
-  const onSubmit = async (values: {
-    login: string
-    display_name: string
-    first_name: string
-    second_name: string
-    email: string
-    phone: string
-  }) => {
-    const { login, display_name, first_name, second_name, email, phone } =
-      values
-    const requestData: ChangeUserRequest = {
-      login,
-      display_name,
-      first_name,
-      second_name,
-      email,
-      phone,
-    }
-    changeUser(requestData)
+  const userData = useAppSelector(selectUser)
+  const onSubmit = async (values: ChangeUserRequest) => {
+    changeUser(values)
       .then(() => showSuccess('Профиль успешно изменён!'))
       .catch(error => {
         const errorMassage = error.response?.data?.reason

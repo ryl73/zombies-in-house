@@ -1,15 +1,14 @@
-import { AppDispatch, useSelector } from './store'
 import { fetchUserThunk, selectUserLoading } from './slices/userSlice'
-import { useDispatch } from 'react-redux'
 import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { PageContainer } from './styles/PageContainer'
 import { ThemedHeader } from './styles/ThemedHeader'
 import Router from './Router'
+import { useAppDispatch, useAppSelector } from './hooks/useApp'
 
 const App = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const isLoading = useSelector(selectUserLoading)
+  const dispatch = useAppDispatch()
+  const isLoading = useAppSelector(selectUserLoading)
 
   useEffect(() => {
     dispatch(fetchUserThunk())

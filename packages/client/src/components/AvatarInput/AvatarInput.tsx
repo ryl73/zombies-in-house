@@ -2,10 +2,10 @@ import { useState, useRef, ChangeEvent, useEffect } from 'react'
 import { Avatar, Box } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { changeAvatar } from '../../api/UserAPI'
-import { useSelector } from 'react-redux'
 import { selectUser } from '../../slices/userSlice'
 import notFoundImage from '../../assets/notfound.webp'
 import { useNotification } from '../../hooks/useNotification'
+import { useAppSelector } from '../../hooks/useApp'
 
 //визуал аватара будет изменёт согласно другой задаче
 const useStyles = makeStyles(theme => ({
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
 export const AvatarInput = () => {
   const classes = useStyles()
   const { showError } = useNotification()
-  const userData = useSelector(selectUser)
+  const userData = useAppSelector(selectUser)
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
