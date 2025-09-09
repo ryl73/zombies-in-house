@@ -1,29 +1,57 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { SERVER_HOST } from '../constants'
+import { getUser } from '../api/LoginAPI'
 
 interface User {
-  name: string
-  secondName: string
+  id: number
+  first_name: string
+  second_name: string
+  display_name: string
+  phone: string
+  login: string
+  avatar: string
+  email: string
 }
 
 export interface UserState {
   data: User | null
   isLoading: boolean
+  error: any
 }
 
 const initialState: UserState = {
   data: null,
   isLoading: false,
+  error: null,
 }
 
-export const fetchUserThunk = createAsyncThunk(
-  'user/fetchUserThunk',
-  async () => {
-    const url = `${SERVER_HOST}/user`
-    return fetch(url).then(res => res.json())
+interface ApiError {
+  message: string
+  code?: number
+  details?: unknown
+}
+
+export const fetchUserThunk = createAsyncThunk<
+  User,
+  void,
+  {
+    rejectValue: ApiError
   }
-)
+>('user/fetchUserThunk', async (_, { rejectWithValue }) => {
+  try {
+    const userInfo = await getUser()
+    return userInfo
+  } catch (error: any) {
+    const apiError: ApiError = {
+      message:
+        error.response?.data?.message || error.message || 'Unknown error',
+      code: error.response?.status,
+      details: error.response?.data,
+    }
+
+    return rejectWithValue(apiError)
+  }
+})
 
 export const userSlice = createSlice({
   name: 'user',
@@ -31,19 +59,21 @@ export const userSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      .addCase(fetchUserThunk.pending.type, state => {
+      .addCase(fetchUserThunk.pending, state => {
         state.data = null
         state.isLoading = true
+        state.error = null
       })
       .addCase(
-        fetchUserThunk.fulfilled.type,
+        fetchUserThunk.fulfilled,
         (state, { payload }: PayloadAction<User>) => {
           state.data = payload
           state.isLoading = false
         }
       )
-      .addCase(fetchUserThunk.rejected.type, state => {
+      .addCase(fetchUserThunk.rejected, (state, action) => {
         state.isLoading = false
+        state.error = action.error.message
       })
   },
 })

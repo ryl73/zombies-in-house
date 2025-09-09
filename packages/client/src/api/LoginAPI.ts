@@ -52,6 +52,6 @@ export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
 }
 
 export const getUser = async (): Promise<UserResponse> => {
-  const response = await apiClient.get<UserResponse>('/user')
+  const response = await apiClient.get<UserResponse>('/auth/user')
   return response.data
 }

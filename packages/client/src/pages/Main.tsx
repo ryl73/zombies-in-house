@@ -16,6 +16,9 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
+import React from 'react'
+import { fetchUserThunk } from '../slices/userSlice'
+import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -61,32 +64,42 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
+const features = [
+  {
+    icon: <span>🔍</span>,
+    title: 'Исследуй',
+    description:
+      'Обыскивай комнаты в\u00A0поисках оружия, аптечек и\u00A0ключей к\u00A0выходу. Каждый шаг может быть последним',
+  },
+  {
+    icon: <span>⚔️</span>,
+    title: 'Сражайся',
+    description:
+      'Отбивайся от\u00A0полчищ мертвецов. Используй всё, что\u00A0попадётся под\u00A0руку\u00A0— от\u00A0биты до\u00A0дробовика',
+  },
+  {
+    icon: <span>🛡️</span>,
+    title: 'Выживай',
+    description:
+      'Держись вместе с\u00A0другими выжившими. Только команда поможет вам\u00A0дожить до\u00A0рассвета',
+  },
+]
+
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
   const navigate = useNavigate()
   const theme = useTheme()
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+  const { data: user, isLoading, error } = useAppSelector(state => state.user)
 
-  const features = [
-    {
-      icon: <span>🔍</span>,
-      title: 'Исследуй',
-      description:
-        'Обыскивай комнаты в\u00A0поисках оружия, аптечек и\u00A0ключей к\u00A0выходу. Каждый шаг может быть последним',
-    },
-    {
-      icon: <span>⚔️</span>,
-      title: 'Сражайся',
-      description:
-        'Отбивайся от\u00A0полчищ мертвецов. Используй всё, что\u00A0попадётся под\u00A0руку\u00A0— от\u00A0биты до\u00A0дробовика',
-    },
-    {
-      icon: <span>🛡️</span>,
-      title: 'Выживай',
-      description:
-        'Держись вместе с\u00A0другими выжившими. Только команда поможет вам\u00A0дожить до\u00A0рассвета',
-    },
-  ]
+  React.useEffect(() => {
+    const getUserInfo = async () => {
+      const userData = await dispatch(fetchUserThunk()).unwrap()
+      console.log(userData)
+    }
+    getUserInfo()
+  }, [dispatch])
 
   return (
     <Box style={{ backgroundColor: theme.palette.background.default }} pb={5}>
