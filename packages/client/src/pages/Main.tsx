@@ -14,7 +14,8 @@ import {
   useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-// import { AppError, ErrorCode } from '../utils/errorHandling'
+import { logout } from '../api/LoginAPI'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -62,6 +63,7 @@ const useStyles = makeStyles(theme => ({
 
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
+  const navigate = useNavigate()
   const theme = useTheme()
   const classes = useStyles()
 
@@ -186,6 +188,17 @@ export const MainPage = () => {
             className={classes.readyButton}>
             Я готов!
           </Button>
+          <Button
+            component={Link}
+            onClick={() => {
+              logout().then(() => navigate('/signin'))
+            }}
+            to="/signin"
+            variant="contained"
+            color="primary"
+            className={classes.readyButton}>
+            Выход
+          </Button>
         </Box>
       </Container>
     </Box>
@@ -193,7 +206,5 @@ export const MainPage = () => {
 }
 
 export const initMainPage = async (_args: PageInitArgs) => {
-  // Для тестирования раскомментировать это и импорты:
-  // throw new AppError('Серверная ошибка', ErrorCode.SERVER_ERROR)
   return Promise.resolve()
 }

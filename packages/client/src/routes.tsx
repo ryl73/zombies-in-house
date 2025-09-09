@@ -7,11 +7,13 @@ import { initSigninPage, SigninPage } from './pages/SigninPage'
 import { initSignupPage, SignupPage } from './pages/SignupPage'
 import { initProfilePage, ProfilePage } from './pages/ProfilePage'
 import { GamePage, initGamePage } from './pages/GamePage'
+import { GameStart, initGameStart } from './pages/GameStart'
 import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
 import { ForumCreatePage, initForumCreatePage } from './pages/ForumCreate'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
 import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
+import { GameEnd, initGameEnd } from './pages/GameEnd'
 
 export type PageInitContext = {
   clientToken?: string
@@ -55,6 +57,16 @@ export const routes: Route[] = [
     path: '/game',
     Component: GamePage,
     fetchData: initGamePage,
+  },
+  {      
+    path: '/game-start',
+    Component: GameStart,
+    fetchData: initGameStart,
+  },
+  {
+    path: '/game-end',
+    Component: GameEnd,
+    fetchData: initGameEnd,
   },
   {
     path: '/leaderboard',
