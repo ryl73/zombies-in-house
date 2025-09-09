@@ -17,6 +17,10 @@ if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
   })
 }
 
+if (process.env.NODE_ENV === 'development' && 'caches' in window) {
+  caches.keys().then(keys => keys.forEach(key => caches.delete(key)))
+}
+
 function Main() {
   React.useEffect(() => {
     const jssStyles = document.getElementById('jss-server-side')
@@ -26,16 +30,16 @@ function Main() {
   }, [])
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Provider store={store}>
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <AppErrorBoundary>
           <BrowserRouter>
             <Router />
           </BrowserRouter>
         </AppErrorBoundary>
-      </Provider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </Provider>
   )
 }
 
