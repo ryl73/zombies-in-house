@@ -23,6 +23,7 @@ import { routes } from './routes'
 import './index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
 import { theme } from './theme/theme'
+import { CssBaseline } from '@material-ui/core'
 
 export const render = async (req: ExpressRequest) => {
   const { query, dataRoutes } = createStaticHandler(routes)
@@ -74,11 +75,12 @@ export const render = async (req: ExpressRequest) => {
         // Собираем стили Material-UI
         styledComponentsSheet.collectStyles(
           // Собираем стили styled-components
-          <ThemeProvider theme={theme}>
-            <Provider store={store}>
+          <Provider store={store}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
               <StaticRouterProvider router={router} context={context} />
-            </Provider>
-          </ThemeProvider>
+            </ThemeProvider>
+          </Provider>
         )
       )
     )

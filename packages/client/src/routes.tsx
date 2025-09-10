@@ -1,6 +1,6 @@
 import { AppDispatch, RootState } from './store'
 
-import { initMainPage, MainPage } from './pages/Main'
+import { initMainPage, MainPage } from './pages/MainPage'
 import { initNotFoundPage, NotFoundPage } from './pages/NotFound'
 import { ServerErrorPage, initServerErrorPage } from './pages/ServerErrorPage'
 import { initSigninPage, SigninPage } from './pages/SigninPage'
@@ -58,7 +58,7 @@ export const routes: Route[] = [
     Component: GamePage,
     fetchData: initGamePage,
   },
-  {      
+  {
     path: '/game-start',
     Component: GameStart,
     fetchData: initGameStart,

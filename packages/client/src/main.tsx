@@ -5,23 +5,48 @@ import { Provider } from 'react-redux'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { store } from './store'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
-import './index.css'
 import Router from './Router'
 import { theme } from './theme/theme'
+import { startServiceWorker } from './serviceWorkers'
+import { CssBaseline } from '@material-ui/core'
+import './index.css'
 
-const jssStyles = document.getElementById('jss-server-side')
-if (jssStyles) {
-  jssStyles.parentElement?.removeChild(jssStyles)
+if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(reg => reg.unregister())
+  })
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ThemeProvider theme={theme}>
+if (process.env.NODE_ENV === 'development' && 'caches' in window) {
+  caches.keys().then(keys => keys.forEach(key => caches.delete(key)))
+}
+
+function Main() {
+  React.useEffect(() => {
+    const jssStyles = document.getElementById('jss-server-side')
+    if (jssStyles) {
+      jssStyles.parentElement?.removeChild(jssStyles)
+    }
+  }, [])
+
+  return (
     <Provider store={store}>
-      <AppErrorBoundary>
-        <BrowserRouter>
-          <Router />
-        </BrowserRouter>
-      </AppErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppErrorBoundary>
+          <BrowserRouter>
+            <Router />
+          </BrowserRouter>
+        </AppErrorBoundary>
+      </ThemeProvider>
     </Provider>
-  </ThemeProvider>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <Main />
 )
+
+if (process.env.NODE_ENV === 'production') {
+  startServiceWorker()
+}
