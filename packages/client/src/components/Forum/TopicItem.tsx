@@ -44,13 +44,11 @@ export interface Topic {
 
 interface TopicItemProps {
   topic: Topic
-  onClick?: () => void
   isContent?: boolean
 }
 
 export const TopicItem: React.FC<TopicItemProps> = ({
   topic,
-  onClick,
   isContent = true,
 }) => {
   const classes = useStyles()
@@ -58,7 +56,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({
   return (
     <Card className={classes.card}>
       <Link to={`/forum/topic/${topic.id}`} className={classes.link}>
-        <CardContent onClick={onClick}>
+        <CardContent>
           <Box display="flex" flexDirection="row" alignItems="center" mb={1}>
             <Avatar className={classes.avatar}>
               {topic.author.charAt(0).toUpperCase()}

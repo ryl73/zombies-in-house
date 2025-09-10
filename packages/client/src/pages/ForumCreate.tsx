@@ -44,6 +44,16 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
+interface FormData {
+  title: string
+  content: string
+}
+
+interface FormErrors {
+  title: string
+  content: string
+}
+
 const TopicCreateSchema = Yup.object().shape({
   title: Yup.string()
     .required('Заголовок обязателен')
@@ -57,12 +67,12 @@ export const ForumCreatePage = () => {
   usePage({ initPage: initForumCreatePage })
   const classes = useStyles()
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     content: '',
   })
 
-  const [errors, setErrors] = useState({
+  const [errors, setErrors] = useState<FormErrors>({
     title: '',
     content: '',
   })
@@ -73,15 +83,17 @@ export const ForumCreatePage = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target
+    const fieldName = name as keyof FormData
+
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [fieldName]: value,
     }))
 
-    if (errors[name as keyof typeof errors]) {
+    if (errors[fieldName]) {
       setErrors(prev => ({
         ...prev,
-        [name]: '',
+        [fieldName]: '',
       }))
     }
   }
@@ -101,15 +113,24 @@ export const ForumCreatePage = () => {
       // Делаю имитацию загрузки данных
       await new Promise(resolve => setTimeout(resolve, 1000))
       console.log('Создание топика:', formData)
+      setFormData({
+        title: '',
+        content: '',
+      })
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
-        const validationErrors: { [key: string]: string } = {}
+        const validationErrors: FormErrors = {
+          title: '',
+          content: '',
+        }
+
         error.inner.forEach(err => {
-          if (err.path) {
-            validationErrors[err.path] = err.message
+          if (err.path && err.path in validationErrors) {
+            validationErrors[err.path as keyof FormErrors] = err.message
           }
         })
-        setErrors(prev => ({ ...prev, ...validationErrors }))
+
+        setErrors(validationErrors)
       } else {
         console.error('Ошибка при создании топика:', error)
       }

@@ -78,7 +78,11 @@ export const ForumTopicPage = () => {
       // Делаю имитацию загрузки данных
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      const topicId = parseInt(id || '', 10)
+      const topicId = Number(id)
+      if (!topicId) {
+        setIsLoading(false)
+        return
+      }
       const foundTopic = mockTopics.find(t => t.id === topicId)
 
       if (foundTopic) {
@@ -165,7 +169,12 @@ export const ForumTopicPage = () => {
     <Box className={classes.root}>
       <Helmet>
         <title>{topic.title} | Форум | Зомби в доме</title>
-        <meta name="description" content={topic.content.substring(0, 150)} />
+        <meta
+          name="description"
+          content={
+            topic.content ? topic.content.slice(0, 150) : 'Описание отсутствует'
+          }
+        />
       </Helmet>
 
       <Header />

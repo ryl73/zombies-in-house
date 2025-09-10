@@ -51,11 +51,7 @@ export const ForumPage = () => {
         topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         topic.content.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  }, [searchQuery])
-
-  const handleTopicClick = (topicId: number) => {
-    console.log('Topic clicked:', topicId)
-  }
+  }, [searchQuery, topics])
 
   return (
     <Box
@@ -132,12 +128,7 @@ export const ForumPage = () => {
         ) : (
           <Box>
             {filteredTopics.map(topic => (
-              <TopicItem
-                key={topic.id}
-                topic={topic}
-                onClick={() => handleTopicClick(topic.id)}
-                isContent={false}
-              />
+              <TopicItem key={topic.id} topic={topic} isContent={false} />
             ))}
           </Box>
         )}

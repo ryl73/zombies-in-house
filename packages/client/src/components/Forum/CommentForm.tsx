@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Box, TextField, Button, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import * as Yup from 'yup'
@@ -21,6 +21,25 @@ const CommentSchema = Yup.object().shape({
     .min(5, 'Комментарий должен содержать минимум 5 символов'),
 })
 
+const useValidation = (schema: Yup.ObjectSchema<any>) => {
+  const validate = useCallback(
+    async (data: Record<string, unknown>): Promise<string> => {
+      try {
+        await schema.validate(data, { abortEarly: false })
+        return ''
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          return err.message
+        }
+        return 'Произошла неизвестная ошибка при валидации'
+      }
+    },
+    [schema]
+  )
+
+  return validate
+}
+
 interface CommentFormProps {
   onSubmit: (content: string) => void
   isSubmitting?: boolean
@@ -33,21 +52,22 @@ export const CommentForm: React.FC<CommentFormProps> = ({
   const classes = useStyles()
   const [content, setContent] = useState('')
   const [error, setError] = useState('')
+  const [isTouched, setIsTouched] = useState(false)
+  const validate = useValidation(CommentSchema)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    try {
-      await CommentSchema.validate({ content })
-
-      setError('')
-      onSubmit(content.trim())
-      setContent('')
-    } catch (err) {
-      if (err instanceof Yup.ValidationError) {
-        setError(err.message)
-      }
+    const validationError = await validate({ content })
+    if (validationError) {
+      setError(validationError)
+      return
     }
+
+    setError('')
+    onSubmit(content.trim())
+    setContent('')
+    setIsTouched(false)
   }
 
   const handleChange = (
@@ -58,6 +78,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({
     if (error) {
       setError('')
     }
+  }
+
+  const handleBlur = async () => {
+    setIsTouched(true)
+    const validationError = await validate({ content })
+    setError(validationError)
   }
 
   return (
@@ -73,22 +99,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({
           variant="outlined"
           value={content}
           onChange={handleChange}
-          onBlur={() => {
-            if (content.trim()) {
-              CommentSchema.validate({ content })
-                .then(() => setError(''))
-                .catch(err => {
-                  if (err instanceof Yup.ValidationError) {
-                    setError(err.message)
-                  }
-                })
-            }
-          }}
+          onBlur={handleBlur}
           placeholder="Напишите ваш комментарий..."
           className={classes.textField}
           disabled={isSubmitting}
-          error={!!error}
-          helperText={error}
+          error={isTouched && !!error}
+          helperText={isTouched ? error : ''}
         />
         <Button
           type="submit"
