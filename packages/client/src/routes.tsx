@@ -10,6 +10,7 @@ import { GamePage, initGamePage } from './pages/GamePage'
 import { GameStart, initGameStart } from './pages/GameStart'
 import { initLeaderboardPage, LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage, initForumPage } from './pages/ForumPage'
+import { ForumCreatePage, initForumCreatePage } from './pages/ForumCreate'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
 import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
 import { GameEnd, initGameEnd } from './pages/GameEnd'
@@ -78,7 +79,12 @@ export const routes: Route[] = [
     fetchData: initForumPage,
   },
   {
-    path: '/forum/topic',
+    path: '/forum/create',
+    Component: ForumCreatePage,
+    fetchData: initForumCreatePage,
+  },
+  {
+    path: '/forum/topic/:id',
     Component: ForumTopicPage,
     fetchData: initForumTopicPage,
   },

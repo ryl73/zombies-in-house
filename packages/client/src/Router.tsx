@@ -7,6 +7,8 @@ import { ProfilePage } from './pages/ProfilePage'
 import { GamePage } from './pages/GamePage'
 import { LeaderboardPage } from './pages/LeaderboardPage'
 import { ForumPage } from './pages/ForumPage'
+import { ForumCreatePage } from './pages/ForumCreate'
+import { ForumTopicPage } from './pages/ForumTopicPage'
 import { NotFoundPage } from './pages/NotFound'
 import { ProtectedRoute } from './components/Routes/ProtectedRoute'
 import { OnlyPublicRoute } from './components/Routes/OnlyPublicRoute'
@@ -74,6 +76,22 @@ function Router() {
         element={
           <ProtectedRoute>
             <ForumPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/forum/create"
+        element={
+          <ProtectedRoute>
+            <ForumCreatePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/forum/topic/:id"
+        element={
+          <ProtectedRoute>
+            <ForumTopicPage />
           </ProtectedRoute>
         }
       />

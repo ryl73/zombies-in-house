@@ -105,7 +105,6 @@ export const Header = () => {
     { text: 'Игра', to: '/game' },
     { text: 'Лидерборд', to: '/leaderboard' },
     { text: 'Форум', to: '/forum' },
-    { text: 'Топик форума', to: '/forum/topic' },
     { text: '404', to: '/404' },
   ]
 
