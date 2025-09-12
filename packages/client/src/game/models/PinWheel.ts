@@ -23,6 +23,7 @@ const pinWheelFields: Record<string, PinWheelResult> = {
 }
 
 export async function spinPinWheel() {
+  console.log('🎡 Крутим вертушку...')
   await new Promise(resolve => setTimeout(resolve, 1000))
 
   const keys = Array.from(Object.keys(pinWheelFields).map(key => Number(key)))

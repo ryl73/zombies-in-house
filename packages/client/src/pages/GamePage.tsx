@@ -5,6 +5,8 @@ import { Hud } from '../components/HUD/HUD'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 import styled from 'styled-components'
 import { startGame } from '../slices/gameSlice'
+import { BarricadeDirectionSelector } from '../components/Game/BarricadeDirectionSelector'
+import { WinDialog } from '../components/Game/WinDialog'
 
 export const GamePage = () => {
   const dispatch = useAppDispatch()
@@ -29,6 +31,8 @@ export const GamePage = () => {
           <BoardImage src="/images/game/board.jpg" alt="board" />
           <BoardComponent />
           {currentPlayer && <Hud />}
+          <BarricadeDirectionSelector />
+          <WinDialog />
         </Wrapper>
       </main>
     </>
