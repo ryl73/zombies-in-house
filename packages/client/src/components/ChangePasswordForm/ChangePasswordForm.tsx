@@ -44,13 +44,13 @@ export const ChangePasswordForm = () => {
     changePassword(requestData)
       .then(() => showSuccess('Пароль успешно изменён!'))
       .catch(error => {
-        const errorMassage = error.response?.data?.reason
+        const errorMessage = error.response?.data?.reason
           ? error.response.data.reason
           : 'Ошибка при смене пароля'
         setFieldValue('newPassword', '', false) // false = не валидировать
         setFieldValue('reNewPassword', '', false)
         setFieldValue('password', '', false)
-        showError(errorMassage)
+        showError(errorMessage)
       })
       .finally(() => {
         setIsSubmitting(false)

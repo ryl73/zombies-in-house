@@ -64,10 +64,10 @@ export const AvatarInput = () => {
       const formData = new FormData()
       formData.append('avatar', file)
       changeAvatar(formData).catch(err => {
-        const errorMassage = err.response?.data?.reason
+        const errorMessage = err.response?.data?.reason
           ? err.response.data?.reason
           : 'Ошибка при смене аватара'
-        showError(errorMassage)
+        showError(errorMessage)
       })
       const reader = new FileReader()
       reader.onloadend = () => {

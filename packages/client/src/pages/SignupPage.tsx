@@ -54,10 +54,10 @@ export const SignupPage = () => {
     signup({ email, login, first_name, second_name, phone, password })
       .then(() => navigate('/'))
       .catch(error => {
-        const errorMassage = error.response?.data?.reason
+        const errorMessage = error.response?.data?.reason
           ? error.response.data?.reason
           : 'Ошибка при регистрации'
-        showError(errorMassage)
+        showError(errorMessage)
       })
   }
 

@@ -39,10 +39,10 @@ export const SigninPage = () => {
         })
       )
       .catch(err => {
-        const errorMassage = err.response?.data?.reason
+        const errorMessage = err.response?.data?.reason
           ? err.response.data?.reason
           : 'Ошибка при входе'
-        showError(errorMassage)
+        showError(errorMessage)
       })
   }
 

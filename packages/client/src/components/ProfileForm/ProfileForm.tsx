@@ -31,10 +31,10 @@ export const ChangeProfileForm = () => {
     changeUser(values)
       .then(() => showSuccess('Профиль успешно изменён!'))
       .catch(error => {
-        const errorMassage = error.response?.data?.reason
+        const errorMessage = error.response?.data?.reason
           ? error.response.data?.reason
           : 'Ошибка при изменении профиля'
-        showError(errorMassage)
+        showError(errorMessage)
       })
   }
 
