@@ -24,7 +24,7 @@ import { useAppSelector } from '../hooks/useApp'
 const useStyles = makeStyles(theme => ({
   firstScreen: {
     minHeight: 500,
-    backgroundImage: 'url(src/assets/landing-first-screen.webp)',
+    backgroundImage: 'url(/images/landing-first-screen.webp)',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     display: 'flex',

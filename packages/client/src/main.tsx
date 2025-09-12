@@ -9,22 +9,47 @@ import './index.css'
 import { theme } from './theme/theme'
 import { NotificationProvider } from './hooks/useNotification'
 import App from './App'
+import { startServiceWorker } from './serviceWorkers'
+import { CssBaseline } from '@material-ui/core'
 
-const jssStyles = document.getElementById('jss-server-side')
-if (jssStyles) {
-  jssStyles.parentElement?.removeChild(jssStyles)
+if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(reg => reg.unregister())
+  })
 }
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <ThemeProvider theme={theme}>
+if (process.env.NODE_ENV === 'development' && 'caches' in window) {
+  caches.keys().then(keys => keys.forEach(key => caches.delete(key)))
+}
+
+function Main() {
+  React.useEffect(() => {
+    const jssStyles = document.getElementById('jss-server-side')
+    if (jssStyles) {
+      jssStyles.parentElement?.removeChild(jssStyles)
+    }
+  }, [])
+
+  return (
     <Provider store={store}>
-      <AppErrorBoundary>
-        <NotificationProvider>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </NotificationProvider>
-      </AppErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <AppErrorBoundary>
+          <NotificationProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </NotificationProvider>
+        </AppErrorBoundary>
+      </ThemeProvider>
     </Provider>
-  </ThemeProvider>
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <Main />
 )
+
+if (process.env.NODE_ENV === 'production') {
+  startServiceWorker()
+}
