@@ -1,5 +1,5 @@
 import apiClient from './APIClient'
-import { setUser } from '../slices/userSlice'
+import { setUser, User } from '../slices/userSlice'
 import { SimpleResponse } from './LoginAPI'
 
 export type UserResponse = {
@@ -27,10 +27,22 @@ export type ChangePasswordRequest = {
   newPassword: string
 }
 
-export const getUser = async (): Promise<UserResponse> => {
+const mapUserResponseToUser = (response: UserResponse): User => ({
+  id: response.id,
+  firstName: response.first_name,
+  secondName: response.second_name,
+  displayName: response.display_name,
+  login: response.login,
+  email: response.email,
+  phone: response.phone,
+  avatar: response.avatar,
+})
+
+export const getUser = async (): Promise<User> => {
   const response = await apiClient.get<UserResponse>('/auth/user')
-  setUser(response.data)
-  return response.data
+  const user: User = mapUserResponseToUser(response.data)
+  setUser(user)
+  return user
 }
 
 export const changePassword = async (
@@ -40,19 +52,19 @@ export const changePassword = async (
   return response.data
 }
 
-export const changeUser = async (
-  data: ChangeUserRequest
-): Promise<UserResponse> => {
+export const changeUser = async (data: ChangeUserRequest): Promise<User> => {
   const response = await apiClient.put<UserResponse>('/user/profile', data)
-  setUser(response.data)
-  return response.data
+  const user: User = mapUserResponseToUser(response.data)
+  setUser(user)
+  return user
 }
 
-export const changeAvatar = async (data: FormData): Promise<UserResponse> => {
+export const changeAvatar = async (data: FormData): Promise<User> => {
   const response = await apiClient.put<UserResponse>(
     '/user/profile/avatar',
     data
   )
-  setUser(response.data)
-  return response.data
+  const user: User = mapUserResponseToUser(response.data)
+  setUser(user)
+  return user
 }

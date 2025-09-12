@@ -27,13 +27,13 @@ const ChangeProfileSchema = Yup.object().shape({
 export const ChangeProfileForm = () => {
   const { showSuccess, showError } = useNotification()
   const userData = useAppSelector(selectUser)
-  const onSubmit = async (values: ChangeUserRequest) => {
+  const onSubmit = (values: ChangeUserRequest) => {
     changeUser(values)
       .then(() => showSuccess('Профиль успешно изменён!'))
       .catch(error => {
         const errorMassage = error.response?.data?.reason
           ? error.response.data?.reason
-          : 'Ошибка при из'
+          : 'Ошибка при изменении профиля'
         showError(errorMassage)
       })
   }
@@ -42,9 +42,9 @@ export const ChangeProfileForm = () => {
     <Formik
       initialValues={{
         login: userData.login,
-        display_name: userData.display_name ? userData.display_name : '',
-        first_name: userData.first_name,
-        second_name: userData.second_name,
+        display_name: userData.displayName ? userData.displayName : '',
+        first_name: userData.firstName,
+        second_name: userData.secondName,
         email: userData.email,
         phone: userData.phone,
       }}

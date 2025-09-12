@@ -12,14 +12,14 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchUserThunk())
-  }, [])
+  }, [dispatch])
 
   if (isLoading) {
     return (
       <>
         <Helmet>
           <meta charSet="utf-8" />
-          <title>Вход</title>
+          <title>Загрузка</title>
           <meta name="description" content="Страница логина" />
         </Helmet>
         <PageContainer>

@@ -16,14 +16,27 @@ const ChangePasswordSchema = Yup.object().shape({
 })
 
 export const ChangePasswordForm = () => {
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { showSuccess, showError } = useNotification()
-  const onSubmit = async ({
-    newPassword,
-    password,
-  }: {
-    newPassword: string
-    password: string
-  }) => {
+  const onSubmit = (
+    {
+      newPassword,
+      password,
+    }: {
+      newPassword: string
+      password: string
+    },
+    {
+      setFieldValue,
+    }: {
+      setFieldValue: (
+        field: string,
+        value: any,
+        shouldValidate?: boolean
+      ) => void
+    }
+  ) => {
+    setIsSubmitting(true)
     const requestData: ChangePasswordRequest = {
       oldPassword: password,
       newPassword,
@@ -32,9 +45,15 @@ export const ChangePasswordForm = () => {
       .then(() => showSuccess('Пароль успешно изменён!'))
       .catch(error => {
         const errorMassage = error.response?.data?.reason
-          ? error.response.data?.reason
+          ? error.response.data.reason
           : 'Ошибка при смене пароля'
+        setFieldValue('newPassword', '', false) // false = не валидировать
+        setFieldValue('reNewPassword', '', false)
+        setFieldValue('password', '', false)
         showError(errorMassage)
+      })
+      .finally(() => {
+        setIsSubmitting(false)
       })
   }
   return (
@@ -50,6 +69,7 @@ export const ChangePasswordForm = () => {
             name="newPassword"
             type="password"
             placeholder="Новый пароль"
+            disabled={isSubmitting}
           />
           {errors.newPassword && touched.newPassword && (
             <ErrorMessage>{errors.newPassword}</ErrorMessage>
@@ -61,6 +81,7 @@ export const ChangePasswordForm = () => {
             name="reNewPassword"
             type="password"
             placeholder="Повторите новый пароль"
+            disabled={isSubmitting}
           />
           {errors.reNewPassword && touched.reNewPassword && (
             <ErrorMessage>{errors.reNewPassword}</ErrorMessage>
@@ -72,11 +93,14 @@ export const ChangePasswordForm = () => {
             name="password"
             type="password"
             placeholder="Старый пароль"
+            disabled={isSubmitting}
           />
           {errors.password && touched.password && (
             <ErrorMessage>{errors.password}</ErrorMessage>
           )}
-          <Button type="submit">СМЕНИТЬ ПАРОЛЬ</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? 'СОХРАНЕНИЕ...' : 'СМЕНИТЬ ПАРОЛЬ'}
+          </Button>
         </StyledForm>
       )}
     </Formik>

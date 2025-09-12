@@ -1,15 +1,34 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from '../store'
-import { getUser, UserResponse } from '../api/UserAPI'
+import { getUser } from '../api/UserAPI'
+
+export interface User {
+  id: number
+  firstName: string
+  secondName: string
+  displayName: string
+  login: string
+  email: string
+  phone: string
+  avatar: string
+}
 
 export interface UserState {
-  data: UserResponse | null
+  data: User | null
   isLoading: boolean
+  error: any
 }
 
 const initialState: UserState = {
   data: null,
   isLoading: true,
+  error: null,
+}
+
+interface ApiError {
+  message: string
+  code?: number
+  details?: unknown
 }
 
 export const fetchUserThunk = createAsyncThunk(
@@ -17,8 +36,14 @@ export const fetchUserThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       return await getUser()
-    } catch (e) {
-      return rejectWithValue('Ошибка загрузки')
+    } catch (error: any) {
+      const apiError: ApiError = {
+        message:
+          error.response?.data?.message || error.message || 'Unknown error',
+        code: error.response?.status,
+        details: error.response?.data,
+      }
+      return rejectWithValue(apiError)
     }
   }
 )
@@ -27,7 +52,7 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUser: (state, action: PayloadAction<UserResponse>) => {
+    setUser: (state, action: PayloadAction<User>) => {
       state.data = action.payload
     },
     clearUser: state => {
@@ -42,13 +67,15 @@ export const userSlice = createSlice({
       })
       .addCase(
         fetchUserThunk.fulfilled,
-        (state, { payload }: PayloadAction<UserResponse>) => {
+        (state, { payload }: PayloadAction<User>) => {
           state.data = payload
           state.isLoading = false
         }
       )
-      .addCase(fetchUserThunk.rejected, state => {
+      .addCase(fetchUserThunk.rejected, (state, action) => {
         state.isLoading = false
+        state.error = action.error.message
+        console.error('Ошибка загрузки пользователя:', action.payload)
       })
   },
 })

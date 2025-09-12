@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react'
-import { Snackbar, IconButton } from '@material-ui/core'
+import { createContext, useContext, useState, ReactNode, FC } from 'react'
+import { Snackbar, IconButton, SnackbarProps } from '@material-ui/core'
 import { Close as CloseIcon } from '@material-ui/icons'
 
 type NotificationType = 'success' | 'error' | 'warning' | 'info'
@@ -49,9 +49,17 @@ const getSnackbarProps = (type: NotificationType): Partial<SnackbarProps> => {
         },
       }
     case 'info':
-      break
+      return {
+        ContentProps: {
+          style: { backgroundColor: '#ffffff' },
+        },
+      }
     default:
-      break
+      return {
+        ContentProps: {
+          style: { backgroundColor: '#ffffff' },
+        },
+      }
   }
 }
 

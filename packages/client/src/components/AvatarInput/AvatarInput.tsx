@@ -6,6 +6,11 @@ import { selectUser } from '../../slices/userSlice'
 import notFoundImage from '../../assets/notfound.webp'
 import { useNotification } from '../../hooks/useNotification'
 import { useAppSelector } from '../../hooks/useApp'
+import {
+  API_RESOURCES_URL,
+  MAX_SIZE_AVATAR_FILE,
+  MAX_SIZE_AVATAR_FILE_TEXT,
+} from '../../constants'
 
 //визуал аватара будет изменёт согласно другой задаче
 const useStyles = makeStyles(theme => ({
@@ -16,8 +21,8 @@ const useStyles = makeStyles(theme => ({
     margin: '20px',
   },
   avatar: {
-    width: theme.spacing(12),
-    height: theme.spacing(12),
+    width: theme.spacing(20),
+    height: theme.spacing(20),
     border: `2px solid ${theme.palette.primary.main}`,
   },
   input: {
@@ -36,20 +41,32 @@ export const AvatarInput = () => {
     if (userData)
       setPreview(
         userData.avatar
-          ? 'https://ya-praktikum.tech/api/v2/resources/' + userData.avatar
+          ? API_RESOURCES_URL + userData.avatar
           : (notFoundImage as string)
       )
-  }, [])
+  }, [userData])
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif']
+      if (!allowedTypes.includes(file.type)) {
+        showError('Разрешены только изображения (JPEG, PNG, GIF)')
+        return
+      }
+      if (file.size > MAX_SIZE_AVATAR_FILE) {
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2)
+        showError(
+          `Файл слишком большой. Максимальный размер: ${MAX_SIZE_AVATAR_FILE_TEXT}. Текущий размер: ${fileSizeMB}MB`
+        )
+        return
+      }
       const formData = new FormData()
       formData.append('avatar', file)
       changeAvatar(formData).catch(err => {
         const errorMassage = err.response?.data?.reason
           ? err.response.data?.reason
-          : 'Ошибка при смене пароля'
+          : 'Ошибка при смене аватара'
         showError(errorMassage)
       })
       const reader = new FileReader()
@@ -69,7 +86,6 @@ export const AvatarInput = () => {
       <Avatar
         src={preview || undefined}
         className={classes.avatar}
-        style={{ width: 128, height: 128 }}
         onClick={handleClick}>
         {!preview && 'А'}
       </Avatar>
