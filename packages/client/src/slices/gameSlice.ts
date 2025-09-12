@@ -112,12 +112,18 @@ export const moveStage = createAsyncThunk(
   async (_, { getState, dispatch }) => {
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
+    console.log(
+      `🎲 Очередь ${currentPlayer.name} (${
+        currentPlayer.isZombie ? 'Зомби' : 'Человек'
+      })`
+    )
+
     if (!currentPlayer.cellId) return
 
     const zombieOnCell = getZombieByCellId(game, currentPlayer.cellId)
 
     const { moveCount } = await spinPinWheel()
-    console.log(moveCount)
+    console.log(`🎯 Выпало ${moveCount}`)
     let maxMoveCount = moveCount
 
     if (currentPlayer.type === 'max' && !currentPlayer.isZombie) {
@@ -212,7 +218,8 @@ export const fightStage = createAsyncThunk(
     const currentPlayer = getCurrentPlayer(game)
 
     const { action } = await spinPinWheel()
-    console.log(action)
+
+    console.log(`🎯 Результат вертушки: ${action}`)
 
     const fight = async (weaponType: 'coldWeapon' | 'gunWeapon') => {
       if (!currentPlayer.cellId) return
@@ -254,7 +261,8 @@ export const endTurn = createAsyncThunk(
   'game/endTurn',
   async (_, { getState, dispatch }) => {
     const { game } = getState() as { game: GameState }
-
+    console.log('🔄 Конец хода')
+    console.log('------------------------')
     // check status
     const alivePlayers = game.players.filter(p => !p.isZombie)
     if (alivePlayers.length === 0) {
@@ -305,7 +313,6 @@ export const usePlayerItem = createAsyncThunk(
     if (game.isProcessing) return
 
     dispatch(gameSlice.actions.setIsProcessing(true))
-
     const player = getCurrentPlayer(game)
 
     const zombieOnCell = game.zombies.find(
@@ -343,13 +350,83 @@ export const usePlayerItem = createAsyncThunk(
         }
         break
       }
-
       case 'plank': {
-        // if (currentCell?.type === 'plankPlace') {
-        // player.cell.addItem(this)
-        // this.cell = player.cell
-        // dispatch(useItem(item.id))
-        // }
+        if (player.cellId === null) {
+          console.log('Игрок не находится на клетке')
+          dispatch(gameSlice.actions.setIsProcessing(false))
+          return
+        }
+        console.log('🪵 Попытка использовать доску')
+        const currentPlayerCell = getCellById(game, player.cellId)
+
+        if (!currentPlayerCell) {
+          break
+        }
+
+        console.log(`📍 Игрок на клетке типа: ${currentPlayerCell.type}`)
+
+        if (currentPlayerCell.type === 'plankPlace') {
+          console.log('✅ Клетка является plankPlace')
+
+          // Проверяем есть ли доступные направления для установки баррикады
+          const hasAvailableDirection = Object.values(
+            currentPlayerCell.availableBarricadeDirections
+          ).some(value => value)
+
+          console.log(`🔄 Есть доступные направления: ${hasAvailableDirection}`)
+          console.log(
+            '📋 Доступные направления:',
+            currentPlayerCell.availableBarricadeDirections
+          )
+          console.log(
+            '📋 Установленные направления:',
+            currentPlayerCell.installedBarricadeDirections
+          )
+
+          if (hasAvailableDirection) {
+            dispatch(gameSlice.actions.useItem(item.id))
+            console.log('🎒 Доска удалена из инвентаря')
+
+            // Находим первое доступное направление и устанавливаем баррикаду
+            let directionToInstall:
+              | keyof typeof currentPlayerCell.availableBarricadeDirections
+              | null = null
+
+            for (const [direction, isAvailable] of Object.entries(
+              currentPlayerCell.availableBarricadeDirections
+            )) {
+              const dir =
+                direction as keyof typeof currentPlayerCell.availableBarricadeDirections
+              if (
+                isAvailable &&
+                !currentPlayerCell.installedBarricadeDirections[dir]
+              ) {
+                directionToInstall = dir
+                break
+              }
+            }
+
+            if (directionToInstall) {
+              console.log(
+                `🔨 Устанавливаем баррикаду в направлении: ${directionToInstall}`
+              )
+              dispatch(
+                gameSlice.actions.installBarricade({
+                  cellId: currentPlayerCell.id,
+                  direction: directionToInstall,
+                })
+              )
+            } else {
+              console.log(
+                '❌ Не найдено доступное направление для установки баррикады'
+              )
+            }
+          } else {
+            console.log('❌ Нет доступных направлений для установки баррикады')
+          }
+        } else {
+          console.log('❌ Клетка не является plankPlace')
+        }
         break
       }
     }
@@ -430,6 +507,7 @@ const handlePlayerCellClick = createAsyncThunk(
       dispatch(gameSlice.actions.setZombieOpen(zombieOnCell.id))
 
       if (hasPlayerItem(game, 'grenade')) {
+        console.log(`🧟 Встретил зомби: ${zombieOnCell.name}`)
         dispatch(gameSlice.actions.setCanFight('grenade'))
         return
       }
@@ -644,6 +722,7 @@ export const gameSlice = createSlice({
         item.opened = true
         item.cellId = null
         currentPlayer.items = [...currentPlayer.items, item]
+        console.log(`🎒 ${currentPlayer.name} подобрал: ${item.name}`)
       }
     },
 
@@ -652,6 +731,7 @@ export const gameSlice = createSlice({
       const item = getItemById(state, action.payload)
       if (item) {
         currentPlayer.items = currentPlayer.items.filter(i => i.id !== item.id)
+        console.log(`🎒 Используется: ${item.name}`)
       }
     },
 
@@ -690,6 +770,21 @@ export const gameSlice = createSlice({
 
     setIsProcessing(state, action: PayloadAction<boolean>) {
       state.isProcessing = action.payload
+    },
+    installBarricade(
+      state,
+      action: PayloadAction<{ cellId: number; direction: string }>
+    ) {
+      const cell = state.board.cells
+        .flat()
+        .find(c => c.id === action.payload.cellId)
+      if (cell) {
+        cell.installedBarricadeDirections[
+          action.payload
+            .direction as keyof typeof cell.installedBarricadeDirections
+        ] = true
+        cell.hasBarricade = true
+      }
     },
   },
 })
