@@ -61,6 +61,15 @@ export interface GameState {
   status: 'idle' | 'playing' | 'won' | 'lost'
   isZombieMove: boolean
   isProcessing: boolean
+  barricadeSelection: {
+    cellId: number
+    availableDirections: string[]
+    itemId: number
+  } | null
+  isAwaitingBarricadeDirection: boolean
+  canSkipTurn: boolean
+  isWinDialogOpen: boolean
+  winningPlayerId: number | null
 }
 
 const initialState: GameState = {
@@ -74,6 +83,11 @@ const initialState: GameState = {
   status: 'idle',
   isZombieMove: false,
   isProcessing: false,
+  barricadeSelection: null,
+  isAwaitingBarricadeDirection: false,
+  canSkipTurn: false,
+  isWinDialogOpen: false,
+  winningPlayerId: null,
 }
 
 const getCurrentPlayer = (game: GameState) =>
@@ -155,6 +169,7 @@ export const moveStage = createAsyncThunk(
     )
 
     dispatch(gameSlice.actions.setCanMoveCells(availableCells.map(c => c.id)))
+    dispatch(gameSlice.actions.setCanSkipTurn(true))
   }
 )
 
@@ -216,6 +231,7 @@ export const fightStage = createAsyncThunk(
     dispatch(gameSlice.actions.resetCanMoveCells())
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
+    dispatch(gameSlice.actions.setCanSkipTurn(false))
 
     const { action } = await spinPinWheel()
 
@@ -263,6 +279,8 @@ export const endTurn = createAsyncThunk(
     const { game } = getState() as { game: GameState }
     console.log('🔄 Конец хода')
     console.log('------------------------')
+
+    dispatch(gameSlice.actions.setCanSkipTurn(false))
     // check status
     const alivePlayers = game.players.filter(p => !p.isZombie)
     if (alivePlayers.length === 0) {
@@ -277,13 +295,17 @@ export const endTurn = createAsyncThunk(
     const keyItem = game.items.find(i => i.type === 'key')
     const gasolineItem = game.items.find(i => i.type === 'gasoline')
 
-    if (
+    const isItemsOnCar =
       keyItem?.cellId &&
       carCellIds.includes(keyItem.cellId) &&
       gasolineItem?.cellId &&
       carCellIds.includes(gasolineItem.cellId)
-    ) {
-      alert('You win!')
+
+    const player = getCurrentPlayer(game)
+    const isPlayerOnCar = player.cellId && carCellIds.includes(player.cellId)
+
+    if (isItemsOnCar && isPlayerOnCar) {
+      dispatch(gameSlice.actions.openWinDialog(player.id))
       return
     }
 
@@ -313,6 +335,7 @@ export const usePlayerItem = createAsyncThunk(
     if (game.isProcessing) return
 
     dispatch(gameSlice.actions.setIsProcessing(true))
+    dispatch(gameSlice.actions.setCanSkipTurn(false))
     const player = getCurrentPlayer(game)
 
     const zombieOnCell = game.zombies.find(
@@ -352,81 +375,25 @@ export const usePlayerItem = createAsyncThunk(
       }
       case 'plank': {
         if (player.cellId === null) {
-          console.log('Игрок не находится на клетке')
           dispatch(gameSlice.actions.setIsProcessing(false))
           return
         }
-        console.log('🪵 Попытка использовать доску')
+
         const currentPlayerCell = getCellById(game, player.cellId)
-
-        if (!currentPlayerCell) {
-          break
+        if (!currentPlayerCell || currentPlayerCell.type !== 'plankPlace') {
+          console.log('❌ Нельзя установить баррикаду здесь')
+          dispatch(gameSlice.actions.setIsProcessing(false))
+          return
         }
 
-        console.log(`📍 Игрок на клетке типа: ${currentPlayerCell.type}`)
+        await dispatch(
+          handleBarricadeDirectionSelection({
+            cellId: currentPlayerCell.id,
+            itemId: item.id,
+          })
+        )
 
-        if (currentPlayerCell.type === 'plankPlace') {
-          console.log('✅ Клетка является plankPlace')
-
-          // Проверяем есть ли доступные направления для установки баррикады
-          const hasAvailableDirection = Object.values(
-            currentPlayerCell.availableBarricadeDirections
-          ).some(value => value)
-
-          console.log(`🔄 Есть доступные направления: ${hasAvailableDirection}`)
-          console.log(
-            '📋 Доступные направления:',
-            currentPlayerCell.availableBarricadeDirections
-          )
-          console.log(
-            '📋 Установленные направления:',
-            currentPlayerCell.installedBarricadeDirections
-          )
-
-          if (hasAvailableDirection) {
-            dispatch(gameSlice.actions.useItem(item.id))
-            console.log('🎒 Доска удалена из инвентаря')
-
-            // Находим первое доступное направление и устанавливаем баррикаду
-            let directionToInstall:
-              | keyof typeof currentPlayerCell.availableBarricadeDirections
-              | null = null
-
-            for (const [direction, isAvailable] of Object.entries(
-              currentPlayerCell.availableBarricadeDirections
-            )) {
-              const dir =
-                direction as keyof typeof currentPlayerCell.availableBarricadeDirections
-              if (
-                isAvailable &&
-                !currentPlayerCell.installedBarricadeDirections[dir]
-              ) {
-                directionToInstall = dir
-                break
-              }
-            }
-
-            if (directionToInstall) {
-              console.log(
-                `🔨 Устанавливаем баррикаду в направлении: ${directionToInstall}`
-              )
-              dispatch(
-                gameSlice.actions.installBarricade({
-                  cellId: currentPlayerCell.id,
-                  direction: directionToInstall,
-                })
-              )
-            } else {
-              console.log(
-                '❌ Не найдено доступное направление для установки баррикады'
-              )
-            }
-          } else {
-            console.log('❌ Нет доступных направлений для установки баррикады')
-          }
-        } else {
-          console.log('❌ Клетка не является plankPlace')
-        }
+        dispatch(gameSlice.actions.setIsProcessing(false))
         break
       }
     }
@@ -443,6 +410,7 @@ export const handleCellClick = createAsyncThunk(
     if (game.isProcessing) return
 
     dispatch(gameSlice.actions.setIsProcessing(true))
+    dispatch(gameSlice.actions.setCanSkipTurn(false))
 
     if (getCurrentPlayer(game).isZombie) {
       await dispatch(handleZombieCellClick(cell))
@@ -557,6 +525,79 @@ export const manualSpinPinWheel = createAsyncThunk(
       dispatch(gameSlice.actions.setCanFight(null))
       await dispatch(fightStage())
     }
+  }
+)
+
+export const handleBarricadeDirectionSelection = createAsyncThunk(
+  'game/barricadeDirectionSelection',
+  async (
+    { cellId, itemId }: { cellId: number; itemId: number },
+    { getState, dispatch }
+  ) => {
+    const { game } = getState() as { game: GameState }
+    const cell = getCellById(game, cellId)
+
+    if (!cell) {
+      return
+    }
+
+    const availableDirections = Object.entries(
+      cell.availableBarricadeDirections
+    )
+      .filter(
+        ([dir, available]) =>
+          available &&
+          !cell.installedBarricadeDirections[
+            dir as keyof typeof cell.installedBarricadeDirections
+          ]
+      )
+      .map(([dir]) => dir)
+
+    if (availableDirections.length === 0) {
+      return
+    }
+
+    // Если доступно только одно направление, устанавливаем баррикаду сразу
+    if (availableDirections.length === 1) {
+      dispatch(
+        gameSlice.actions.installBarricade({
+          cellId,
+          direction: availableDirections[0],
+          itemId,
+        })
+      )
+      return
+    }
+
+    // Если несколько направлений, показываем UI для выбора
+    dispatch(
+      gameSlice.actions.startBarricadeSelection({
+        cellId,
+        availableDirections,
+        itemId,
+      })
+    )
+  }
+)
+
+export const skipTurn = createAsyncThunk(
+  'game/skipTurn',
+  async (_, { getState, dispatch }) => {
+    const { game } = getState() as { game: GameState }
+
+    if (!game.canSkipTurn || game.isProcessing) {
+      console.log('❌ Сейчас нельзя пропустить ход')
+      return
+    }
+
+    dispatch(gameSlice.actions.setIsProcessing(true))
+    console.log('⏭️ Игрок пропускает ход')
+
+    dispatch(gameSlice.actions.setCanSkipTurn(false))
+    dispatch(gameSlice.actions.resetCanMoveCells())
+    await dispatch(endTurn())
+
+    dispatch(gameSlice.actions.setIsProcessing(false))
   }
 )
 
@@ -771,9 +812,46 @@ export const gameSlice = createSlice({
     setIsProcessing(state, action: PayloadAction<boolean>) {
       state.isProcessing = action.payload
     },
+    startBarricadeSelection(
+      state,
+      action: PayloadAction<{
+        cellId: number
+        availableDirections: string[]
+        itemId: number
+      }>
+    ) {
+      state.barricadeSelection = action.payload
+      state.isAwaitingBarricadeDirection = true
+    },
+    selectBarricadeDirection(state, action: PayloadAction<string>) {
+      if (state.barricadeSelection) {
+        const { cellId, itemId } = state.barricadeSelection
+        const cell = getCellById(state, cellId)
+        if (cell) {
+          cell.installedBarricadeDirections[
+            action.payload as keyof typeof cell.installedBarricadeDirections
+          ] = true
+          cell.hasBarricade = true
+          const currentPlayer = getCurrentPlayer(state)
+          currentPlayer.items = currentPlayer.items.filter(
+            item => item.id !== itemId
+          )
+        }
+      }
+      state.barricadeSelection = null
+      state.isAwaitingBarricadeDirection = false
+    },
+    cancelBarricadeSelection(state) {
+      state.barricadeSelection = null
+      state.isAwaitingBarricadeDirection = false
+    },
     installBarricade(
       state,
-      action: PayloadAction<{ cellId: number; direction: string }>
+      action: PayloadAction<{
+        cellId: number
+        direction: string
+        itemId: number
+      }>
     ) {
       const cell = state.board.cells
         .flat()
@@ -784,7 +862,27 @@ export const gameSlice = createSlice({
             .direction as keyof typeof cell.installedBarricadeDirections
         ] = true
         cell.hasBarricade = true
+        const currentPlayer = getCurrentPlayer(state)
+        currentPlayer.items = currentPlayer.items.filter(
+          item => item.id !== action.payload.itemId
+        )
       }
+    },
+    setCanSkipTurn(state, action: PayloadAction<boolean>) {
+      state.canSkipTurn = action.payload
+    },
+    openWinDialog(state, action: PayloadAction<number>) {
+      state.isWinDialogOpen = true
+      state.winningPlayerId = action.payload
+    },
+    closeWinDialog(state) {
+      state.isWinDialogOpen = false
+      state.winningPlayerId = null
+    },
+    confirmWin(state) {
+      state.status = 'won'
+      state.isWinDialogOpen = false
+      state.winningPlayerId = null
     },
   },
 })

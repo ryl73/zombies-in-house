@@ -68,33 +68,9 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
           alt="Barricade"
         />
       )}
-
-      {/* <DebugInfo>
-        <div>
-          ({cell.x},{cell.y})
-        </div>
-        <div>{cell.isTraversable ? 'проходима' : 'непроходима'}</div>
-        <div>{cell.hasBarricade ? 'баррикада' : 'нет баррикады'}</div>
-        <div>пустая: {cell.isEmpty ? 'да' : 'нет'}</div>
-      </DebugInfo> */}
     </CellBlock>
   )
 }
-
-const DebugInfo = styled.div`
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  font-size: 8px;
-  color: #333;
-  background: rgba(255, 255, 255, 0.8);
-  padding: 2px;
-  border-radius: 3px;
-  z-index: 10;
-  pointer-events: none;
-  max-width: 90px;
-  line-height: 1.2;
-`
 
 const CellBlock = styled.div<{
   $isOpen?: boolean
