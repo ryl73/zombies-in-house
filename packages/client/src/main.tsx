@@ -5,11 +5,12 @@ import { Provider } from 'react-redux'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { store } from './store'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
-import Router from './Router'
+import './index.css'
 import { theme } from './theme/theme'
+import { NotificationProvider } from './hooks/useNotification'
+import App from './App'
 import { startServiceWorker } from './serviceWorkers'
 import { CssBaseline } from '@material-ui/core'
-import './index.css'
 
 if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -34,9 +35,11 @@ function Main() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <AppErrorBoundary>
-          <BrowserRouter>
-            <Router />
-          </BrowserRouter>
+          <NotificationProvider>
+            <BrowserRouter>
+              <App />
+            </BrowserRouter>
+          </NotificationProvider>
         </AppErrorBoundary>
       </ThemeProvider>
     </Provider>
