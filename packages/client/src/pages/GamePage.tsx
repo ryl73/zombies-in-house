@@ -1,17 +1,27 @@
 import { Helmet } from 'react-helmet'
 import { BoardComponent } from '../components/Board/BoardComponent'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Hud } from '../components/HUD/HUD'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 import styled from 'styled-components'
 import { startGame } from '../slices/gameSlice'
+import { SpinWheel } from '../components/Spinwheel/Spinwheel'
 
 export const GamePage = () => {
   const dispatch = useAppDispatch()
+  const [isSpinwheelOpen, setIsSpinwheelOpen] = useState(false)
 
   const { players, currentPlayerIndex } = useAppSelector(state => state.game)
 
   const currentPlayer = players[currentPlayerIndex]
+
+  const closeSpinwheel = () => {
+    setIsSpinwheelOpen(false)
+  }
+
+  const openSpinwheel = () => {
+    setIsSpinwheelOpen(true)
+  }
 
   useEffect(() => {
     dispatch(startGame())
@@ -27,8 +37,13 @@ export const GamePage = () => {
       <main>
         <Wrapper>
           <BoardImage src="/images/game/board.jpg" alt="board" />
-          <BoardComponent />
+          <BoardComponent onOpenSpinwheel={openSpinwheel} />
           {currentPlayer && <Hud />}
+          <SpinWheel
+            isOpen={isSpinwheelOpen}
+            onOpen={openSpinwheel}
+            onClose={closeSpinwheel}
+          />
         </Wrapper>
       </main>
     </>

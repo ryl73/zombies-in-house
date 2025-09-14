@@ -5,13 +5,18 @@ import { Cell } from '../../game/models/Cell'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { handleCellClick } from '../../slices/gameSlice'
 
-export const BoardComponent = () => {
+type Props = {
+  onOpenSpinwheel: () => void
+}
+
+export const BoardComponent = ({ onOpenSpinwheel }: Props) => {
   const dispatch = useAppDispatch()
 
   const { board } = useAppSelector(state => state.game)
 
   const handleClick = async (cell: Cell) => {
     await dispatch(handleCellClick(cell))
+    onOpenSpinwheel()
   }
 
   return (

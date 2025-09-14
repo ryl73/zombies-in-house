@@ -21,6 +21,7 @@
     "express": "^4.18.2",
     "fast-glob": "^3.3.3",
     "formik": "^2.4.6",
+    "motion": "^12.23.12",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

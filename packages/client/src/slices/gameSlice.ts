@@ -61,6 +61,7 @@ export interface GameState {
   status: 'idle' | 'playing' | 'won' | 'lost'
   isZombieMove: boolean
   isProcessing: boolean
+  moveCount: number
 }
 
 const initialState: GameState = {
@@ -74,6 +75,7 @@ const initialState: GameState = {
   status: 'idle',
   isZombieMove: false,
   isProcessing: false,
+  moveCount: 0,
 }
 
 const getCurrentPlayer = (game: GameState) =>
@@ -110,13 +112,14 @@ export const startGame = createAsyncThunk(
 export const moveStage = createAsyncThunk(
   'game/moveStage',
   async (_, { getState, dispatch }) => {
+    await dispatch(spinPinwheel())
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
     if (!currentPlayer.cellId) return
 
     const zombieOnCell = getZombieByCellId(game, currentPlayer.cellId)
 
-    const { moveCount } = await spinPinWheel()
+    const moveCount = game.moveCount
     console.log(moveCount)
     let maxMoveCount = moveCount
 
@@ -470,6 +473,14 @@ const handlePlayerCellClick = createAsyncThunk(
   }
 )
 
+const spinPinwheel = createAsyncThunk(
+  'game/spinPinwheel',
+  async (_, { dispatch }) => {
+    const { moveCount } = await spinPinWheel()
+    dispatch(gameSlice.actions.setMoveCount(moveCount))
+  }
+)
+
 export const manualSpinPinWheel = createAsyncThunk(
   'game/manualSpinPinWheel',
   async (_, { getState, dispatch }) => {
@@ -499,6 +510,7 @@ export const gameSlice = createSlice({
       state.status = 'playing'
       state.isZombieMove = false
       state.isProcessing = false
+      state.moveCount = 0
     },
 
     createCharacters(state) {
@@ -690,6 +702,10 @@ export const gameSlice = createSlice({
 
     setIsProcessing(state, action: PayloadAction<boolean>) {
       state.isProcessing = action.payload
+    },
+
+    setMoveCount(state, action: PayloadAction<number>) {
+      state.moveCount = action.payload
     },
   },
 })
