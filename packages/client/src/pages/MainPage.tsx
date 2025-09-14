@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { clearUser, isUserLoggedIn } from '../slices/userSlice'
 import { useDispatch } from 'react-redux'
 import { useAppSelector } from '../hooks/useApp'
+import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -112,6 +113,7 @@ export const MainPage = () => {
       </Helmet>
 
       <Box className={classes.firstScreen}>
+        <FullscreenToggle />
         <Container maxWidth="lg" className={classes.contentContainer}>
           <Typography variant="h1" gutterBottom>
             Зомби в&nbsp;доме
