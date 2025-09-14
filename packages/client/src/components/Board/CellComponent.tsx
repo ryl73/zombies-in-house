@@ -62,6 +62,12 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
         })}
       </CellBlockCard>
       {cell.isTraversable && <Dot />}
+      {cell.hasBarricade && (
+        <BarricadeImage
+          src="/images/game/cards/items/plank.png"
+          alt="Barricade"
+        />
+      )}
     </CellBlock>
   )
 }
@@ -150,4 +156,10 @@ const ripple = keyframes`
   to {
     opacity: 1;
   }
+`
+const BarricadeImage = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
 `
