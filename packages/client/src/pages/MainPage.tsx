@@ -18,6 +18,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -109,6 +110,7 @@ export const MainPage = () => {
       </Helmet>
 
       <Box className={classes.firstScreen}>
+        <FullscreenToggle />
         <Container maxWidth="lg" className={classes.contentContainer}>
           <Typography variant="h1" gutterBottom>
             Зомби в&nbsp;доме
