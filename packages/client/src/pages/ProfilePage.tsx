@@ -6,6 +6,7 @@ import { ChangePasswordForm } from '../components/ChangePasswordForm/ChangePassw
 import { Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
+import { Header } from '../components/Header'
 
 export const ProfilePage = () => {
   return (
@@ -16,6 +17,7 @@ export const ProfilePage = () => {
         <meta name="description" content="Профиль пользователя" />
       </Helmet>
       <PageContainer>
+        <Header />
         <ThemedHeader>Профиль</ThemedHeader>
         <AvatarInput />
         <ChangeProfileForm />

@@ -1,14 +1,10 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
 import { PageContainer } from '../styles/PageContainer'
-import { Form as StyledForm } from '../styles/Form'
-import { Input } from '../styles/Input'
-import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
 import { signup } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
-import { ErrorMessage } from '../styles/Errors'
-import { Formik, Field } from 'formik'
+import { Formik } from 'formik'
 import * as Yup from 'yup'
 import {
   LoginSchema,
@@ -19,6 +15,8 @@ import {
   RepeatPasswordSchema,
 } from '../utils/validation'
 import { useNotification } from '../hooks/useNotification'
+import { Link } from 'react-router-dom'
+import { TextField, Button, FormControl } from '@material-ui/core'
 
 type FormValues = {
   login: string
@@ -82,57 +80,102 @@ export const SignupPage = () => {
           }}
           validationSchema={SignupSchema}
           onSubmit={onSubmit}>
-          {({ errors, touched, handleSubmit }) => (
-            <StyledForm onSubmit={handleSubmit}>
-              <Field as={Input} name="email" placeholder="Почта" />
-              {errors.email && touched.email && (
-                <ErrorMessage>{errors.email}</ErrorMessage>
-              )}
+          {({ errors, touched, handleSubmit, handleChange, handleBlur }) => (
+            <FormControl
+              component="form"
+              onSubmit={handleSubmit}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                width: 550,
+              }}>
+              <TextField
+                name="email"
+                label="Почта"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.email && Boolean(errors.email)}
+                helperText={touched.email && errors.email}
+              />
 
-              <Field as={Input} name="login" placeholder="Логин" />
-              {errors.login && touched.login && (
-                <ErrorMessage>{errors.login}</ErrorMessage>
-              )}
+              <TextField
+                name="login"
+                label="Логин"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.login && Boolean(errors.login)}
+                helperText={touched.login && errors.login}
+              />
 
-              <Field as={Input} name="first_name" placeholder="Имя" />
-              {errors.first_name && touched.first_name && (
-                <ErrorMessage>{errors.first_name}</ErrorMessage>
-              )}
+              <TextField
+                name="first_name"
+                label="Имя"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.first_name && Boolean(errors.first_name)}
+                helperText={touched.first_name && errors.first_name}
+              />
 
-              <Field as={Input} name="second_name" placeholder="Фамилия" />
-              {errors.second_name && touched.second_name && (
-                <ErrorMessage>{errors.second_name}</ErrorMessage>
-              )}
+              <TextField
+                name="second_name"
+                label="Фамилия"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.second_name && Boolean(errors.second_name)}
+                helperText={touched.second_name && errors.second_name}
+              />
 
-              <Field as={Input} name="phone" placeholder="Телефон" />
-              {errors.phone && touched.phone && (
-                <ErrorMessage>{errors.phone}</ErrorMessage>
-              )}
+              <TextField
+                name="phone"
+                label="Телефон"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.phone && Boolean(errors.phone)}
+                helperText={touched.phone && errors.phone}
+              />
 
-              <Field
-                as={Input}
+              <TextField
                 name="password"
                 type="password"
-                placeholder="Пароль"
+                label="Пароль"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && Boolean(errors.password)}
+                helperText={touched.password && errors.password}
               />
-              {errors.password && touched.password && (
-                <ErrorMessage>{errors.password}</ErrorMessage>
-              )}
 
-              <Field
-                as={Input}
+              <TextField
                 name="password_repeat"
                 type="password"
-                placeholder="Повторите пароль"
+                label="Повторите пароль"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={
+                  touched.password_repeat && Boolean(errors.password_repeat)
+                }
+                helperText={touched.password_repeat && errors.password_repeat}
               />
-              {errors.password_repeat && touched.password_repeat && (
-                <ErrorMessage>{errors.password_repeat}</ErrorMessage>
-              )}
 
-              <Button type="submit">Зарегистрироваться</Button>
-            </StyledForm>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large">
+                Зарегистрироваться
+              </Button>
+            </FormControl>
           )}
         </Formik>
+
+        <Button
+          component={Link}
+          to="/signin"
+          variant="text"
+          size="large"
+          color="default">
+          Есть аккаунт? Войти
+        </Button>
       </PageContainer>
     </div>
   )

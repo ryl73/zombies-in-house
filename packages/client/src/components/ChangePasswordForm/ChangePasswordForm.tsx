@@ -1,13 +1,10 @@
-import { Form as StyledForm } from '../../styles/Form'
 import React from 'react'
-import { Input } from '../../styles/Input'
 import { changePassword, ChangePasswordRequest } from '../../api/UserAPI'
 import * as Yup from 'yup'
-import { ErrorMessage } from '../../styles/Errors'
-import { Formik, Field } from 'formik'
+import { Formik } from 'formik'
 import { PasswordSchema, RepeatPasswordSchema } from '../../utils/validation'
-import { Button } from '../../styles/Buttons'
 import { useNotification } from '../../hooks/useNotification'
+import { TextField, Button, FormControl } from '@material-ui/core'
 
 const ChangePasswordSchema = Yup.object().shape({
   newPassword: PasswordSchema,
@@ -61,47 +58,74 @@ export const ChangePasswordForm = () => {
       initialValues={{ newPassword: '', reNewPassword: '', password: '' }}
       validationSchema={ChangePasswordSchema}
       onSubmit={onSubmit}>
-      {({ errors, touched, handleSubmit }) => (
-        <StyledForm onSubmit={handleSubmit}>
-          <Field
-            as={Input}
+      {({
+        errors,
+        touched,
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        values,
+      }) => (
+        <FormControl
+          component="form"
+          onSubmit={handleSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            width: 550,
+          }}>
+          <TextField
             id="newPassword"
             name="newPassword"
             type="password"
-            placeholder="Новый пароль"
+            label="Новый пароль"
+            value={values.newPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.newPassword && Boolean(errors.newPassword)}
+            helperText={touched.newPassword && errors.newPassword}
             disabled={isSubmitting}
+            InputLabelProps={{ shrink: true }}
           />
-          {errors.newPassword && touched.newPassword && (
-            <ErrorMessage>{errors.newPassword}</ErrorMessage>
-          )}
 
-          <Field
-            as={Input}
+          <TextField
             id="reNewPassword"
             name="reNewPassword"
             type="password"
-            placeholder="Повторите новый пароль"
+            label="Повторите новый пароль"
+            value={values.reNewPassword}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.reNewPassword && Boolean(errors.reNewPassword)}
+            helperText={touched.reNewPassword && errors.reNewPassword}
             disabled={isSubmitting}
+            InputLabelProps={{ shrink: true }}
           />
-          {errors.reNewPassword && touched.reNewPassword && (
-            <ErrorMessage>{errors.reNewPassword}</ErrorMessage>
-          )}
 
-          <Field
-            as={Input}
+          <TextField
             id="password"
             name="password"
             type="password"
-            placeholder="Старый пароль"
+            label="Старый пароль"
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.password && Boolean(errors.password)}
+            helperText={touched.password && errors.password}
             disabled={isSubmitting}
+            InputLabelProps={{ shrink: true }}
           />
-          {errors.password && touched.password && (
-            <ErrorMessage>{errors.password}</ErrorMessage>
-          )}
-          <Button type="submit" disabled={isSubmitting}>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            disabled={isSubmitting}>
             {isSubmitting ? 'СОХРАНЕНИЕ...' : 'СМЕНИТЬ ПАРОЛЬ'}
           </Button>
-        </StyledForm>
+        </FormControl>
       )}
     </Formik>
   )
