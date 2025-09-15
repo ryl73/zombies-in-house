@@ -1,23 +1,34 @@
 import { Helmet } from 'react-helmet'
 import { BoardComponent } from '../components/Board/BoardComponent'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Hud } from '../components/HUD/HUD'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
 import styled from 'styled-components'
 import { startGame } from '../slices/gameSlice'
 import { BarricadeDirectionSelector } from '../components/Game/BarricadeDirectionSelector'
 import { WinDialog } from '../components/Game/WinDialog'
+import { StartDialog } from '../components/Game/StartDialog'
+import { createPortal } from 'react-dom'
 
 export const GamePage = () => {
   const dispatch = useAppDispatch()
-
   const { players, currentPlayerIndex } = useAppSelector(state => state.game)
+
+  const [isDialog, setIsDialog] = useState(true)
+  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
 
   const currentPlayer = players[currentPlayerIndex]
 
   useEffect(() => {
+    setPortalRoot(document.body)
+  }, [])
+
+  const onStartGame = () => {
+    setIsDialog(false)
+    const scrollHeight = document.documentElement.scrollHeight
+    window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' })
     dispatch(startGame())
-  }, [dispatch])
+  }
 
   return (
     <>
@@ -31,9 +42,16 @@ export const GamePage = () => {
           <BoardImage src="/images/game/board.jpg" alt="board" />
           <BoardComponent />
           {currentPlayer && <Hud />}
-          <BarricadeDirectionSelector />
-          <WinDialog />
         </Wrapper>
+        {portalRoot &&
+          createPortal(
+            <>
+              <BarricadeDirectionSelector />
+              <WinDialog />
+              <StartDialog isDialog={isDialog} startGame={onStartGame} />
+            </>,
+            portalRoot
+          )}
       </main>
     </>
   )

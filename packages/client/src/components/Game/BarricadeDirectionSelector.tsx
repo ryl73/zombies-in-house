@@ -2,16 +2,19 @@ import React from 'react'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { gameSlice } from '../../slices/gameSlice'
 import styled from 'styled-components'
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from '@material-ui/core'
 
 export const BarricadeDirectionSelector: React.FC = () => {
   const dispatch = useAppDispatch()
   const { barricadeSelection, isAwaitingBarricadeDirection } = useAppSelector(
     state => state.game
   )
-
-  if (!isAwaitingBarricadeDirection || !barricadeSelection) {
-    return null
-  }
 
   const handleSelect = (direction: string) => {
     dispatch(gameSlice.actions.selectBarricadeDirection(direction))
@@ -29,50 +32,29 @@ export const BarricadeDirectionSelector: React.FC = () => {
   }
 
   return (
-    <Overlay>
-      <Content>
-        <Title>Выберите направление для баррикады</Title>
+    <Dialog open={isAwaitingBarricadeDirection && !!barricadeSelection}>
+      <DialogTitle>Выберите направление для баррикады</DialogTitle>
+      <DialogContent>
         <Directions>
-          {barricadeSelection.availableDirections.map(dir => (
+          {barricadeSelection?.availableDirections.map(dir => (
             <DirectionButton key={dir} onClick={() => handleSelect(dir)}>
               {directionLabels[dir] || dir}
             </DirectionButton>
           ))}
         </Directions>
-        <CancelButton onClick={handleCancel}>Отмена</CancelButton>
-      </Content>
-    </Overlay>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          variant="text"
+          color="primary"
+          size="large"
+          onClick={handleCancel}>
+          Отмена
+        </Button>
+      </DialogActions>
+    </Dialog>
   )
 }
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(45, 57, 73, 0.5);
-  backdrop-filter: blur(4px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`
-
-const Content = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #fffbca;
-`
-
-const Title = styled.h3`
-  margin-bottom: 20px;
-  color: #0b1727;
-`
 
 const Directions = styled.div`
   display: flex;
@@ -89,17 +71,5 @@ const DirectionButton = styled.button`
 
   &:hover {
     background: #e0e0e0;
-  }
-`
-
-const CancelButton = styled.button`
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #ffcccc;
-  cursor: pointer;
-
-  &:hover {
-    background: #ffbbbb;
   }
 `
