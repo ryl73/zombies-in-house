@@ -36,6 +36,27 @@ const boardObjectsMatrix = [
   [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
 ]
+/*
+  1 - top
+  2 - right
+  4 - bottom
+  8 - left
+ */
+
+const boardBarricadeMatrix = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+  [0, 2, 8, 0, 0, 0, 2, 8, 0, 0, 2, 8],
+  [0, 0, 0, 2, 12, 0, 0, 0, 0, 4, 0, 0],
+  [0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+  [0, 2, 8, 0, 0, 0, 2, 8, 0, 0, 2, 8],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 4, 4, 0, 0, 4, 0, 0, 0],
+  [0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+]
 
 export type Board = {
   cells: Cell[][]
@@ -54,7 +75,9 @@ export function initCells(board: Board): Board {
     for (let j = 0; j < boardWallsMatrix[0].length; j++) {
       const value = boardWallsMatrix[i][j]
       const valueObject = boardObjectsMatrix[i][j]
+      const barricadeValue = boardBarricadeMatrix[i][j]
       const cell = createCell(i, j)
+
       if (valueObject === 2) {
         cell.type = 'car'
       }
@@ -62,12 +85,24 @@ export function initCells(board: Board): Board {
       if (valueObject === 1) {
         cell.type = 'start'
       }
+
+      if (barricadeValue !== 0) {
+        cell.type = 'plankPlace'
+      }
       cell.walls = {
         top: (value & 1) !== 0,
         right: (value & 2) !== 0,
         bottom: (value & 4) !== 0,
         left: (value & 8) !== 0,
       }
+
+      cell.availableBarricadeDirections = {
+        top: (barricadeValue & 1) !== 0,
+        right: (barricadeValue & 2) !== 0,
+        bottom: (barricadeValue & 4) !== 0,
+        left: (barricadeValue & 8) !== 0,
+      }
+
       row.push(cell)
     }
     cells.push(row)
@@ -89,6 +124,8 @@ export function findAllPaths(
   const rows = game.board.cells.length
   const cols = game.board.cells[0].length
 
+  console.log(`📏 Число ходов: ${moveCount}, Максимум: ${maxMoveCount}`)
+
   const results: Cell[] = []
 
   function canMove(
@@ -96,11 +133,39 @@ export function findAllPaths(
     next: Cell,
     dir: { dx: number; dy: number }
   ): boolean {
-    if (dir.dx === 1) return !current.walls.bottom && !next.walls.top
-    if (dir.dx === -1) return !current.walls.top && !next.walls.bottom
-    if (dir.dy === 1) return !current.walls.right && !next.walls.left
-    if (dir.dy === -1) return !current.walls.left && !next.walls.right
-    return false
+    if (dir.dx === 1) {
+      if (current.walls.bottom || next.walls.top) return false
+      if (
+        current.installedBarricadeDirections.bottom ||
+        next.installedBarricadeDirections.top
+      )
+        return false
+    }
+    if (dir.dx === -1) {
+      if (current.walls.top || next.walls.bottom) return false
+      if (
+        current.installedBarricadeDirections.top ||
+        next.installedBarricadeDirections.bottom
+      )
+        return false
+    }
+    if (dir.dy === 1) {
+      if (current.walls.right || next.walls.left) return false
+      if (
+        current.installedBarricadeDirections.right ||
+        next.installedBarricadeDirections.left
+      )
+        return false
+    }
+    if (dir.dy === -1) {
+      if (current.walls.left || next.walls.right) return false
+      if (
+        current.installedBarricadeDirections.left ||
+        next.installedBarricadeDirections.right
+      )
+        return false
+    }
+    return true
   }
 
   function isBlockingCell(nextCell: Cell, isZombieTurn: boolean) {
@@ -171,6 +236,6 @@ export function findAllPaths(
   }
 
   dfs(start, 0, new Set([start.id]))
-
+  console.log(`📍 Найдено ${results.length} доступных клеток`)
   return results
 }

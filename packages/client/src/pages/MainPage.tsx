@@ -17,9 +17,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
-import { clearUser, isUserLoggedIn } from '../slices/userSlice'
-import { useDispatch } from 'react-redux'
-import { useAppSelector } from '../hooks/useApp'
+import { useAuth } from '../hooks/useAuth'
+import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -67,8 +66,7 @@ const useStyles = makeStyles(theme => ({
 
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
-  const dispatch = useDispatch()
-  const isLoggedIn = useAppSelector(isUserLoggedIn)
+  const { isLoggedIn, clearUser } = useAuth()
   const navigate = useNavigate()
   const theme = useTheme()
   const classes = useStyles()
@@ -112,6 +110,7 @@ export const MainPage = () => {
       </Helmet>
 
       <Box className={classes.firstScreen}>
+        <FullscreenToggle />
         <Container maxWidth="lg" className={classes.contentContainer}>
           <Typography variant="h1" gutterBottom>
             Зомби в&nbsp;доме
@@ -203,7 +202,7 @@ export const MainPage = () => {
           <Button
             component={Link}
             onClick={() => {
-              logout().then(() => dispatch(clearUser()))
+              logout().then(() => clearUser())
             }}
             to="/signin"
             variant="contained"

@@ -55,7 +55,10 @@ export const TopicItem: React.FC<TopicItemProps> = ({
 
   return (
     <Card className={classes.card}>
-      <Link to={`/forum/topic/${topic.id}`} className={classes.link}>
+      <Link
+        to={`/forum/topic/${topic.id}`}
+        className={classes.link}
+        data-testid="topic-link">
         <CardContent>
           <Box display="flex" flexDirection="row" alignItems="center" mb={1}>
             <Avatar className={classes.avatar}>
