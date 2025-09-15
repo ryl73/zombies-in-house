@@ -1,7 +1,11 @@
 import styled from 'styled-components'
 import { Item } from '../../game/models/Item'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { manualSpinPinWheel, usePlayerItem } from '../../slices/gameSlice'
+import {
+  manualSpinPinWheel,
+  usePlayerItem,
+  skipTurn,
+} from '../../slices/gameSlice'
 import { Card, CardImage } from '../Board/CellComponent'
 
 export const Hud = () => {
@@ -12,6 +16,8 @@ export const Hud = () => {
   )
 
   const player = players[currentPlayerIndex]
+
+  const game = useAppSelector(state => state.game)
 
   const clickHandler = async (item: Item) => {
     await dispatch(usePlayerItem(item))
@@ -32,6 +38,11 @@ export const Hud = () => {
           <LifeImage src="/images/game/cards/life.png" alt="life" key={i} />
         ))}
       </div>
+      {game.canSkipTurn && !game.isProcessing && (
+        <SkipTurnButton onClick={() => dispatch(skipTurn())}>
+          Пропустить ход
+        </SkipTurnButton>
+      )}
       <Items>
         {player.items.map(item => (
           <Card
@@ -87,4 +98,22 @@ const HudCard = styled(Card)`
 const LifeImage = styled.img`
   width: 50px;
   height: 50px;
+`
+const SkipTurnButton = styled.button`
+  padding: 10px 20px;
+  background-color: #ff6b6b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #ff5252;
+  }
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
 `

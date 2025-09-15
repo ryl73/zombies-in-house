@@ -7,6 +7,19 @@ export type Cell = {
   isTraversable: boolean
   isEmpty: boolean
   type?: CellType
+  hasBarricade: boolean
+  availableBarricadeDirections: {
+    top: boolean
+    right: boolean
+    bottom: boolean
+    left: boolean
+  }
+  installedBarricadeDirections: {
+    top: boolean
+    right: boolean
+    bottom: boolean
+    left: boolean
+  }
   walls: {
     top: boolean
     right: boolean
@@ -21,6 +34,19 @@ export function createCell(x: number, y: number): Cell {
     y,
     isTraversable: false,
     isEmpty: true,
+    hasBarricade: false,
+    availableBarricadeDirections: {
+      top: false,
+      right: false,
+      bottom: false,
+      left: false,
+    },
+    installedBarricadeDirections: {
+      top: false,
+      right: false,
+      bottom: false,
+      left: false,
+    },
     id: Math.random(),
     walls: {
       top: false,

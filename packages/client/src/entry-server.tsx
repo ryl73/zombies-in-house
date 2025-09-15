@@ -23,6 +23,7 @@ import { routes } from './routes'
 import './index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
 import { theme } from './theme/theme'
+import { NotificationProvider } from './hooks/useNotification'
 import { CssBaseline } from '@material-ui/core'
 
 export const render = async (req: ExpressRequest) => {
@@ -78,7 +79,9 @@ export const render = async (req: ExpressRequest) => {
           <Provider store={store}>
             <ThemeProvider theme={theme}>
               <CssBaseline />
-              <StaticRouterProvider router={router} context={context} />
+              <NotificationProvider>
+                <StaticRouterProvider router={router} context={context} />
+              </NotificationProvider>
             </ThemeProvider>
           </Provider>
         )
