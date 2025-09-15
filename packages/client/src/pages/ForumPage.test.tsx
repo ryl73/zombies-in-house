@@ -1,20 +1,22 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ForumPage } from './ForumPage'
 import { Provider } from 'react-redux'
-import { store } from '../store'
+import { reducer } from '../store'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { theme } from '../theme/theme'
 import { ReactNode } from 'react'
 import { mockTopics } from '../components/Forum/TopicItem'
+import { configureStore } from '@reduxjs/toolkit'
 
-// @ts-ignore
-global.fetch = jest.fn(() => Promise.resolve({}))
-
-export const renderWithProviders = (ui: ReactNode, withRoutes = false) =>
+export const renderWithProviders = (
+  ui: ReactNode,
+  withRoutes = false,
+  customStore = configureStore({ reducer: reducer })
+) =>
   render(
-    <Provider store={store}>
+    <Provider store={customStore}>
       <ThemeProvider theme={theme}>
         <MemoryRouter initialEntries={['/forum']}>
           {withRoutes ? (
@@ -36,38 +38,37 @@ describe('ForumPage', () => {
     renderWithProviders(<ForumPage />)
     expect(
       screen.getByRole('heading', { name: /^Форум$/, level: 1 })
-    ).toBeTruthy()
+    ).toBeInTheDocument()
   })
 
   test('displays all mock topics by default', () => {
     renderWithProviders(<ForumPage />)
     mockTopics.forEach(topic => {
-      expect(screen.getByText(topic.title)).toBeTruthy()
+      expect(screen.getByText(topic.title)).toBeInTheDocument()
     })
   })
 
-  test('filters topics when typing in the search field', () => {
+  test('filters topics when typing in the search field', async () => {
     renderWithProviders(<ForumPage />)
     const searchInput = screen.getByPlaceholderText(/Поиск по форуму/i)
+    await userEvent.type(searchInput, mockTopics[0].title)
 
-    fireEvent.change(searchInput, { target: { value: mockTopics[0].title } })
-
-    expect(screen.getByText(mockTopics[0].title)).toBeTruthy()
+    expect(screen.getByText(mockTopics[0].title)).toBeInTheDocument()
 
     mockTopics.slice(1).forEach(topic => {
-      expect(screen.queryByText(topic.title)).toBeNull()
+      expect(screen.queryByText(topic.title)).not.toBeInTheDocument()
     })
   })
 
-  test('shows "Ничего не найдено" for no matches', () => {
+  test('shows "Ничего не найдено" for no matches', async () => {
     renderWithProviders(<ForumPage />)
     const searchInput = screen.getByPlaceholderText(/Поиск по форуму/i)
-    fireEvent.change(searchInput, { target: { value: 'не существует' } })
+    await userEvent.type(searchInput, 'не существует')
 
-    expect(screen.getByText(/Ничего не найдено/i)).toBeTruthy()
+    expect(screen.getByText(/Ничего не найдено/i)).toBeInTheDocument()
     expect(
       screen.getByText(/Попробуйте изменить поисковый запрос/i)
-    ).toBeTruthy()
+    ).toBeInTheDocument()
   })
 
   test('navigates to create topic page on button click', async () => {
@@ -78,7 +79,7 @@ describe('ForumPage', () => {
     const createLink = screen.getByText(/Создать топик/i)
     await user.click(createLink)
 
-    expect(screen.getByText(/Create Page/i)).toBeTruthy()
+    expect(screen.getByText(/Create Page/i)).toBeInTheDocument()
   })
 
   test('navigates to topic page on topic card click', async () => {
@@ -89,6 +90,6 @@ describe('ForumPage', () => {
     const topicLinks = screen.getAllByTestId('topic-link')
     await user.click(topicLinks[0])
 
-    expect(screen.getByText(/Topic Page/i)).toBeTruthy()
+    expect(screen.getByText(/Topic Page/i)).toBeInTheDocument()
   })
 })

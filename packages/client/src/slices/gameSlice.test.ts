@@ -15,6 +15,7 @@ import { createPlayer } from '../game/models/Player'
 import { createZombie, ZombieType } from '../game/models/Zombie'
 import { createItem, ItemType } from '../game/models/Item'
 import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore'
+import { Cell } from '../game/models/Cell'
 
 // Mock spinPinWheel to control randomness
 jest.mock('../game/models/PinWheel', () => ({
@@ -42,7 +43,36 @@ function setupStore(preloadedState?: Partial<typeof baseInitialState>) {
   })
 }
 
+function createTestPlayer(cell: Cell, overrides = {}) {
+  return createPlayer({
+    name: 'Test',
+    lifeCount: 3,
+    type: 'boris',
+    cellId: cell.id,
+    ...overrides,
+  })
+}
+
+function createTestZombie(cell: Cell, overrides = {}) {
+  return createZombie({
+    name: 'ordinary',
+    type: 'ordinary',
+    cellId: cell.id,
+    ...overrides,
+  })
+}
+
+function createTestItem(cell: Cell, overrides = {}) {
+  return createItem({
+    name: 'test',
+    type: 'coldWeapon',
+    cellId: cell.id,
+    ...overrides,
+  })
+}
+
 beforeEach(() => {
+  jest.clearAllMocks()
   store = setupStore()
   store.dispatch(gameSlice.actions.resetBoard())
 })
@@ -61,17 +91,8 @@ describe('gameSlice reducers', () => {
   it('pickItem should move item from board to player inventory', () => {
     const cell = store.getState().game.board.cells[2][2]
 
-    const player = createPlayer({
-      name: 'Test',
-      lifeCount: 3,
-      type: 'boris',
-      cellId: cell.id,
-    })
-    const item = createItem({
-      name: 'knife',
-      type: 'coldWeapon',
-      cellId: cell.id,
-    })
+    const player = createTestPlayer(cell)
+    const item = createTestItem(cell)
 
     store = setupStore({ players: [player], items: [item] })
 
@@ -86,17 +107,8 @@ describe('gameSlice reducers', () => {
   it('killZombie should remove zombie from player cell', () => {
     const cell = store.getState().game.board.cells[2][2]
 
-    const player = createPlayer({
-      name: 'Test',
-      lifeCount: 3,
-      type: 'sasha',
-      cellId: cell.id,
-    })
-    const zombie = createZombie({
-      name: 'ordinary',
-      type: 'ordinary',
-      cellId: cell.id,
-    })
+    const player = createTestPlayer(cell)
+    const zombie = createTestZombie(cell)
 
     store = setupStore({ players: [player], zombies: [zombie] })
 
@@ -123,12 +135,7 @@ describe('game engine', () => {
     it('moveStage should set traversable cells', async () => {
       const cell = store.getState().game.board.cells[11][0]
 
-      const player = createPlayer({
-        name: 'Test',
-        lifeCount: 3,
-        type: 'sasha',
-        cellId: cell.id,
-      })
+      const player = createTestPlayer(cell)
 
       store = setupStore({ players: [player] })
 
@@ -145,12 +152,7 @@ describe('game engine', () => {
     it('fightStage with "run" action should call moveStage', async () => {
       const cell = store.getState().game.board.cells[11][0]
 
-      const player = createPlayer({
-        name: 'Test',
-        lifeCount: 3,
-        type: 'sasha',
-        cellId: cell.id,
-      })
+      const player = createTestPlayer(cell)
 
       store = setupStore({ players: [player] })
 
@@ -167,18 +169,8 @@ describe('game engine', () => {
     it('endTurn should increment turn and cycle player index', async () => {
       const cell = store.getState().game.board.cells[11][0]
 
-      const p1 = createPlayer({
-        name: 'P1',
-        lifeCount: 3,
-        type: 'sasha',
-        cellId: cell.id,
-      })
-      const p2 = createPlayer({
-        name: 'P2',
-        lifeCount: 3,
-        type: 'boris',
-        cellId: cell.id,
-      })
+      const p1 = createTestPlayer(cell)
+      const p2 = createTestPlayer(cell, { type: 'sasha' })
 
       store = setupStore({ players: [p1, p2] })
 
@@ -189,28 +181,13 @@ describe('game engine', () => {
       expect(state.currentPlayerIndex).toBe(1)
     })
 
-    describe('using items', () => {
+    describe('using player items', () => {
       function setupStoreForItems(itemType: ItemType, zombieType: ZombieType) {
         const cell = store.getState().game.board.cells[11][0]
 
-        const player = createPlayer({
-          name: 'Test',
-          lifeCount: 3,
-          type: 'boris',
-          cellId: cell.id,
-        })
-
-        const zombie = createZombie({
-          name: 'test',
-          type: zombieType,
-          cellId: cell.id,
-        })
-
-        const item = createItem({
-          name: 'test',
-          type: itemType,
-          cellId: null,
-        })
+        const player = createTestPlayer(cell)
+        const zombie = createTestZombie(cell, { type: zombieType })
+        const item = createTestItem(cell, { cellId: null, type: itemType })
 
         store = setupStore({
           players: [player],
@@ -223,27 +200,27 @@ describe('game engine', () => {
         return { state: store.getState().game, player: player }
       }
 
-      it('using medkit', () => {
+      it('add extra life to player when using medkit', () => {
         const { state, player } = setupStoreForItems('medkit', 'ordinary')
         expect(state.players[0].lifeCount).toBe(player.lifeCount + 1)
         expect(state.players[0].items).toHaveLength(0)
       })
 
-      it('using grenade', () => {
+      it('removes zombie in cell when using grenade', () => {
         const { state } = setupStoreForItems('grenade', 'ordinary')
         expect(state.zombies).toHaveLength(0)
         expect(state.canFight).toBeNull()
         expect(state.players[0].items).toHaveLength(0)
       })
 
-      it('using cold/gun weapon', () => {
+      it('removes zombie in cell when using cold/gun weapon', () => {
         const { state } = setupStoreForItems('coldWeapon', 'ordinary')
         expect(state.zombies).toHaveLength(0)
         expect(state.canFight).toBeNull()
         expect(state.players[0].items).toHaveLength(1)
       })
 
-      it('using launcher', () => {
+      it('removes boss zombie in cell when using launcher', () => {
         const { state } = setupStoreForItems('launcher', 'boss')
         expect(state.zombies).toHaveLength(0)
         expect(state.canFight).toBeNull()
@@ -254,18 +231,8 @@ describe('game engine', () => {
     it('when player bitten life count should decrease', async () => {
       const cell = store.getState().game.board.cells[11][0]
 
-      const player = createPlayer({
-        name: 'Test',
-        lifeCount: 3,
-        type: 'boris',
-        cellId: cell.id,
-      })
-
-      const zombie = createZombie({
-        name: 'test',
-        type: 'ordinary',
-        cellId: cell.id,
-      })
+      const player = createTestPlayer(cell)
+      const zombie = createTestZombie(cell)
 
       store = setupStore({
         players: [player],
@@ -280,25 +247,9 @@ describe('game engine', () => {
     it('when player bitten and life count is 0 he should become zombie', async () => {
       const cell = store.getState().game.board.cells[11][0]
 
-      const p1 = createPlayer({
-        name: 'Test',
-        lifeCount: 1,
-        type: 'boris',
-        cellId: cell.id,
-      })
-
-      const p2 = createPlayer({
-        name: 'Test',
-        lifeCount: 3,
-        type: 'sasha',
-        cellId: cell.id,
-      })
-
-      const zombie = createZombie({
-        name: 'test',
-        type: 'ordinary',
-        cellId: cell.id,
-      })
+      const p1 = createTestPlayer(cell, { lifeCount: 1 })
+      const p2 = createTestPlayer(cell, { type: 'sasha' })
+      const zombie = createTestZombie(cell)
 
       store = setupStore({
         players: [p1, p2],
@@ -318,24 +269,9 @@ describe('game engine', () => {
         const playerCell = store.getState().game.board.cells[11][0]
         const targetCell = store.getState().game.board.cells[10][0]
 
-        const player = createPlayer({
-          name: 'Test',
-          lifeCount: 3,
-          type: 'boris',
-          cellId: playerCell.id,
-        })
-
-        const zombie = createZombie({
-          name: 'test',
-          type: 'ordinary',
-          cellId: targetCell.id,
-        })
-
-        const item = createItem({
-          name: 'test',
-          type: 'medkit',
-          cellId: targetCell.id,
-        })
+        const player = createTestPlayer(playerCell)
+        const zombie = createTestZombie(targetCell)
+        const item = createTestItem(targetCell, { type: 'medkit' })
 
         store = setupStore({
           players: [player],
@@ -374,18 +310,8 @@ describe('game engine', () => {
         const playerCell = store.getState().game.board.cells[1][7]
         const targetCell = store.getState().game.board.cells[1][8]
 
-        const player = createPlayer({
-          name: 'Test',
-          lifeCount: 3,
-          type: 'boris',
-          cellId: playerCell.id,
-        })
-
-        const itemKey = createItem({
-          name: 'test',
-          type: 'key',
-          cellId: playerCell.id,
-        })
+        const player = createTestPlayer(playerCell)
+        const itemKey = createTestItem(playerCell, { type: 'key' })
 
         store = setupStore({
           players: [player],
@@ -409,25 +335,9 @@ describe('game engine', () => {
         const playerCell = store.getState().game.board.cells[1][7]
         const zombieCell = store.getState().game.board.cells[2][2]
 
-        const p1 = createPlayer({
-          name: 'Test',
-          lifeCount: 3,
-          type: 'boris',
-          cellId: playerCell.id,
-        })
-
-        const p2 = createPlayer({
-          name: 'Test',
-          lifeCount: 3,
-          type: 'sasha',
-          cellId: playerCell.id,
-        })
-
-        const zombie = createZombie({
-          name: 'test',
-          type: 'ordinary',
-          cellId: zombieCell.id,
-        })
+        const p1 = createTestPlayer(playerCell)
+        const p2 = createTestPlayer(playerCell, { type: 'sasha' })
+        const zombie = createTestZombie(zombieCell)
 
         store = setupStore({
           players: [p1, p2],
