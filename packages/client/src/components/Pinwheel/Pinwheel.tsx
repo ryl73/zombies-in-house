@@ -42,12 +42,12 @@ export const Pinwheel = () => {
     <PinwheelOverlay $isOpen={isPinwheelOpen}>
       <PinwheelWrapper>
         <PinwheelContainer>
-          <PinwheelImg src="/src/assets/spinwheel.png" alt="spin wheel" />
+          <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
           <Arrow
             animate={{ rotate: rotation }}
             transition={{ duration: 3, ease: 'easeOut' }}
             onAnimationComplete={handleAnimationComplete}>
-            <ArrowImg src="/src/assets/spinner-arrow.png" alt="spin arrow" />
+            <ArrowImg src="/src/assets/spinner-arrow.webp" alt="spin arrow" />
           </Arrow>
         </PinwheelContainer>
 
@@ -91,16 +91,16 @@ const PinwheelImg = styled.img`
 
 const Arrow = styled(motion.div)`
   position: absolute;
-  width: 120px;
-  height: 160px;
-  top: calc(50% - 160px);
-  left: calc(50% - 60px);
+  width: 60px;
+  height: 120px;
+  top: calc(50% - 120px);
+  left: calc(50% - 27px);
   transform-origin: bottom center;
 `
 
 const ArrowImg = styled.img`
-  width: 120px;
-  height: 160px;
+  width: 60px;
+  height: 120px;
 `
 
 const SpinButton = styled(Button)`
