@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import styled from 'styled-components'
-import { useAppSelector } from '../../hooks/useApp'
+import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
+import { manualSpinPinwheel } from '../../slices/gameSlice'
+import { Button } from '../../styles/Buttons'
 
-type Props = {
-  isOpen: boolean
-  onOpen: () => void
-  onClose: () => void
-}
-
-export const SpinWheel = ({ isOpen, onOpen, onClose }: Props) => {
+export const Pinwheel = () => {
   const [rotation, setRotation] = useState(0)
   const [isSpinning, setIsSpinning] = useState(false)
+  const dispatch = useAppDispatch()
 
-  const { moveCount } = useAppSelector(state => state.game)
+  const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
 
   const spinArrow = () => {
+    if (!pinwheelResult) return
     if (isSpinning) return
+
     setIsSpinning(true)
 
+    const { moveCount } = pinwheelResult
     const segmentAngle = 90
 
     const minAngle = (moveCount - 1) * segmentAngle
@@ -33,37 +33,33 @@ export const SpinWheel = ({ isOpen, onOpen, onClose }: Props) => {
   const handleAnimationComplete = () => {
     if (isSpinning) {
       setIsSpinning(false)
-      onClose()
+      dispatch(manualSpinPinwheel())
       setRotation(0)
     }
   }
 
-  useEffect(() => {
-    onOpen()
-  }, [moveCount])
-
   return (
-    <WheelWrapper $isOpen={isOpen}>
-      <WheelContainer>
-        <Wheel>
-          <WheelImg src="/src/assets/spinwheel.png" alt="spin wheel" />
+    <PinwheelOverlay $isOpen={isPinwheelOpen}>
+      <PinwheelWrapper>
+        <PinwheelContainer>
+          <PinwheelImg src="/src/assets/spinwheel.png" alt="spin wheel" />
           <Arrow
             animate={{ rotate: rotation }}
             transition={{ duration: 3, ease: 'easeOut' }}
             onAnimationComplete={handleAnimationComplete}>
             <ArrowImg src="/src/assets/spinner-arrow.png" alt="spin arrow" />
           </Arrow>
-        </Wheel>
+        </PinwheelContainer>
 
         <SpinButton onClick={spinArrow} disabled={isSpinning}>
           Spin
         </SpinButton>
-      </WheelContainer>
-    </WheelWrapper>
+      </PinwheelWrapper>
+    </PinwheelOverlay>
   )
 }
 
-const WheelWrapper = styled.div<{ $isOpen: boolean }>`
+const PinwheelOverlay = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -74,7 +70,7 @@ const WheelWrapper = styled.div<{ $isOpen: boolean }>`
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
 `
 
-const WheelContainer = styled.div`
+const PinwheelWrapper = styled.div`
   position: absolute;
   left: 50%;
   top: 50%;
@@ -85,11 +81,11 @@ const WheelContainer = styled.div`
   z-index: 1000;
 `
 
-const Wheel = styled.div`
+const PinwheelContainer = styled.div`
   position: relative;
 `
 
-const WheelImg = styled.img`
+const PinwheelImg = styled.img`
   width: 1000px;
 `
 
@@ -107,12 +103,12 @@ const ArrowImg = styled.img`
   height: 160px;
 `
 
-const SpinButton = styled.button`
-  margin-top: 30px;
-  padding: 10px 20px;
-  font-size: 18px;
+const SpinButton = styled(Button)`
+  min-width: 160px;
   cursor: pointer;
-  &:disabled {
-    cursor: not-allowed;
+
+  &:hover {
+    filter: brightness(0.9);
+    transition: 0.2s ease;
   }
 `

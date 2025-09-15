@@ -1,15 +1,14 @@
 import styled from 'styled-components'
 import { Item } from '../../game/models/Item'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { manualSpinPinWheel, usePlayerItem } from '../../slices/gameSlice'
+import { manualSpinPinwheel, usePlayerItem } from '../../slices/gameSlice'
 import { Card, CardImage } from '../Board/CellComponent'
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
 
-  const { players, currentPlayerIndex, canFight } = useAppSelector(
-    state => state.game
-  )
+  const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
+    useAppSelector(state => state.game)
 
   const player = players[currentPlayerIndex]
 
@@ -20,7 +19,7 @@ export const Hud = () => {
   const isAnimation = (item: Item) => canFight === item.type
 
   return (
-    <HudWrapper>
+    <HudWrapper $isOpen={isPinwheelOpen}>
       <div>
         <CardWrapper>
           <HudCard>
@@ -42,7 +41,7 @@ export const Hud = () => {
           </Card>
         ))}
         {canFight === 'grenade' && (
-          <button onClick={() => dispatch(manualSpinPinWheel())}>
+          <button onClick={() => dispatch(manualSpinPinwheel())}>
             Spin pinwheel
           </button>
         )}
@@ -51,7 +50,7 @@ export const Hud = () => {
   )
 }
 
-const HudWrapper = styled.div`
+const HudWrapper = styled.div<{ $isOpen: boolean }>`
   position: fixed;
   left: 50%;
   transform: translateX(-50%);
@@ -59,12 +58,12 @@ const HudWrapper = styled.div`
   max-width: 1000px;
   bottom: 20px;
   padding: 10px 32px;
-  display: flex;
   justify-content: space-between;
   align-items: center;
   z-index: 999;
   background-color: white;
   border-radius: 10px;
+  display: ${({ $isOpen }) => ($isOpen ? 'none' : 'flex')};
 `
 
 const Items = styled.div`
