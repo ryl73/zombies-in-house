@@ -3,6 +3,7 @@ import { Item } from '../../game/models/Item'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { manualSpinPinwheel, usePlayerItem } from '../../slices/gameSlice'
 import { Card, CardImage } from '../Board/CellComponent'
+import { Button } from '../../styles/Buttons'
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
@@ -20,7 +21,7 @@ export const Hud = () => {
 
   return (
     <HudWrapper $isOpen={isPinwheelOpen}>
-      <div>
+      <PlayerCardWrapper>
         <CardWrapper>
           <HudCard>
             <CardImage src={player.image} alt={player.name} />
@@ -30,7 +31,7 @@ export const Hud = () => {
         {Array.from({ length: player.lifeCount }, (_, i) => (
           <LifeImage src="/images/game/cards/life.png" alt="life" key={i} />
         ))}
-      </div>
+      </PlayerCardWrapper>
       <Items>
         {player.items.map(item => (
           <Card
@@ -41,9 +42,9 @@ export const Hud = () => {
           </Card>
         ))}
         {canFight === 'grenade' && (
-          <button onClick={() => dispatch(manualSpinPinwheel())}>
+          <SpinButton onClick={() => dispatch(manualSpinPinwheel())}>
             Spin pinwheel
-          </button>
+          </SpinButton>
         )}
       </Items>
     </HudWrapper>
@@ -56,18 +57,25 @@ const HudWrapper = styled.div<{ $isOpen: boolean }>`
   transform: translateX(-50%);
   width: calc(100% - 60px);
   max-width: 1000px;
-  bottom: 20px;
+  bottom: 0;
   padding: 10px 32px;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   z-index: 999;
-  background-color: white;
-  border-radius: 10px;
+  background: url(/src/assets/hud.webp) center 50% no-repeat;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
   display: ${({ $isOpen }) => ($isOpen ? 'none' : 'flex')};
+`
+
+const PlayerCardWrapper = styled.div`
+  min-width: 150px;
 `
 
 const Items = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
 `
 
@@ -86,4 +94,10 @@ const HudCard = styled(Card)`
 const LifeImage = styled.img`
   width: 50px;
   height: 50px;
+`
+
+const SpinButton = styled(Button)`
+  margin: 0;
+  border-radius: 20px;
+  cursor: pointer;
 `
