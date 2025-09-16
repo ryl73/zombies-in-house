@@ -1,20 +1,17 @@
-import { Form as StyledForm } from '../../styles/Form'
 import React from 'react'
-import { Input } from '../../styles/Input'
 import { changeUser, ChangeUserRequest } from '../../api/UserAPI'
 import * as Yup from 'yup'
-import { ErrorMessage } from '../../styles/Errors'
-import { Formik, Field } from 'formik'
+import { Formik } from 'formik'
 import {
   EmailSchema,
   LoginSchema,
   NameSchema,
   PhoneSchema,
 } from '../../utils/validation'
-import { Button } from '../../styles/Buttons'
 import { useNotification } from '../../hooks/useNotification'
 import { selectUser } from '../../slices/userSlice'
 import { useAppSelector } from '../../hooks/useApp'
+import { TextField, Button, FormControl } from '@material-ui/core'
 
 const ChangeProfileSchema = Yup.object().shape({
   login: LoginSchema,
@@ -50,70 +47,109 @@ export const ChangeProfileForm = () => {
       }}
       validationSchema={ChangeProfileSchema}
       onSubmit={onSubmit}>
-      {({ errors, touched, handleSubmit }) => (
-        <StyledForm onSubmit={handleSubmit}>
-          <Field
-            as={Input}
+      {({
+        errors,
+        touched,
+        handleSubmit,
+        handleChange,
+        handleBlur,
+        values,
+      }) => (
+        <FormControl
+          component="form"
+          onSubmit={handleSubmit}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            width: 550,
+          }}>
+          <TextField
             id="login"
             name="login"
             type="text"
-            placeholder="Логин"
+            label="Логин"
+            value={values.login}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.login && Boolean(errors.login)}
+            helperText={touched.login && errors.login}
           />
-          {errors.login && touched.login && (
-            <ErrorMessage>{errors.login}</ErrorMessage>
-          )}
-          <Field
-            as={Input}
+
+          <TextField
             id="display_name"
             name="display_name"
             type="text"
-            placeholder="Отображаемое имя"
+            label="Отображаемое имя"
+            value={values.display_name}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.display_name && Boolean(errors.display_name)}
+            helperText={touched.display_name && errors.display_name}
           />
-          {errors.display_name && touched.display_name && (
-            <ErrorMessage>{errors.display_name}</ErrorMessage>
-          )}
-          <Field
-            as={Input}
+
+          <TextField
             id="first_name"
             name="first_name"
             type="text"
-            placeholder="Имя"
+            label="Имя"
+            value={values.first_name}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.first_name && Boolean(errors.first_name)}
+            helperText={touched.first_name && errors.first_name}
           />
-          {errors.first_name && touched.first_name && (
-            <ErrorMessage>{errors.first_name}</ErrorMessage>
-          )}
-          <Field
-            as={Input}
+
+          <TextField
             id="second_name"
             name="second_name"
             type="text"
-            placeholder="Фамилия"
+            label="Фамилия"
+            value={values.second_name}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.second_name && Boolean(errors.second_name)}
+            helperText={touched.second_name && errors.second_name}
           />
-          {errors.second_name && touched.second_name && (
-            <ErrorMessage>{errors.second_name}</ErrorMessage>
-          )}
-          <Field
-            as={Input}
+
+          <TextField
             id="email"
             name="email"
             type="email"
-            placeholder="Электронный адрес"
+            label="Электронный адрес"
+            value={values.email}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.email && Boolean(errors.email)}
+            helperText={touched.email && errors.email}
           />
-          {errors.email && touched.email && (
-            <ErrorMessage>{errors.email}</ErrorMessage>
-          )}
-          <Field
-            as={Input}
+
+          <TextField
             id="phone"
             name="phone"
             type="text"
-            placeholder="Телефон"
+            label="Телефон"
+            value={values.phone}
+            InputLabelProps={{ shrink: true }}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            error={touched.phone && Boolean(errors.phone)}
+            helperText={touched.phone && errors.phone}
           />
-          {errors.phone && touched.phone && (
-            <ErrorMessage>{errors.phone}</ErrorMessage>
-          )}
-          <Button type="submit">СОХРАНИТЬ ИЗМЕНЕНИЯ</Button>
-        </StyledForm>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large">
+            СОХРАНИТЬ ИЗМЕНЕНИЯ
+          </Button>
+        </FormControl>
       )}
     </Formik>
   ) : (
