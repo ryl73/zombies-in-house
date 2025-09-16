@@ -1,11 +1,12 @@
 import { Helmet } from 'react-helmet'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
 import { Box, Container, Typography, Button, useTheme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import { useAppSelector } from '../hooks/useApp'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   firstScreen: {
     position: 'relative',
     minHeight: '100vh',
@@ -39,8 +40,7 @@ const useStyles = makeStyles(theme => ({
 
 export const GameEnd = () => {
   usePage({ initPage: initGameEnd })
-  const location = useLocation()
-  const { gameResult } = location.state === null ? '' : location.state
+  const { status } = useAppSelector(state => state.game)
   const theme = useTheme()
   const classes = useStyles()
 
@@ -59,9 +59,9 @@ export const GameEnd = () => {
           </Typography>
           <Box position="absolute" top="20px" width="100%">
             <Typography variant="h1" gutterBottom style={{ fontSize: '60px' }}>
-              {gameResult === 'win'
+              {status === 'won'
                 ? 'Вы спаслись!'
-                : 'В следующий раз обязательно получиться.'}
+                : 'В следующий раз обязательно получится.'}
             </Typography>
           </Box>
           <Button

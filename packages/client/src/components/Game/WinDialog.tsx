@@ -1,6 +1,6 @@
 import { FC } from 'react'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { gameSlice } from '../../slices/gameSlice'
 import {
   Button,
@@ -13,6 +13,7 @@ import {
 
 export const WinDialog: FC = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { isWinDialogOpen, winningPlayerId, players } = useAppSelector(
     state => state.game
   )
@@ -21,6 +22,7 @@ export const WinDialog: FC = () => {
 
   const handleConfirm = () => {
     dispatch(gameSlice.actions.confirmWin())
+    navigate('/game-end')
   }
 
   const handleCancel = () => {

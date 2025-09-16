@@ -12,6 +12,7 @@ import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
 import { RootState } from '../store'
 import { Cell } from '../game/models/Cell'
+import { useNavigate } from 'react-router-dom'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
@@ -50,6 +51,8 @@ export type CanFightType =
   | 'launcher'
   | null
 
+export type GameStatus = 'idle' | 'playing' | 'won' | 'lost'
+
 export interface GameState {
   board: Board
   players: Player[]
@@ -58,7 +61,7 @@ export interface GameState {
   turn: number
   currentPlayerIndex: number
   canFight: CanFightType
-  status: 'idle' | 'playing' | 'won' | 'lost'
+  status: GameStatus
   isZombieMove: boolean
   isProcessing: boolean
   barricadeSelection: {
@@ -284,7 +287,7 @@ export const endTurn = createAsyncThunk(
     // check status
     const alivePlayers = game.players.filter(p => !p.isZombie)
     if (alivePlayers.length === 0) {
-      alert('You lost!')
+      dispatch(gameSlice.actions.setGameStatus('lost'))
       return
     }
 
@@ -883,6 +886,9 @@ export const gameSlice = createSlice({
       state.status = 'won'
       state.isWinDialogOpen = false
       state.winningPlayerId = null
+    },
+    setGameStatus(state, action: PayloadAction<GameStatus>) {
+      state.status = action.payload
     },
   },
 })
