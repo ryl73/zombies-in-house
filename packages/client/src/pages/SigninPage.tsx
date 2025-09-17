@@ -1,20 +1,18 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
 import { PageContainer } from '../styles/PageContainer'
-import { Form as StyledForm } from '../styles/Form'
-import { Input } from '../styles/Input'
-import { Button } from '../styles/Buttons'
 import { ThemedHeader } from '../styles/ThemedHeader'
 import { signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
-import { ErrorMessage } from '../styles/Errors'
-import { Formik, Field } from 'formik'
+import { Formik } from 'formik'
 import { LoginSchema, PasswordSchema } from '../utils/validation'
 import { useNotification } from '../hooks/useNotification'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../slices/userSlice'
 import { getUser } from '../api/UserAPI'
+import { Link } from 'react-router-dom'
+import { TextField, Button, FormControl } from '@material-ui/core'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
@@ -59,28 +57,55 @@ export const SigninPage = () => {
           initialValues={{ login: '', password: '' }}
           validationSchema={SigninSchema}
           onSubmit={onSubmit}>
-          {({ errors, touched, handleSubmit }) => (
-            <StyledForm onSubmit={handleSubmit}>
-              <Field as={Input} id="login" name="login" placeholder="Логин" />
-              {errors.login && touched.login && (
-                <ErrorMessage>{errors.login}</ErrorMessage>
-              )}
+          {({ errors, touched, handleSubmit, handleChange, handleBlur }) => (
+            <FormControl
+              component="form"
+              onSubmit={handleSubmit}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1rem',
+                width: 550,
+              }}>
+              <TextField
+                id="login"
+                name="login"
+                label="Логин"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.login && Boolean(errors.login)}
+                helperText={touched.login && errors.login}
+              />
 
-              <Field
-                as={Input}
+              <TextField
                 id="password"
                 name="password"
                 type="password"
-                placeholder="Пароль"
+                label="Пароль"
+                onChange={handleChange}
+                onBlur={handleBlur}
+                error={touched.password && Boolean(errors.password)}
+                helperText={touched.password && errors.password}
               />
-              {errors.password && touched.password && (
-                <ErrorMessage>{errors.password}</ErrorMessage>
-              )}
 
-              <Button type="submit">ВОЙТИ</Button>
-            </StyledForm>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                size="large">
+                ВОЙТИ
+              </Button>
+            </FormControl>
           )}
         </Formik>
+        <Button
+          component={Link}
+          to="/signup"
+          variant="text"
+          size="large"
+          color="default">
+          Регистрация
+        </Button>
       </PageContainer>
     </>
   )
