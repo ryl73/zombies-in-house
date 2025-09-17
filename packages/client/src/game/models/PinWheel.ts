@@ -22,10 +22,7 @@ const pinWheelFields: Record<string, PinWheelResult> = {
   '4': { action: PINWHEEL_STATE_MAP.SHOOT, moveCount: 4 },
 }
 
-export async function spinPinWheel() {
-  console.log('🎡 Крутим вертушку...')
-  await new Promise(resolve => setTimeout(resolve, 1000))
-
+export async function getPinwheelResult() {
   const keys = Array.from(Object.keys(pinWheelFields).map(key => Number(key)))
   const min = Math.min(...keys)
   const max = Math.max(...keys)

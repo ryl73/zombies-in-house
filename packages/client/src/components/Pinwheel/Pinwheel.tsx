@@ -1,18 +1,17 @@
-import { useState } from 'react'
-import { motion } from 'motion/react'
+import { useEffect, useState } from 'react'
+import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { manualSpinPinwheel } from '../../slices/gameSlice'
-import { Button } from '../../styles/Buttons'
+import { resolvePinwheel } from '../../slices/gameSlice'
 
 export const Pinwheel = () => {
-  const [rotation, setRotation] = useState(0)
   const [isSpinning, setIsSpinning] = useState(false)
+  const controls = useAnimation()
   const dispatch = useAppDispatch()
 
   const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
 
-  const spinArrow = () => {
+  const spinArrow = async () => {
     if (!pinwheelResult) return
     if (isSpinning) return
 
@@ -27,16 +26,25 @@ export const Pinwheel = () => {
     const spins =
       360 * (3 + Math.floor(Math.random() * 3)) + minAngle + randomOffset
 
-    setRotation(spins)
+    await controls.start({
+      rotate: spins,
+      transition: { duration: 3, ease: 'easeOut' },
+    })
   }
 
   const handleAnimationComplete = () => {
     if (isSpinning) {
       setIsSpinning(false)
-      dispatch(manualSpinPinwheel())
-      setRotation(0)
+      dispatch(resolvePinwheel())
     }
   }
+
+  useEffect(() => {
+    if (isPinwheelOpen) {
+      controls.set({ rotate: 0 })
+      spinArrow()
+    }
+  }, [isPinwheelOpen])
 
   return (
     <PinwheelOverlay $isOpen={isPinwheelOpen}>
@@ -44,16 +52,11 @@ export const Pinwheel = () => {
         <PinwheelContainer>
           <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
           <Arrow
-            animate={{ rotate: rotation }}
-            transition={{ duration: 3, ease: 'easeOut' }}
+            animate={controls}
             onAnimationComplete={handleAnimationComplete}>
             <ArrowImg src="/src/assets/spinner-arrow.webp" alt="spin arrow" />
           </Arrow>
         </PinwheelContainer>
-
-        <SpinButton onClick={spinArrow} disabled={isSpinning}>
-          Spin
-        </SpinButton>
       </PinwheelWrapper>
     </PinwheelOverlay>
   )
@@ -101,14 +104,4 @@ const Arrow = styled(motion.div)`
 const ArrowImg = styled.img`
   width: 60px;
   height: 120px;
-`
-
-const SpinButton = styled(Button)`
-  min-width: 160px;
-  cursor: pointer;
-
-  &:hover {
-    filter: brightness(0.9);
-    transition: 0.2s ease;
-  }
 `

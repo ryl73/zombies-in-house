@@ -6,7 +6,7 @@ import {
   findAllPaths,
   initCells,
 } from '../game/models/Board'
-import { PinWheelResult, spinPinWheel } from '../game/models/PinWheel'
+import { PinWheelResult, getPinwheelResult } from '../game/models/PinWheel'
 import { getRandomInt, randomGenerator } from '../utils/random'
 import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
@@ -236,13 +236,14 @@ export const fightStage = createAsyncThunk(
   async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.resetCanMoveCells())
     await dispatch(spinPinwheel())
+
     const { game } = getState() as { game: GameState }
-    const currentPlayer = getCurrentPlayer(game)
     if (!game.pinwheelResult) return
+    const currentPlayer = getCurrentPlayer(game)
+
     dispatch(gameSlice.actions.setCanSkipTurn(false))
 
     const { action } = game.pinwheelResult
-
     console.log(`🎯 Результат вертушки: ${action}`)
 
     const fight = async (weaponType: 'coldWeapon' | 'gunWeapon') => {
@@ -524,18 +525,38 @@ const handlePlayerCellClick = createAsyncThunk(
   }
 )
 
-let pinwheelResolver: ((value: unknown) => void) | null = null
+let pinwheelResolver: ((value: unknown) => void) | null
 
-const spinPinwheel = createAsyncThunk(
+export const spinPinwheel = createAsyncThunk(
   'game/spinPinwheel',
   async (_, { dispatch }) => {
-    const result = await spinPinWheel()
-    dispatch(gameSlice.actions.setPinwheelResult(result))
-    dispatch(gameSlice.actions.setIsPinwheelOpen(true))
+    dispatch(gameSlice.actions.setIsPinwheelOpen(false))
+    dispatch(gameSlice.actions.setPinwheelResult(null))
 
-    return new Promise((resolve: (value: unknown) => void) => {
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    const result = await getPinwheelResult()
+    dispatch(gameSlice.actions.setIsPinwheelOpen(true))
+    dispatch(gameSlice.actions.setPinwheelResult(result))
+
+    console.log('🎡 Крутим вертушку...')
+    await new Promise(resolve => {
       pinwheelResolver = resolve
     })
+  }
+)
+
+export const resolvePinwheel = createAsyncThunk(
+  'game/pinwheelResolver',
+  async (_, { dispatch }) => {
+    if (pinwheelResolver) {
+      pinwheelResolver(null)
+      pinwheelResolver = null
+    }
+
+    dispatch(gameSlice.actions.setIsPinwheelOpen(false))
+
+    await new Promise(resolve => setTimeout(resolve, 100))
   }
 )
 
@@ -543,10 +564,6 @@ export const manualSpinPinwheel = createAsyncThunk(
   'game/manualSpinPinWheel',
   async (_, { getState, dispatch }) => {
     const { game } = getState() as { game: GameState }
-
-    if (pinwheelResolver) {
-      pinwheelResolver(null)
-    }
 
     if (game.canFight === 'grenade') {
       dispatch(gameSlice.actions.setCanFight(null))
@@ -916,7 +933,7 @@ export const gameSlice = createSlice({
       state.winningPlayerId = null
     },
 
-    setPinwheelResult(state, action: PayloadAction<PinWheelResult>) {
+    setPinwheelResult(state, action: PayloadAction<PinWheelResult | null>) {
       state.pinwheelResult = action.payload
     },
 
