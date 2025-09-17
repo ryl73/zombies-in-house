@@ -16,10 +16,26 @@ import { createZombie, ZombieType } from '../game/models/Zombie'
 import { createItem, ItemType } from '../game/models/Item'
 import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore'
 import { Cell } from '../game/models/Cell'
+import * as gameSliceModule from '../slices/gameSlice'
+
+jest.spyOn(gameSliceModule, 'spinPinwheel').mockImplementation((): any => {
+  return (dispatch: any) => {
+    dispatch(
+      gameSliceModule.gameSlice.actions.setPinwheelResult({
+        moveCount: 1,
+        action: 'run',
+      })
+    )
+    return Promise.resolve()
+  }
+})
 
 // Mock spinPinWheel to control randomness
 jest.mock('../game/models/PinWheel', () => ({
-  spinPinWheel: jest.fn().mockResolvedValue({ moveCount: 1, action: 'run' }),
+  getPinwheelResult: jest.fn().mockResolvedValue({
+    moveCount: 1,
+    action: 'run',
+  }),
 }))
 
 let store: ToolkitStore<

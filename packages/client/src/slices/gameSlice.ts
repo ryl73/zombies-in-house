@@ -6,7 +6,7 @@ import {
   findAllPaths,
   initCells,
 } from '../game/models/Board'
-import { spinPinWheel } from '../game/models/PinWheel'
+import { PinWheelResult, getPinwheelResult } from '../game/models/PinWheel'
 import { getRandomInt, randomGenerator } from '../utils/random'
 import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
@@ -73,6 +73,8 @@ export interface GameState {
   canSkipTurn: boolean
   isWinDialogOpen: boolean
   winningPlayerId: number | null
+  pinwheelResult: PinWheelResult | null
+  isPinwheelOpen: boolean
 }
 
 const initialState: GameState = {
@@ -91,6 +93,8 @@ const initialState: GameState = {
   canSkipTurn: false,
   isWinDialogOpen: false,
   winningPlayerId: null,
+  pinwheelResult: null,
+  isPinwheelOpen: false,
 }
 
 const getCurrentPlayer = (game: GameState) =>
@@ -127,6 +131,7 @@ export const startGame = createAsyncThunk(
 export const moveStage = createAsyncThunk(
   'game/moveStage',
   async (_, { getState, dispatch }) => {
+    await dispatch(spinPinwheel())
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
     console.log(
@@ -136,10 +141,11 @@ export const moveStage = createAsyncThunk(
     )
 
     if (!currentPlayer.cellId) return
+    if (!game.pinwheelResult) return
 
     const zombieOnCell = getZombieByCellId(game, currentPlayer.cellId)
 
-    const { moveCount } = await spinPinWheel()
+    const { moveCount } = game.pinwheelResult
     console.log(`🎯 Выпало ${moveCount}`)
     let maxMoveCount = moveCount
 
@@ -232,12 +238,15 @@ export const fightStage = createAsyncThunk(
   'game/fightStage',
   async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.resetCanMoveCells())
+    await dispatch(spinPinwheel())
+
     const { game } = getState() as { game: GameState }
+    if (!game.pinwheelResult) return
     const currentPlayer = getCurrentPlayer(game)
+
     dispatch(gameSlice.actions.setCanSkipTurn(false))
 
-    const { action } = await spinPinWheel()
-
+    const { action } = game.pinwheelResult
     console.log(`🎯 Результат вертушки: ${action}`)
 
     const fight = async (weaponType: 'coldWeapon' | 'gunWeapon') => {
@@ -519,7 +528,42 @@ const handlePlayerCellClick = createAsyncThunk(
   }
 )
 
-export const manualSpinPinWheel = createAsyncThunk(
+let pinwheelResolver: ((value: unknown) => void) | null
+
+export const spinPinwheel = createAsyncThunk(
+  'game/spinPinwheel',
+  async (_, { dispatch }) => {
+    dispatch(gameSlice.actions.setIsPinwheelOpen(false))
+    dispatch(gameSlice.actions.setPinwheelResult(null))
+
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    const result = await getPinwheelResult()
+    dispatch(gameSlice.actions.setIsPinwheelOpen(true))
+    dispatch(gameSlice.actions.setPinwheelResult(result))
+
+    console.log('🎡 Крутим вертушку...')
+    await new Promise(resolve => {
+      pinwheelResolver = resolve
+    })
+  }
+)
+
+export const resolvePinwheel = createAsyncThunk(
+  'game/pinwheelResolver',
+  async (_, { dispatch }) => {
+    if (pinwheelResolver) {
+      pinwheelResolver(null)
+      pinwheelResolver = null
+    }
+
+    dispatch(gameSlice.actions.setIsPinwheelOpen(false))
+
+    await new Promise(resolve => setTimeout(resolve, 100))
+  }
+)
+
+export const manualSpinPinwheel = createAsyncThunk(
   'game/manualSpinPinWheel',
   async (_, { getState, dispatch }) => {
     const { game } = getState() as { game: GameState }
@@ -528,6 +572,8 @@ export const manualSpinPinWheel = createAsyncThunk(
       dispatch(gameSlice.actions.setCanFight(null))
       await dispatch(fightStage())
     }
+
+    dispatch(gameSlice.actions.setIsPinwheelOpen(false))
   }
 )
 
@@ -621,6 +667,8 @@ export const gameSlice = createSlice({
       state.status = 'playing'
       state.isZombieMove = false
       state.isProcessing = false
+      state.pinwheelResult = null
+      state.isPinwheelOpen = false
     },
 
     createCharacters(state) {
@@ -889,6 +937,14 @@ export const gameSlice = createSlice({
     },
     setGameStatus(state, action: PayloadAction<GameStatus>) {
       state.status = action.payload
+    },
+
+    setPinwheelResult(state, action: PayloadAction<PinWheelResult | null>) {
+      state.pinwheelResult = action.payload
+    },
+
+    setIsPinwheelOpen(state, action: PayloadAction<boolean>) {
+      state.isPinwheelOpen = action.payload
     },
   },
 })
