@@ -47,7 +47,11 @@ export const Pinwheel = () => {
   }, [isPinwheelOpen])
 
   return (
-    <PinwheelOverlay $isOpen={isPinwheelOpen}>
+    <PinwheelOverlay
+      $isOpen={isPinwheelOpen}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: isPinwheelOpen ? 1 : 0 }}
+      transition={{ duration: 0.4 }}>
       <PinwheelWrapper>
         <PinwheelContainer>
           <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
@@ -62,7 +66,7 @@ export const Pinwheel = () => {
   )
 }
 
-const PinwheelOverlay = styled.div<{ $isOpen: boolean }>`
+const PinwheelOverlay = styled(motion.div)<{ $isOpen: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
