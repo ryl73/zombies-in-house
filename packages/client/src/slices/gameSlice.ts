@@ -75,6 +75,7 @@ export interface GameState {
   winningPlayerId: number | null
   pinwheelResult: PinWheelResult | null
   isPinwheelOpen: boolean
+  stage: 'move' | 'fight'
 }
 
 const initialState: GameState = {
@@ -95,9 +96,10 @@ const initialState: GameState = {
   winningPlayerId: null,
   pinwheelResult: null,
   isPinwheelOpen: false,
+  stage: 'move',
 }
 
-const getCurrentPlayer = (game: GameState) =>
+export const getCurrentPlayer = (game: GameState) =>
   game.players[game.currentPlayerIndex]
 
 const getCellById = (game: GameState, id: number) =>
@@ -131,6 +133,7 @@ export const startGame = createAsyncThunk(
 export const moveStage = createAsyncThunk(
   'game/moveStage',
   async (_, { getState, dispatch }) => {
+    dispatch(gameSlice.actions.setStage('move'))
     await dispatch(spinPinwheel())
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
@@ -238,6 +241,7 @@ export const fightStage = createAsyncThunk(
   'game/fightStage',
   async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.resetCanMoveCells())
+    dispatch(gameSlice.actions.setStage('fight'))
     await dispatch(spinPinwheel())
 
     const { game } = getState() as { game: GameState }
@@ -669,6 +673,7 @@ export const gameSlice = createSlice({
       state.isProcessing = false
       state.pinwheelResult = null
       state.isPinwheelOpen = false
+      state.stage = 'move'
     },
 
     createCharacters(state) {
@@ -945,6 +950,10 @@ export const gameSlice = createSlice({
 
     setIsPinwheelOpen(state, action: PayloadAction<boolean>) {
       state.isPinwheelOpen = action.payload
+    },
+
+    setStage(state, action: PayloadAction<'move' | 'fight'>) {
+      state.stage = action.payload
     },
   },
 })

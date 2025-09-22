@@ -2,14 +2,18 @@ import { useEffect, useState } from 'react'
 import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { resolvePinwheel } from '../../slices/gameSlice'
+import { getCurrentPlayer, resolvePinwheel } from '../../slices/gameSlice'
 
 export const Pinwheel = () => {
   const [isSpinning, setIsSpinning] = useState(false)
   const controls = useAnimation()
   const dispatch = useAppDispatch()
 
-  const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
+  const { pinwheelResult, isPinwheelOpen, stage } = useAppSelector(
+    state => state.game
+  )
+  const player = useAppSelector(state => getCurrentPlayer(state.game))
+  const name = player?.name ?? ''
 
   const spinArrow = async () => {
     if (!pinwheelResult) return
@@ -53,6 +57,7 @@ export const Pinwheel = () => {
       animate={{ opacity: isPinwheelOpen ? 1 : 0 }}
       transition={{ duration: 0.4 }}>
       <PinwheelWrapper>
+        <Stage>{`${name}: ${stage === 'move' ? 'перемещение' : 'бой'}`}</Stage>
         <PinwheelContainer>
           <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
           <Arrow
@@ -86,6 +91,13 @@ const PinwheelWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   z-index: 1000;
+`
+
+const Stage = styled.span`
+  background-color: var(--color-bg-danger);
+  border-radius: 8px;
+  padding: 16px 12px;
+  color: var(--color-primary);
 `
 
 const PinwheelContainer = styled.div`
