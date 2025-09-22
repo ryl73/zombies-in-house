@@ -10,6 +10,7 @@ import { WinDialog } from '../components/Game/WinDialog'
 import { StartDialog } from '../components/Game/StartDialog'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
+import { Pinwheel } from '../components/Pinwheel/Pinwheel'
 
 export const GamePage = () => {
   const navigate = useNavigate()
@@ -53,6 +54,7 @@ export const GamePage = () => {
           <BoardImage src="/images/game/board.jpg" alt="board" />
           <BoardComponent />
           {currentPlayer && <Hud />}
+          <Pinwheel />
         </Wrapper>
         {portalRoot &&
           createPortal(
