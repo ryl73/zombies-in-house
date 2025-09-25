@@ -4,6 +4,7 @@ import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs'
 import { createClientAndConnect } from './db'
+import serializeJavascript from 'serialize-javascript'
 
 dotenv.config()
 
@@ -47,7 +48,10 @@ async function startServer() {
           .replace('<!--ssr-outlet-->', html)
           .replace(
             '<!--ssr-initial-state-->',
-            `<script>window.__INITIAL_STATE__=${initialState}</script>`
+            `<script>window.__INITIAL_STATE__=${serializeJavascript(
+              initialState,
+              { isJSON: true }
+            )}</script>`
           )
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(page)
@@ -83,7 +87,10 @@ async function startServer() {
         .replace('<!--ssr-outlet-->', html)
         .replace(
           '<!--ssr-initial-state-->',
-          `<script>window.__INITIAL_STATE__=${initialState}</script>`
+          `<script>window.__INITIAL_STATE__=${serializeJavascript(
+            initialState,
+            { isJSON: true }
+          )}</script>`
         )
 
       res.setHeader('Content-Type', 'text/html')
