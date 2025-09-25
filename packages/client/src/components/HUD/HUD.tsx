@@ -8,6 +8,7 @@ import {
 } from '../../slices/gameSlice'
 import { Card, CardImage } from '../Board/CellComponent'
 import { Button } from '../../styles/Buttons'
+import hud from '../../assets/hud.webp'
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
@@ -74,7 +75,7 @@ const HudWrapper = styled.div<{ $isOpen: boolean }>`
   align-items: center;
   gap: 8px;
   z-index: 999;
-  background: url(/src/assets/hud.webp) center 50% no-repeat;
+  background: url(${hud}) center 50% no-repeat;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   display: ${({ $isOpen }) => ($isOpen ? 'none' : 'flex')};
