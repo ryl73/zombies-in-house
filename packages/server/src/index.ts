@@ -2,9 +2,10 @@ import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
-import fs from 'fs'
+import fs from 'fs/promises'
 import { createClientAndConnect } from './db'
-import serializeJavascript from 'serialize-javascript'
+import serialize from 'serialize-javascript'
+import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
@@ -13,6 +14,7 @@ const port = Number(process.env.SERVER_PORT) || 3001
 
 async function startServer() {
   const app = express()
+  app.use(cookieParser())
   app.use(cors())
 
   createClientAndConnect()
@@ -21,7 +23,7 @@ async function startServer() {
     const vite = await import('vite')
     const viteServer = await vite.createServer({
       root: path.resolve(__dirname, '../../client'),
-      server: { middlewareMode: 'ssr' },
+      server: { middlewareMode: true },
       appType: 'custom',
     })
 
@@ -31,7 +33,7 @@ async function startServer() {
       try {
         const url = req.originalUrl
         const templatePath = path.resolve(__dirname, '../../client/index.html')
-        let template = fs.readFileSync(templatePath, 'utf-8')
+        let template = await fs.readFile(templatePath, 'utf-8')
         template = await viteServer.transformIndexHtml(url, template)
 
         const { render } = await viteServer.ssrLoadModule(
@@ -43,15 +45,16 @@ async function startServer() {
           .replace('<!--ssr-styles-->', styleTags || '')
           .replace(
             '<!--ssr-helmet-->',
-            helmet ? `${helmet.title.toString()}${helmet.meta.toString()}` : ''
+            helmet
+              ? `${helmet.meta.toString()} ${helmet.title.toString()} ${helmet.link.toString()}`
+              : ''
           )
           .replace('<!--ssr-outlet-->', html)
           .replace(
             '<!--ssr-initial-state-->',
-            `<script>window.__INITIAL_STATE__=${serializeJavascript(
-              initialState,
-              { isJSON: true }
-            )}</script>`
+            `<script>window.__INITIAL_STATE__=${serialize(initialState, {
+              isJSON: true,
+            })}</script>`
           )
 
         res.status(200).set({ 'Content-Type': 'text/html' }).end(page)
@@ -69,12 +72,11 @@ async function startServer() {
 
     app.use(express.static(clientDist))
 
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { render } = require(ssrBundlePath)
+    const { render } = await import(ssrBundlePath)
 
     app.get('*', async (req, res) => {
       const templatePath = path.join(clientDist, 'index.html')
-      let template = fs.readFileSync(templatePath, 'utf8')
+      let template = await fs.readFile(templatePath, 'utf-8')
 
       const { html, styleTags, helmet, initialState } = await render(req)
 
@@ -82,15 +84,16 @@ async function startServer() {
         .replace('<!--ssr-styles-->', styleTags || '')
         .replace(
           '<!--ssr-helmet-->',
-          helmet ? `${helmet.title.toString()}${helmet.meta.toString()}` : ''
+          helmet
+            ? `${helmet.meta.toString()} ${helmet.title.toString()} ${helmet.link.toString()}`
+            : ''
         )
         .replace('<!--ssr-outlet-->', html)
         .replace(
           '<!--ssr-initial-state-->',
-          `<script>window.__INITIAL_STATE__=${serializeJavascript(
-            initialState,
-            { isJSON: true }
-          )}</script>`
+          `<script>window.__INITIAL_STATE__=${serialize(initialState, {
+            isJSON: true,
+          })}</script>`
         )
 
       res.setHeader('Content-Type', 'text/html')
