@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { PageContainer } from '../styles/PageContainer'
-import { ThemedHeader } from '../styles/ThemedHeader'
 import { signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -18,6 +16,7 @@ import {
   FormControl,
   makeStyles,
   Box,
+  Typography,
 } from '@material-ui/core'
 
 const SigninSchema = Yup.object().shape({
@@ -33,6 +32,14 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  themedHeader: {
+    fontFamily: 'Rubik Wet Paint, cursive',
+    textAlign: 'center',
+    color: 'var(--color-primary)',
+    fontSize: '64px',
+    lineHeight: '64px',
+    margin: '30px 0',
   },
 }))
 
@@ -70,7 +77,9 @@ export const SigninPage = () => {
         <meta name="description" content="Страница логина" />
       </Helmet>
       <Box className={classes.pageContainer}>
-        <ThemedHeader>ВХОД</ThemedHeader>
+        <Typography variant="h1" className={classes.themedHeader}>
+          ВХОД
+        </Typography>
         <Formik
           initialValues={{ login: '', password: '' }}
           validationSchema={SigninSchema}

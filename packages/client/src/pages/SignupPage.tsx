@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { PageContainer } from '../styles/PageContainer'
-import { ThemedHeader } from '../styles/ThemedHeader'
 import { signup } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { Formik } from 'formik'
@@ -16,7 +14,14 @@ import {
 } from '../utils/validation'
 import { useNotification } from '../hooks/useNotification'
 import { Link } from 'react-router-dom'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  FormControl,
+  makeStyles,
+  Box,
+  Typography,
+} from '@material-ui/core'
 
 type FormValues = {
   login: string
@@ -38,7 +43,27 @@ const SignupSchema = Yup.object().shape({
   password_repeat: RepeatPasswordSchema('password'),
 })
 
+const useStyles = makeStyles(theme => ({
+  pageContainer: {
+    minHeight: '100vh',
+    backgroundColor: 'var(--color-bg-primary)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themedHeader: {
+    fontFamily: 'Rubik Wet Paint, cursive',
+    textAlign: 'center',
+    color: 'var(--color-primary)',
+    fontSize: '64px',
+    lineHeight: '64px',
+    margin: '30px 0',
+  },
+}))
+
 export const SignupPage = () => {
+  const classes = useStyles()
   const navigate = useNavigate()
   const { showError } = useNotification()
   const onSubmit = async ({
@@ -66,8 +91,10 @@ export const SignupPage = () => {
         <title>Регистрация</title>
         <meta name="description" content="Страница регистрации" />
       </Helmet>
-      <PageContainer>
-        <ThemedHeader>РЕГИСТРАЦИЯ</ThemedHeader>
+      <Box className={classes.pageContainer}>
+        <Typography variant="h1" className={classes.themedHeader}>
+          РЕГИСТРАЦИЯ
+        </Typography>
         <Formik
           initialValues={{
             email: '',
@@ -176,7 +203,7 @@ export const SignupPage = () => {
           color="default">
           Есть аккаунт? Войти
         </Button>
-      </PageContainer>
+      </Box>
     </div>
   )
 }
