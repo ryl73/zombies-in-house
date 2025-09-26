@@ -1,8 +1,9 @@
 import { FC, useState } from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Cell } from '../../game/models/Cell'
 import { useAppSelector } from '../../hooks/useApp'
 import { Box, makeStyles } from '@material-ui/core'
+import { CellCard } from '../../styles/CellCard'
 
 type Props = {
   cell: Cell
@@ -18,15 +19,6 @@ const useStyles = makeStyles(() => ({
     width: 100,
     height: 100,
     transition: 'all 0.3s ease-in-out',
-  },
-  cellBlockCard: {
-    transition: 'all 0.3s ease-in-out',
-  },
-  cardWrapper: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
   },
   cardImage: {
     width: '100%',
@@ -47,59 +39,6 @@ const useStyles = makeStyles(() => ({
     zIndex: 2,
   },
 }))
-
-const ripple = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`
-
-const CellBlockCardStyled = styled('div')<{ $isOpen?: boolean }>`
-  transition: all 0.3s ease-in-out;
-
-  ${({ $isOpen }) =>
-    $isOpen &&
-    `
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 10px;
-    z-index: 3;
-    background-color: lightblue;
-    padding: 10px;
-    border-radius: 10px;
-  `}
-`
-
-const CardWrapperStyled = styled('div')<{ $isOpen?: boolean }>`
-  position: ${({ $isOpen }) => ($isOpen ? 'static' : 'absolute')};
-
-  ${({ $isOpen }) =>
-    !$isOpen &&
-    `
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    `}
-`
-
-export const CardStyled = styled('div')<{
-  $isPlayer?: boolean
-  $animation?: boolean
-}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(255, 255, 192);
-  width: 98px;
-  height: 98px;
-  border-radius: 20px;
-  z-index: ${({ $isPlayer }) => ($isPlayer ? 1 : 0)};
-  ${({ $animation }) =>
-    $animation &&
-    `
-      animation: ${ripple} 1s infinite ease-in-out;
-    `}
-`
 
 export const CellComponent: FC<Props> = ({ cell, click }) => {
   const classes = useStyles()
@@ -139,14 +78,14 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
       onClick={() => click(cell)}
       onMouseOver={mouseOverHandler}
       onMouseLeave={mouseLeaveHandler}>
-      <CellBlockCardStyled $isOpen={isOpen}>
+      <CellBlockCard $isOpen={isOpen}>
         {objectsOnCell.map(object => {
           const isPlayer = !('opened' in object)
           const isVisible = isPlayer || object.opened
 
           return (
-            <CardWrapperStyled $isOpen={isOpen} key={object.id}>
-              <Card $isPlayer={isPlayer}>
+            <CardWrapper $isOpen={isOpen} key={object.id}>
+              <CellCard $isPlayer={isPlayer}>
                 {isVisible && (
                   <img
                     className={classes.cardImage}
@@ -154,11 +93,11 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
                     alt={object.name}
                   />
                 )}
-              </Card>
-            </CardWrapperStyled>
+              </CellCard>
+            </CardWrapper>
           )
         })}
-      </CellBlockCardStyled>
+      </CellBlockCard>
       {cell.isTraversable && <Box className={classes.dot} />}
       {cell.hasBarricade && (
         <img
@@ -170,18 +109,6 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
     </Box>
   )
 }
-
-const CellBlock = styled.div<{
-  $isOpen?: boolean
-}>`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 100px;
-  transition: all 0.3s ease-in-out;
-`
 
 const CellBlockCard = styled.div<{
   $isOpen?: boolean
@@ -212,24 +139,4 @@ const CardWrapper = styled.div<{
       left: 50%;
       transform: translate(-50%, -50%);
     `};
-`
-
-export const Card = styled.div<{
-  $isOpen?: boolean
-  $isPlayer?: boolean
-  $animation?: boolean
-}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(255, 255, 192);
-  width: 98px;
-  height: 98px;
-  border-radius: 20px;
-  ${props =>
-    props.$animation &&
-    css`
-      animation: ${ripple} 1s infinite ease-in-out;
-    `}
-  z-index: ${props => (props.$isPlayer ? '1' : '0')};
 `

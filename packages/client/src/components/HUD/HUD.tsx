@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import { Item } from '../../game/models/Item'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import {
@@ -6,8 +5,8 @@ import {
   usePlayerItem,
   skipTurn,
 } from '../../slices/gameSlice'
-import { Card } from '../Board/CellComponent'
 import { Box, Button, makeStyles } from '@material-ui/core'
+import { CellCard } from '../../styles/CellCard'
 
 const useStyles = makeStyles(theme => ({
   hudWrapper: (props: { isOpen: boolean }) => ({
@@ -27,19 +26,21 @@ const useStyles = makeStyles(theme => ({
     borderTopRightRadius: '10px',
     display: props.isOpen ? 'none' : 'flex',
   }),
-  playerCardWrapper: {
+  playerWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px',
     minWidth: '150px',
+  },
+  playerCard: {
+    width: '70px',
+    height: '70px',
   },
   items: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '20px',
-  },
-  cardWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '5px',
   },
   lifeImage: {
     width: '50px',
@@ -97,25 +98,27 @@ export const Hud = () => {
 
   return (
     <Box className={classes.hudWrapper}>
-      <Box className={classes.playerCardWrapper}>
-        <Box className={classes.cardWrapper}>
-          <HudCard>
-            <img
-              className={classes.cardImage}
-              src={player.image}
-              alt={player.name}
-            />
-          </HudCard>
-          {player.name}
-        </Box>
-        {Array.from({ length: player.lifeCount }, (_, i) => (
+      <Box className={classes.playerWrapper}>
+        <CellCard className={classes.playerCard}>
           <img
-            className={classes.lifeImage}
-            src="/images/game/cards/life.png"
-            alt="life"
-            key={i}
+            className={classes.cardImage}
+            src={player.image}
+            alt={player.name}
           />
-        ))}
+        </CellCard>
+        {player.name}
+        {player.lifeCount > 0 && (
+          <Box>
+            {Array.from({ length: player.lifeCount }, (_, i) => (
+              <img
+                className={classes.lifeImage}
+                src="/images/game/cards/life.png"
+                alt="life"
+                key={i}
+              />
+            ))}
+          </Box>
+        )}
       </Box>
       {game.canSkipTurn && !game.isProcessing && (
         <Button
@@ -126,7 +129,7 @@ export const Hud = () => {
       )}
       <Box className={classes.items}>
         {player.items.map(item => (
-          <Card
+          <CellCard
             $animation={isAnimation(item)}
             key={item.id}
             onClick={() => clickHandler(item)}>
@@ -135,7 +138,7 @@ export const Hud = () => {
               src={item.image}
               alt={item.name}
             />
-          </Card>
+          </CellCard>
         ))}
         {canFight === 'grenade' && (
           <Button
@@ -148,8 +151,3 @@ export const Hud = () => {
     </Box>
   )
 }
-
-const HudCard = styled(Card)`
-  width: 70px;
-  height: 70px;
-`
