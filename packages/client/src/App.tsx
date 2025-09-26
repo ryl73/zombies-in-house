@@ -6,6 +6,7 @@ import { ThemedHeader } from './styles/ThemedHeader'
 import Router from './Router'
 import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import './App.css'
+
 const App = () => {
   const dispatch = useAppDispatch()
   const isLoading = useAppSelector(selectUserLoading)

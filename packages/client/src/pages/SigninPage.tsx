@@ -12,14 +12,32 @@ import { useDispatch } from 'react-redux'
 import { setUser } from '../slices/userSlice'
 import { getUser } from '../api/UserAPI'
 import { Link } from 'react-router-dom'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  FormControl,
+  makeStyles,
+  Box,
+} from '@material-ui/core'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
   password: PasswordSchema,
 })
 
+const useStyles = makeStyles(theme => ({
+  pageContainer: {
+    minHeight: '100vh',
+    backgroundColor: 'var(--color-bg-primary)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+}))
+
 export const SigninPage = () => {
+  const classes = useStyles()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { showError } = useNotification()
@@ -51,7 +69,7 @@ export const SigninPage = () => {
         <title>Вход</title>
         <meta name="description" content="Страница логина" />
       </Helmet>
-      <PageContainer>
+      <Box className={classes.pageContainer}>
         <ThemedHeader>ВХОД</ThemedHeader>
         <Formik
           initialValues={{ login: '', password: '' }}
@@ -106,7 +124,7 @@ export const SigninPage = () => {
           color="default">
           Регистрация
         </Button>
-      </PageContainer>
+      </Box>
     </>
   )
 }

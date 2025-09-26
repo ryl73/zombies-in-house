@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet'
 import { useEffect } from 'react'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'

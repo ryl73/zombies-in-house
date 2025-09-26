@@ -1,7 +1,7 @@
 import { Box, Typography, Button } from '@material-ui/core'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowBack } from '@material-ui/icons'
-import { Header } from '../Header'
+import { Header } from '../Header/Header'
 import { makeStyles } from '@material-ui/core/styles'
 import { Helmet } from 'react-helmet'
 import notFoundImage from '../../assets/notfound.webp'

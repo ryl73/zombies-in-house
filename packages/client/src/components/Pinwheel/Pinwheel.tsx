@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
@@ -11,26 +11,29 @@ export const Pinwheel = () => {
 
   const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
 
-  const spinArrow = async () => {
-    if (!pinwheelResult) return
-    if (isSpinning) return
+  const spinArrow = useCallback(
+    () => async () => {
+      if (!pinwheelResult) return
+      if (isSpinning) return
 
-    setIsSpinning(true)
+      setIsSpinning(true)
 
-    const { moveCount } = pinwheelResult
-    const segmentAngle = 90
+      const { moveCount } = pinwheelResult
+      const segmentAngle = 90
 
-    const minAngle = (moveCount - 1) * segmentAngle
-    const maxAngle = moveCount * segmentAngle
-    const randomOffset = Math.random() * (maxAngle - minAngle)
-    const spins =
-      360 * (3 + Math.floor(Math.random() * 3)) + minAngle + randomOffset
+      const minAngle = (moveCount - 1) * segmentAngle
+      const maxAngle = moveCount * segmentAngle
+      const randomOffset = Math.random() * (maxAngle - minAngle)
+      const spins =
+        360 * (3 + Math.floor(Math.random() * 3)) + minAngle + randomOffset
 
-    await controls.start({
-      rotate: spins,
-      transition: { duration: 3, ease: 'easeOut' },
-    })
-  }
+      await controls.start({
+        rotate: spins,
+        transition: { duration: 3, ease: 'easeOut' },
+      })
+    },
+    [controls, isSpinning, pinwheelResult]
+  )
 
   const handleAnimationComplete = () => {
     if (isSpinning) {
@@ -44,7 +47,7 @@ export const Pinwheel = () => {
       controls.set({ rotate: 0 })
       spinArrow()
     }
-  }, [isPinwheelOpen])
+  }, [controls, isPinwheelOpen, spinArrow])
 
   return (
     <PinwheelOverlay
