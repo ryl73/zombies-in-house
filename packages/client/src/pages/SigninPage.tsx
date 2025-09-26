@@ -41,6 +41,13 @@ const useStyles = makeStyles(theme => ({
     lineHeight: '64px',
     margin: '30px 0',
   },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    width: 550,
+    marginBottom: '20px',
+  },
 }))
 
 export const SigninPage = () => {
@@ -88,12 +95,7 @@ export const SigninPage = () => {
             <FormControl
               component="form"
               onSubmit={handleSubmit}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-                width: 550,
-              }}>
+              className={classes.form}>
               <TextField
                 id="login"
                 name="login"

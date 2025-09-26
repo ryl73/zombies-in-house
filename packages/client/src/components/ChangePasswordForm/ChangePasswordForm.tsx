@@ -4,7 +4,7 @@ import * as Yup from 'yup'
 import { Formik } from 'formik'
 import { PasswordSchema, RepeatPasswordSchema } from '../../utils/validation'
 import { useNotification } from '../../hooks/useNotification'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import { TextField, Button, FormControl, makeStyles } from '@material-ui/core'
 
 const ChangePasswordSchema = Yup.object().shape({
   newPassword: PasswordSchema,
@@ -12,7 +12,17 @@ const ChangePasswordSchema = Yup.object().shape({
   password: PasswordSchema,
 })
 
+const useStyles = makeStyles({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    width: 550,
+  },
+})
+
 export const ChangePasswordForm = () => {
+  const classes = useStyles()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { showSuccess, showError } = useNotification()
   const onSubmit = (
@@ -53,6 +63,7 @@ export const ChangePasswordForm = () => {
         setIsSubmitting(false)
       })
   }
+
   return (
     <Formik
       initialValues={{ newPassword: '', reNewPassword: '', password: '' }}
@@ -69,12 +80,7 @@ export const ChangePasswordForm = () => {
         <FormControl
           component="form"
           onSubmit={handleSubmit}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            width: 550,
-          }}>
+          className={classes.form}>
           <TextField
             id="newPassword"
             name="newPassword"

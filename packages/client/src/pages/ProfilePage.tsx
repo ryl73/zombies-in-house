@@ -1,14 +1,34 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { ThemedHeader } from '../styles/ThemedHeader'
-import { PageContainer } from '../styles/PageContainer'
 import { ChangePasswordForm } from '../components/ChangePasswordForm/ChangePasswordForm'
-import { Typography } from '@material-ui/core'
+import { Box, makeStyles, Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 import { Header } from '../components/Header/Header'
 
+const useStyles = makeStyles(theme => ({
+  pageContainer: {
+    minHeight: '100vh',
+    backgroundColor: 'var(--color-bg-primary)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  pageContent: {
+    padding: '20px',
+  },
+  themedHeader: {
+    fontFamily: 'Rubik Wet Paint, cursive',
+    textAlign: 'center',
+    color: 'var(--color-primary)',
+    fontSize: '64px',
+    lineHeight: '64px',
+  },
+}))
+
 export const ProfilePage = () => {
+  const classes = useStyles()
+
   return (
     <div>
       <Helmet>
@@ -16,16 +36,20 @@ export const ProfilePage = () => {
         <title>Профиль</title>
         <meta name="description" content="Профиль пользователя" />
       </Helmet>
-      <PageContainer>
+      <Box className={classes.pageContainer}>
         <Header />
-        <ThemedHeader>Профиль</ThemedHeader>
-        <AvatarInput />
-        <ChangeProfileForm />
-        <Typography variant="h2" component="h2" align="center" gutterBottom>
-          Смена пароля
-        </Typography>
-        <ChangePasswordForm />
-      </PageContainer>
+        <div className={classes.pageContent}>
+          <Typography variant="h1" className={classes.themedHeader}>
+            Профиль
+          </Typography>
+          <AvatarInput />
+          <ChangeProfileForm />
+          <Typography variant="h2" component="h2" align="center" gutterBottom>
+            Смена пароля
+          </Typography>
+          <ChangePasswordForm />
+        </div>
+      </Box>
     </div>
   )
 }

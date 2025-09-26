@@ -11,7 +11,7 @@ import {
 import { useNotification } from '../../hooks/useNotification'
 import { selectUser } from '../../slices/userSlice'
 import { useAppSelector } from '../../hooks/useApp'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import { TextField, Button, FormControl, makeStyles } from '@material-ui/core'
 
 const ChangeProfileSchema = Yup.object().shape({
   login: LoginSchema,
@@ -21,7 +21,18 @@ const ChangeProfileSchema = Yup.object().shape({
   phone: PhoneSchema,
 })
 
+const useStyles = makeStyles({
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    width: 550,
+    marginBottom: '20px',
+  },
+})
+
 export const ChangeProfileForm = () => {
+  const classes = useStyles()
   const { showSuccess, showError } = useNotification()
   const userData = useAppSelector(selectUser)
   const onSubmit = (values: ChangeUserRequest) => {
@@ -58,12 +69,7 @@ export const ChangeProfileForm = () => {
         <FormControl
           component="form"
           onSubmit={handleSubmit}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            width: 550,
-          }}>
+          className={classes.form}>
           <TextField
             id="login"
             name="login"
