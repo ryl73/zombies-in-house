@@ -1,13 +1,32 @@
 import { fetchUserThunk, selectUserLoading } from './slices/userSlice'
 import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
-import { PageContainer } from './styles/PageContainer'
-import { ThemedHeader } from './styles/ThemedHeader'
 import Router from './Router'
 import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import './App.css'
+import { Box, makeStyles, Typography } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+  pageContainer: {
+    minHeight: '100vh',
+    backgroundColor: 'var(--color-bg-primary)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themedHeader: {
+    fontFamily: 'Rubik Wet Paint, cursive',
+    textAlign: 'center',
+    color: 'var(--color-primary)',
+    fontSize: '64px',
+    lineHeight: '64px',
+    margin: '30px 0',
+  },
+}))
 
 const App = () => {
+  const classes = useStyles()
   const dispatch = useAppDispatch()
   const isLoading = useAppSelector(selectUserLoading)
 
@@ -23,9 +42,11 @@ const App = () => {
           <title>Загрузка</title>
           <meta name="description" content="Страница логина" />
         </Helmet>
-        <PageContainer>
-          <ThemedHeader>Загрузка...</ThemedHeader>
-        </PageContainer>
+        <Box className={classes.pageContainer}>
+          <Typography variant="h1" className={classes.themedHeader}>
+            Загрузка...
+          </Typography>
+        </Box>
       </>
     )
   }

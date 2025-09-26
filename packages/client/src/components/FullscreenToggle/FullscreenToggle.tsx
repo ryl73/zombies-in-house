@@ -1,19 +1,37 @@
 import React from 'react'
-import { IconButton, Tooltip } from '@material-ui/core'
+import { Box, IconButton, makeStyles, Tooltip } from '@material-ui/core'
 import {
   Fullscreen as FullscreenIcon,
   FullscreenExit as FullscreenExitIcon,
 } from '@material-ui/icons'
 import { useFullscreen } from '../../hooks/useFullscreen'
-import styled from 'styled-components'
 
 interface FullscreenToggleProps {
   element?: HTMLElement
 }
 
+const useStyles = makeStyles(theme => ({
+  wrapper: {
+    position: 'fixed',
+    top: 0,
+    right: 0,
+  },
+  errorWrapper: {
+    position: 'fixed',
+    bottom: 20,
+    right: 20,
+    backgroundColor: '#f44336',
+    color: 'white',
+    padding: '8px 16px',
+    borderRadius: 4,
+    zIndex: 9999,
+  },
+}))
+
 export const FullscreenToggle: React.FC<FullscreenToggleProps> = ({
   element,
 }: FullscreenToggleProps) => {
+  const classes = useStyles()
   const { isFullscreen, isSupported, error, toggleFullscreen } = useFullscreen()
 
   if (!isSupported) {
@@ -25,7 +43,7 @@ export const FullscreenToggle: React.FC<FullscreenToggleProps> = ({
   }
 
   return (
-    <Wrapper>
+    <Box className={classes.wrapper}>
       <Tooltip
         title={
           isFullscreen
@@ -36,28 +54,7 @@ export const FullscreenToggle: React.FC<FullscreenToggleProps> = ({
           {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
         </IconButton>
       </Tooltip>
-
-      {error && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: 20,
-            right: 20,
-            backgroundColor: '#f44336',
-            color: 'white',
-            padding: '8px 16px',
-            borderRadius: 4,
-            zIndex: 9999,
-          }}>
-          {error}
-        </div>
-      )}
-    </Wrapper>
+      {error && <Box className={classes.errorWrapper}>{error}</Box>}
+    </Box>
   )
 }
-
-const Wrapper = styled.div`
-  position: fixed;
-  top: 0;
-  right: 0;
-`

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
@@ -11,8 +11,15 @@ export const Pinwheel = () => {
 
   const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
 
-  const spinArrow = useCallback(
-    () => async () => {
+  const handleAnimationComplete = () => {
+    if (isSpinning) {
+      setIsSpinning(false)
+      dispatch(resolvePinwheel())
+    }
+  }
+
+  useEffect(() => {
+    const spinArrow = async () => {
       if (!pinwheelResult) return
       if (isSpinning) return
 
@@ -31,23 +38,13 @@ export const Pinwheel = () => {
         rotate: spins,
         transition: { duration: 3, ease: 'easeOut' },
       })
-    },
-    [controls, isSpinning, pinwheelResult]
-  )
-
-  const handleAnimationComplete = () => {
-    if (isSpinning) {
-      setIsSpinning(false)
-      dispatch(resolvePinwheel())
     }
-  }
 
-  useEffect(() => {
     if (isPinwheelOpen) {
       controls.set({ rotate: 0 })
       spinArrow()
     }
-  }, [controls, isPinwheelOpen, spinArrow])
+  }, [controls, isPinwheelOpen, isSpinning, pinwheelResult])
 
   return (
     <PinwheelOverlay
