@@ -19,13 +19,13 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(1),
   },
   commentContent: {
-    marginLeft: 56,
+    marginLeft: theme.spacing(6),
   },
   topDivider: {
-    marginBottom: 24,
+    marginBottom: theme.spacing(3),
   },
   commentDivider: {
-    marginTop: 16,
+    marginTop: theme.spacing(2),
   },
 }))
 

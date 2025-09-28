@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: '2rem',
   },
   divider: {
-    marginBottom: 24,
+    marginBottom: theme.spacing(3),
   },
   paper: {
     padding: theme.spacing(4),

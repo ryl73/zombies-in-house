@@ -18,12 +18,12 @@ const useStyles = makeStyles(theme => ({
   },
   errorWrapper: {
     position: 'fixed',
-    bottom: 20,
-    right: 20,
+    bottom: theme.spacing(2.5),
+    right: theme.spacing(2.5),
     backgroundColor: '#f44336',
     color: 'white',
-    padding: '8px 16px',
-    borderRadius: 4,
+    padding: theme.spacing(1, 2),
+    borderRadius: theme.spacing(0.5),
     zIndex: 9999,
   },
 }))

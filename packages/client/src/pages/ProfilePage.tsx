@@ -14,9 +14,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'center',
   },
-  pageContent: {
-    padding: '20px',
-  },
   themedHeader: {
     fontFamily: 'Rubik Wet Paint, cursive',
     textAlign: 'center',
@@ -38,7 +35,7 @@ export const ProfilePage = () => {
       </Helmet>
       <Box className={classes.pageContainer}>
         <Header />
-        <div className={classes.pageContent}>
+        <Box p={2.5}>
           <Typography variant="h1" className={classes.themedHeader}>
             Профиль
           </Typography>
@@ -48,7 +45,7 @@ export const ProfilePage = () => {
             Смена пароля
           </Typography>
           <ChangePasswordForm />
-        </div>
+        </Box>
       </Box>
     </div>
   )

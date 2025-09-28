@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
   },
   cardContent: {
-    padding: 24,
+    padding: theme.spacing(3),
   },
   featureTitle: {
     whiteSpace: 'nowrap',
@@ -78,10 +78,10 @@ const useStyles = makeStyles(theme => ({
   },
   iconWrapper: {
     display: 'inline-flex',
-    padding: '8px',
+    padding: theme.spacing(1),
     backgroundColor: '#355155',
-    borderRadius: '6px',
-    marginRight: '16px',
+    borderRadius: theme.spacing(0.75),
+    marginRight: theme.spacing(2),
     flexShrink: 0,
     '& svg': {
       color: '#121212',
@@ -91,7 +91,7 @@ const useStyles = makeStyles(theme => ({
   readyBlockButton: {
     maxWidth: '250px',
     width: '100%',
-    padding: '12px 24px',
+    padding: theme.spacing(1.5, 3),
     fontSize: '1.1rem',
   },
 }))

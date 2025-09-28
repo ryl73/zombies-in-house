@@ -24,9 +24,6 @@ const useStyles = makeStyles(() => ({
       margin: '0',
     },
   },
-  columnHeader: {
-    textAlign: 'center',
-  },
 }))
 
 export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
@@ -51,7 +48,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
 
         <Box display="grid" gridTemplateColumns="1fr 1px 1fr" gridGap="24px">
           <div>
-            <Typography variant="h6" className={classes.columnHeader}>
+            <Typography variant="h6" align="center">
               Играть по сети
             </Typography>
             <Box
@@ -87,7 +84,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
           </div>
           <Divider orientation="vertical" flexItem />
           <div className="">
-            <Typography variant="h6" className={classes.columnHeader}>
+            <Typography variant="h6" align="center">
               Играть локально
             </Typography>
             <Box

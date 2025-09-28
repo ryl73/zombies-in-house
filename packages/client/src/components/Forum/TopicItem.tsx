@@ -33,8 +33,8 @@ const useStyles = makeStyles(theme => ({
     color: 'inherit',
   },
   commentIcon: {
-    marginRight: 4,
-    marginLeft: 8,
+    marginRight: theme.spacing(0.5),
+    marginLeft: theme.spacing(1),
   },
 }))
 
