@@ -3,6 +3,8 @@ import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { resolvePinwheel } from '../../slices/gameSlice'
+import spinwheel from '../../assets/spinwheel.webp'
+import spinnerArrow from '../../assets/spinner-arrow.webp'
 
 export const Pinwheel = () => {
   const [isSpinning, setIsSpinning] = useState(false)
@@ -54,11 +56,11 @@ export const Pinwheel = () => {
       transition={{ duration: 0.4 }}>
       <PinwheelWrapper>
         <PinwheelContainer>
-          <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
+          <PinwheelImg src={`${spinwheel}`} alt="spinwheel" />
           <Arrow
             animate={controls}
             onAnimationComplete={handleAnimationComplete}>
-            <ArrowImg src="/src/assets/spinner-arrow.webp" alt="spin arrow" />
+            <ArrowImg src={`${spinnerArrow}`} alt="spin arrow" />
           </Arrow>
         </PinwheelContainer>
       </PinwheelWrapper>
