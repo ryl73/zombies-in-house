@@ -16,6 +16,17 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-start',
     position: 'relative',
   },
+  backgroundImg: {
+    maxWidth: '80%',
+    width: '100%',
+    marginBottom: '2rem',
+  },
+  errorContent: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%)',
+  },
 }))
 
 interface ErrorLayoutProps {
@@ -51,15 +62,9 @@ export const ErrorLayout = ({
         <img
           src={notFoundImage}
           alt={title}
-          style={{ maxWidth: '80%', width: '100%', marginBottom: '2rem' }}
+          className={classes.backgroundImg}
         />
-        <Box
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%)',
-          }}>
+        <Box className={classes.errorContent}>
           <Typography
             variant="h1"
             color="textPrimary"

@@ -2,11 +2,20 @@ import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
-import { Box, Container, Typography, Button, useTheme } from '@material-ui/core'
+import { Box, Container, Typography, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { useAppSelector } from '../hooks/useApp'
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(theme => ({
+  wrapper: {
+    backgroundColor: theme.palette.background.default,
+  },
+  mainHeader: {
+    fontSize: 120,
+  },
+  statusHeader: {
+    fontSize: 60,
+  },
   firstScreen: {
     position: 'relative',
     minHeight: '100vh',
@@ -36,16 +45,23 @@ const useStyles = makeStyles(() => ({
     maxWidth: '800px !important',
     zIndex: 2,
   },
+  contentContainerBtn: {
+    width: '100%',
+    maxWidth: '435px',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
 }))
 
 export const GameEnd = () => {
   usePage({ initPage: initGameEnd })
   const { status } = useAppSelector(state => state.game)
-  const theme = useTheme()
   const classes = useStyles()
 
   return (
-    <Box style={{ backgroundColor: theme.palette.background.default }}>
+    <Box className={classes.wrapper}>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Конец игры</title>
@@ -54,14 +70,17 @@ export const GameEnd = () => {
 
       <Box className={classes.firstScreen}>
         <Container maxWidth="lg" className={classes.contentContainer}>
-          <Typography variant="h1" gutterBottom style={{ fontSize: '120px' }}>
+          <Typography variant="h1" gutterBottom className={classes.mainHeader}>
             Зомби в&nbsp;доме
           </Typography>
           <Box position="absolute" top="20px" width="100%">
-            <Typography variant="h1" gutterBottom style={{ fontSize: '60px' }}>
+            <Typography
+              variant="h1"
+              gutterBottom
+              className={classes.statusHeader}>
               {status === 'won'
                 ? 'Вы спаслись!'
-                : 'В следующий раз обязательно получится.'}
+                : 'В следующий раз обязательно получится!'}
             </Typography>
           </Box>
           <Button
@@ -71,14 +90,7 @@ export const GameEnd = () => {
             size="large"
             color="primary"
             fullWidth
-            style={{
-              width: '100%',
-              maxWidth: '435px',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              marginBottom: 8,
-            }}>
+            className={classes.contentContainerBtn}>
             Повторить
           </Button>
           <Button
@@ -88,14 +100,7 @@ export const GameEnd = () => {
             size="large"
             color="primary"
             fullWidth
-            style={{
-              width: '100%',
-              maxWidth: '435px',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              marginBottom: 8,
-            }}>
+            className={classes.contentContainerBtn}>
             Вернуться в главное меню
           </Button>
         </Container>

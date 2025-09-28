@@ -15,18 +15,34 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { ArrowBack } from '@material-ui/icons'
-import {
-  CommentList,
-  Comment,
-  mockComments,
-} from '../components/Forum/CommentList'
+import { CommentList } from '../components/Forum/CommentList'
 import { CommentForm } from '../components/Forum/CommentForm'
-import { mockTopics, Topic } from '../components/Forum/TopicItem'
+import { Comment, Topic } from '../types/types'
+import { mockComments, mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
+  },
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+  },
+  loadingContainer: {
+    paddingTop: '2rem',
+  },
+  noTopicContainer: {
+    paddingTop: '2rem',
+  },
+  noTopicDescription: {
+    marginTop: theme.spacing(2),
+  },
+  errorText: {
+    marginTop: theme.spacing(2),
+  },
+  topicContent: {
+    whiteSpace: 'pre-line',
   },
   backButton: {
     marginBottom: theme.spacing(2),
@@ -130,7 +146,7 @@ export const ForumTopicPage = () => {
     return (
       <Box className={classes.root}>
         <Header />
-        <Container maxWidth="lg" style={{ paddingTop: '2rem' }}>
+        <Container maxWidth="lg" className={classes.loadingContainer}>
           <Box className={classes.loading}>
             <CircularProgress />
           </Box>
@@ -143,7 +159,7 @@ export const ForumTopicPage = () => {
     return (
       <Box className={classes.root}>
         <Header />
-        <Container maxWidth="lg" style={{ paddingTop: '2rem' }}>
+        <Container maxWidth="lg" className={classes.noTopicContainer}>
           <Button
             component={Link}
             to="/forum"
@@ -157,7 +173,10 @@ export const ForumTopicPage = () => {
             Топик не найден
           </Typography>
 
-          <Typography variant="body1" align="center" style={{ marginTop: 16 }}>
+          <Typography
+            variant="body1"
+            align="center"
+            className={classes.noTopicDescription}>
             Запрошенный топик не существует или был удален.
           </Typography>
         </Container>
@@ -179,9 +198,7 @@ export const ForumTopicPage = () => {
 
       <Header />
 
-      <Container
-        maxWidth="lg"
-        style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Container maxWidth="lg" className={classes.container}>
         <Button
           component={Link}
           to="/forum"
@@ -201,7 +218,7 @@ export const ForumTopicPage = () => {
           <Typography
             variant="body1"
             paragraph
-            style={{ whiteSpace: 'pre-line' }}>
+            className={classes.topicContent}>
             {topic.content}
           </Typography>
 
@@ -224,7 +241,10 @@ export const ForumTopicPage = () => {
 
         <CommentForm onSubmit={handleAddComment} isSubmitting={isSubmitting} />
         {submitError && (
-          <Typography color="error" variant="body2" style={{ marginTop: 16 }}>
+          <Typography
+            color="error"
+            variant="body2"
+            className={classes.errorText}>
             {submitError}
           </Typography>
         )}

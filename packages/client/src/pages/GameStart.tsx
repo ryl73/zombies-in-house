@@ -2,10 +2,24 @@ import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
-import { Box, Container, Typography, Button, useTheme } from '@material-ui/core'
+import { Box, Container, Typography, Button } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 const useStyles = makeStyles(theme => ({
+  wrapper: {
+    backgroundColor: theme.palette.background.default,
+  },
+  header: {
+    fontSize: '120px',
+  },
+  startBtn: {
+    width: '100%',
+    maxWidth: '435px',
+    fontWeight: 'bold',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
   firstScreen: {
     position: 'relative',
     minHeight: '100vh',
@@ -39,11 +53,10 @@ const useStyles = makeStyles(theme => ({
 
 export const GameStart = () => {
   usePage({ initPage: initGameStart })
-  const theme = useTheme()
   const classes = useStyles()
 
   return (
-    <Box style={{ backgroundColor: theme.palette.background.default }}>
+    <Box className={classes.wrapper}>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Начало игры</title>
@@ -52,7 +65,7 @@ export const GameStart = () => {
 
       <Box className={classes.firstScreen}>
         <Container maxWidth="lg" className={classes.contentContainer}>
-          <Typography variant="h1" gutterBottom style={{ fontSize: '120px' }}>
+          <Typography variant="h1" gutterBottom className={classes.header}>
             Зомби в&nbsp;доме
           </Typography>
           <Box position="absolute" top="20px" width="100%">
@@ -67,14 +80,7 @@ export const GameStart = () => {
             size="large"
             color="primary"
             fullWidth
-            style={{
-              width: '100%',
-              maxWidth: '435px',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              marginBottom: 8,
-            }}>
+            className={classes.startBtn}>
             Старт
           </Button>
         </Container>

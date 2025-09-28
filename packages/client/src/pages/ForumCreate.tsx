@@ -23,6 +23,13 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+  },
+  divider: {
+    marginBottom: 24,
+  },
   paper: {
     padding: theme.spacing(4),
     backgroundColor: theme.palette.background.paper,
@@ -151,9 +158,7 @@ export const ForumCreatePage = () => {
 
       <Header />
 
-      <Container
-        maxWidth="md"
-        style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Container maxWidth="md" className={classes.container}>
         <Button
           component={Link}
           to="/forum"
@@ -168,7 +173,7 @@ export const ForumCreatePage = () => {
             Создание нового топика
           </Typography>
 
-          <Divider style={{ marginBottom: 24 }} />
+          <Divider className={classes.divider} />
 
           <form onSubmit={handleSubmit} className={classes.form}>
             <TextField

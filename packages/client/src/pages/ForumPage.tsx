@@ -11,13 +11,23 @@ import {
   Button,
   TextField,
   InputAdornment,
-  useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Search } from '@material-ui/icons'
-import { TopicItem, Topic, mockTopics } from '../components/Forum/TopicItem'
+import { TopicItem } from '../components/Forum/TopicItem'
+import { Topic } from '../types/types'
+import { mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
+  wrapper: {
+    backgroundColor: theme.palette.background.default,
+    minHeight: '100vh',
+    fontSize: '20px',
+  },
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+  },
   header: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -37,6 +47,10 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
     padding: theme.spacing(8, 2),
   },
+  createTopicBtn: {
+    whiteSpace: 'nowrap',
+    minWidth: '175px',
+  },
 }))
 
 export const ForumPage = () => {
@@ -44,7 +58,6 @@ export const ForumPage = () => {
   const classes = useStyles()
   const [searchQuery, setSearchQuery] = useState('')
   const [topics] = useState<Topic[]>(mockTopics)
-  const theme = useTheme()
   const filteredTopics = useMemo(() => {
     return topics.filter(
       topic =>
@@ -54,12 +67,7 @@ export const ForumPage = () => {
   }, [searchQuery, topics])
 
   return (
-    <Box
-      style={{
-        backgroundColor: theme.palette.background.default,
-        minHeight: '100vh',
-        fontSize: '20px',
-      }}>
+    <Box className={classes.wrapper}>
       <Helmet>
         <title>Форум | Зомби в доме</title>
         <meta
@@ -70,9 +78,7 @@ export const ForumPage = () => {
 
       <Header />
 
-      <Container
-        maxWidth="lg"
-        style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Container maxWidth="lg" className={classes.container}>
         <Box className={classes.header}>
           <Typography variant="h2" component="h1">
             Форум
@@ -98,7 +104,7 @@ export const ForumPage = () => {
               to="/forum/create"
               variant="contained"
               color="primary"
-              style={{ whiteSpace: 'nowrap', minWidth: '175px' }}>
+              className={classes.createTopicBtn}>
               Создать топик
             </Button>
           </Box>
