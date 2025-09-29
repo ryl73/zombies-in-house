@@ -18,18 +18,12 @@ import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
     backgroundColor: theme.palette.background.default,
     paddingBottom: theme.spacing(5),
-  },
-  startGameBtn: {
-    width: '100%',
-    maxWidth: '435px',
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
   },
   card: {
     height: '100%',
@@ -89,10 +83,8 @@ const useStyles = makeStyles(theme => ({
     },
   },
   readyBlockButton: {
-    maxWidth: '250px',
     width: '100%',
-    padding: theme.spacing(1.5, 3),
-    fontSize: '1.1rem',
+    maxWidth: '250px',
   },
 }))
 
@@ -122,6 +114,7 @@ export const MainPage = () => {
   const { isLoggedIn, clearUser } = useAuth()
   const navigate = useNavigate()
   const classes = useStyles()
+  const globalClasses = useGlobalStyles()
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -152,7 +145,7 @@ export const MainPage = () => {
             variant="contained"
             size="large"
             color="primary"
-            className={classes.startGameBtn}>
+            className={globalClasses.mainBtn}>
             Начать игру
           </Button>
         </Container>
@@ -207,6 +200,7 @@ export const MainPage = () => {
             to="/game"
             variant="contained"
             color="primary"
+            size="large"
             className={classes.readyBlockButton}>
             Я готов!
           </Button>
@@ -218,6 +212,7 @@ export const MainPage = () => {
             to="/signin"
             variant="contained"
             color="primary"
+            size="large"
             className={classes.readyBlockButton}>
             Выход
           </Button>

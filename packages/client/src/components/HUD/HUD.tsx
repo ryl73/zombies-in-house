@@ -6,7 +6,7 @@ import {
   skipTurn,
 } from '../../slices/gameSlice'
 import { Box, Button, makeStyles } from '@material-ui/core'
-import { CellCard } from '../../styles/CellCard'
+import { CellCard } from '../../styles/styledComponents/CellCard'
 
 const useStyles = makeStyles(theme => ({
   hudWrapper: (props: { isOpen: boolean }) => ({

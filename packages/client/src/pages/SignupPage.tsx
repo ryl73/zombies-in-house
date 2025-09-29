@@ -18,10 +18,11 @@ import {
   TextField,
   Button,
   FormControl,
-  makeStyles,
   Box,
   Typography,
 } from '@material-ui/core'
+import { useLoginStyles } from '../styles/mui/LoginStyles'
+import clsx from 'clsx'
 
 type FormValues = {
   login: string
@@ -43,34 +44,8 @@ const SignupSchema = Yup.object().shape({
   password_repeat: RepeatPasswordSchema('password'),
 })
 
-const useStyles = makeStyles(theme => ({
-  pageContainer: {
-    minHeight: '100vh',
-    backgroundColor: 'var(--color-bg-primary)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  themedHeader: {
-    fontFamily: 'Rubik Wet Paint, cursive',
-    textAlign: 'center',
-    color: 'var(--color-primary)',
-    fontSize: '64px',
-    lineHeight: '64px',
-    margin: '30px 0',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    width: 550,
-    marginBottom: '20px',
-  },
-}))
-
 export const SignupPage = () => {
-  const classes = useStyles()
+  const classes = useLoginStyles()
   const navigate = useNavigate()
   const { showError } = useNotification()
   const onSubmit = async ({
@@ -98,7 +73,7 @@ export const SignupPage = () => {
         <title>Регистрация</title>
         <meta name="description" content="Страница регистрации" />
       </Helmet>
-      <Box className={classes.pageContainer}>
+      <Box className={clsx(classes.root, classes.pageContainer)}>
         <Typography variant="h1" className={classes.themedHeader}>
           РЕГИСТРАЦИЯ
         </Typography>
@@ -202,7 +177,8 @@ export const SignupPage = () => {
           to="/signin"
           variant="text"
           size="large"
-          color="default">
+          color="default"
+          fullWidth>
           Есть аккаунт? Войти
         </Button>
       </Box>

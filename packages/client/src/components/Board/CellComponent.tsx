@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 import { Cell } from '../../game/models/Cell'
 import { useAppSelector } from '../../hooks/useApp'
 import { Box, makeStyles } from '@material-ui/core'
-import { CellCard } from '../../styles/CellCard'
+import { CellCard } from '../../styles/styledComponents/CellCard'
 
 type Props = {
   cell: Cell

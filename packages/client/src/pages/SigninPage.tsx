@@ -14,44 +14,19 @@ import {
   TextField,
   Button,
   FormControl,
-  makeStyles,
   Box,
   Typography,
 } from '@material-ui/core'
+import { useLoginStyles } from '../styles/mui/LoginStyles'
+import clsx from 'clsx'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
   password: PasswordSchema,
 })
 
-const useStyles = makeStyles(theme => ({
-  pageContainer: {
-    minHeight: '100vh',
-    backgroundColor: 'var(--color-bg-primary)',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  themedHeader: {
-    fontFamily: 'Rubik Wet Paint, cursive',
-    textAlign: 'center',
-    color: 'var(--color-primary)',
-    fontSize: '64px',
-    lineHeight: '64px',
-    margin: '30px 0',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '1rem',
-    width: 550,
-    marginBottom: '20px',
-  },
-}))
-
 export const SigninPage = () => {
-  const classes = useStyles()
+  const classes = useLoginStyles()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { showError } = useNotification()
@@ -83,7 +58,7 @@ export const SigninPage = () => {
         <title>Вход</title>
         <meta name="description" content="Страница логина" />
       </Helmet>
-      <Box className={classes.pageContainer}>
+      <Box className={clsx(classes.root, classes.pageContainer)}>
         <Typography variant="h1" className={classes.themedHeader}>
           ВХОД
         </Typography>
@@ -132,7 +107,8 @@ export const SigninPage = () => {
           to="/signup"
           variant="text"
           size="large"
-          color="default">
+          color="default"
+          fullWidth>
           Регистрация
         </Button>
       </Box>
