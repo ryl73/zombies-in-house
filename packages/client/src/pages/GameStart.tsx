@@ -4,6 +4,7 @@ import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
 import { Box, Container, Typography, Button, useTheme } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
+import landing from '../assets/landing-first-screen.webp'
 
 const useStyles = makeStyles(theme => ({
   firstScreen: {
@@ -20,7 +21,7 @@ const useStyles = makeStyles(theme => ({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundImage: 'url(src/assets/landing-first-screen.webp)',
+      backgroundImage: `url(${landing})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       filter: 'blur(4px)',
