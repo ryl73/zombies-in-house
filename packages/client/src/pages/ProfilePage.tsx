@@ -1,30 +1,22 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
 import { ChangePasswordForm } from '../components/ChangePasswordForm/ChangePasswordForm'
-import { Box, makeStyles, Typography } from '@material-ui/core'
+import { Box, Container, makeStyles, Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 import { Header } from '../components/Header/Header'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
-  pageContainer: {
-    minHeight: '100vh',
-    backgroundColor: 'var(--color-bg-primary)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  themedHeader: {
-    fontFamily: 'Rubik Wet Paint, cursive',
-    textAlign: 'center',
-    color: 'var(--color-primary)',
-    fontSize: '64px',
-    lineHeight: '64px',
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
   },
 }))
 
 export const ProfilePage = () => {
   const classes = useStyles()
+  const globalClasses = useGlobalStyles()
 
   return (
     <div>
@@ -33,20 +25,20 @@ export const ProfilePage = () => {
         <title>Профиль</title>
         <meta name="description" content="Профиль пользователя" />
       </Helmet>
-      <Box className={classes.pageContainer}>
-        <Header />
-        <Box p={2.5}>
-          <Typography variant="h1" className={classes.themedHeader}>
+      <Header />
+      <Container maxWidth="lg" className={classes.container}>
+        <Box>
+          <Typography variant="h2" align="center" gutterBottom>
             Профиль
           </Typography>
           <AvatarInput />
           <ChangeProfileForm />
-          <Typography variant="h2" component="h2" align="center" gutterBottom>
+          <Typography variant="h2" align="center" gutterBottom>
             Смена пароля
           </Typography>
           <ChangePasswordForm />
         </Box>
-      </Box>
+      </Container>
     </div>
   )
 }

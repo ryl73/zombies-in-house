@@ -17,7 +17,8 @@ const useStyles = makeStyles({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    width: 550,
+    maxWidth: 800,
+    margin: '0 auto',
   },
 })
 

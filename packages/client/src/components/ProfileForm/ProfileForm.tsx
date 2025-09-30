@@ -21,15 +21,16 @@ const ChangeProfileSchema = Yup.object().shape({
   phone: PhoneSchema,
 })
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   form: {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    width: 550,
-    marginBottom: '20px',
+    maxWidth: 800,
+    margin: '0 auto',
+    marginBottom: theme.spacing(7.5),
   },
-})
+}))
 
 export const ChangeProfileForm = () => {
   const classes = useStyles()

@@ -5,28 +5,20 @@ import Router from './Router'
 import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import './App.css'
 import { Box, makeStyles, Typography } from '@material-ui/core'
+import { useGlobalStyles } from './styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
   pageContainer: {
     minHeight: '100vh',
-    backgroundColor: 'var(--color-bg-primary)',
     display: 'flex',
-    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  themedHeader: {
-    fontFamily: 'Rubik Wet Paint, cursive',
-    textAlign: 'center',
-    color: 'var(--color-primary)',
-    fontSize: '64px',
-    lineHeight: '64px',
-    margin: '30px 0',
   },
 }))
 
 const App = () => {
   const classes = useStyles()
+  const globalClasses = useGlobalStyles()
   const dispatch = useAppDispatch()
   const isLoading = useAppSelector(selectUserLoading)
 
@@ -43,7 +35,7 @@ const App = () => {
           <meta name="description" content="Страница логина" />
         </Helmet>
         <Box className={classes.pageContainer}>
-          <Typography variant="h1" className={classes.themedHeader}>
+          <Typography variant="h1" className={globalClasses.themedHeader}>
             Загрузка...
           </Typography>
         </Box>

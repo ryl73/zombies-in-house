@@ -9,4 +9,19 @@ export const useGlobalStyles = makeStyles(theme => ({
     letterSpacing: 1,
     whiteSpace: 'nowrap',
   },
+  themedHeader: {
+    fontFamily: 'Rubik Wet Paint, cursive',
+    textAlign: 'center',
+    color: 'var(--color-primary)',
+    fontSize: '64px',
+    lineHeight: '64px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1rem',
+    width: '100%',
+    maxWidth: 800,
+    margin: '0 auto',
+  },
 }))

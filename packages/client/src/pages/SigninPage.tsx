@@ -16,9 +16,11 @@ import {
   FormControl,
   Box,
   Typography,
+  Container,
 } from '@material-ui/core'
 import { useLoginStyles } from '../styles/mui/LoginStyles'
 import clsx from 'clsx'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
@@ -27,6 +29,7 @@ const SigninSchema = Yup.object().shape({
 
 export const SigninPage = () => {
   const classes = useLoginStyles()
+  const globalClasses = useGlobalStyles()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { showError } = useNotification()
@@ -58,8 +61,12 @@ export const SigninPage = () => {
         <title>Вход</title>
         <meta name="description" content="Страница логина" />
       </Helmet>
-      <Box className={clsx(classes.root, classes.pageContainer)}>
-        <Typography variant="h1" className={classes.themedHeader}>
+      <Container
+        maxWidth="lg"
+        className={clsx(classes.root, classes.pageContainer)}>
+        <Typography
+          variant="h1"
+          className={clsx(globalClasses.themedHeader, classes.themedHeader)}>
           ВХОД
         </Typography>
         <Formik
@@ -70,7 +77,7 @@ export const SigninPage = () => {
             <FormControl
               component="form"
               onSubmit={handleSubmit}
-              className={classes.form}>
+              className={clsx(globalClasses.form, classes.form)}>
               <TextField
                 id="login"
                 name="login"
@@ -108,10 +115,11 @@ export const SigninPage = () => {
           variant="text"
           size="large"
           color="default"
-          fullWidth>
+          fullWidth
+          style={{ maxWidth: 800 }}>
           Регистрация
         </Button>
-      </Box>
+      </Container>
     </>
   )
 }
