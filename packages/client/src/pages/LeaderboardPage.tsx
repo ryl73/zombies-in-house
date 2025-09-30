@@ -137,19 +137,6 @@ export const LeaderboardPage = () => {
     }
   }
 
-  // const sortedData = useMemo(() => {
-  //   return [...leaderboardData].sort((a, b) => {
-  //     const aValue = a.data[sortField]
-  //     const bValue = b.data[sortField]
-  //
-  //     if (sortDirection === 'asc') {
-  //       return aValue - bValue
-  //     } else {
-  //       return bValue - aValue
-  //     }
-  //   })
-  // }, [sortField, sortDirection])
-
   const renderRankIcon = (index: number) => {
     switch (index) {
       case 0:
