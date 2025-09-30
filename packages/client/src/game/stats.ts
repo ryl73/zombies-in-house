@@ -23,12 +23,14 @@ export const sendStats = async (
   try {
     const teamLeaderboard = await getAllLeaderboard({ limit: 100, cursor: 0 })
     const currentStatistics = teamLeaderboard.find(
-      l => l.data.displayName === userData.displayName
+      l => l.data.login === userData.login
     )
     if (!currentStatistics) {
       await sendLeaderboardResults({
         ...statistic,
-        displayName: userData.displayName,
+        totalPoints: pointsMap[field],
+        [field]: 1,
+        login: userData.login,
       })
       return
     }
@@ -41,7 +43,7 @@ export const sendStats = async (
 
     await sendLeaderboardResults({
       ...newStatistics,
-      displayName: userData.displayName,
+      login: userData.login,
     })
   } catch (e) {
     console.log(e)

@@ -12,7 +12,7 @@ type SendLeaderboardRequest = {
 
 export type SendLeaderboardRequestData = {
   [key: string]: number | string
-  displayName: string
+  login: string
   zombiesKilled: number
   lootFound: number
   completions: number

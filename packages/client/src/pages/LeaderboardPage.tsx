@@ -260,7 +260,7 @@ export const LeaderboardPage = () => {
             <TableBody>
               {sortedData.map((row, index) => (
                 <TableRow
-                  key={row.data.displayName}
+                  key={row.data.login}
                   className={
                     index === 0
                       ? classes.firstPlace
@@ -277,9 +277,7 @@ export const LeaderboardPage = () => {
                     {renderRankIcon(index)}
                   </TableCell>
                   <TableCell className={classes.tableCell}>
-                    <div className={classes.usernameCell}>
-                      {row.data.displayName}
-                    </div>
+                    <div className={classes.usernameCell}>{row.data.login}</div>
                   </TableCell>
                   <TableCell className={classes.tableCell} align="right">
                     {row.data.totalPoints}
