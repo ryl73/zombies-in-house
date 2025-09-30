@@ -1,4 +1,3 @@
-import { useAppSelector } from '../hooks/useApp'
 import {
   getAllLeaderboard,
   sendLeaderboardResults,
