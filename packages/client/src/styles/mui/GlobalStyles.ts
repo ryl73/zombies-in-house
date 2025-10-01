@@ -13,8 +13,14 @@ export const useGlobalStyles = makeStyles(theme => ({
     fontFamily: 'Rubik Wet Paint, cursive',
     textAlign: 'center',
     color: 'var(--color-primary)',
-    fontSize: '64px',
+    fontSize: 36,
     lineHeight: '64px',
+    [theme.breakpoints.up('sm')]: {
+      fontSize: 48,
+    },
+    [theme.breakpoints.up('md')]: {
+      fontSize: 64,
+    },
   },
   form: {
     display: 'flex',

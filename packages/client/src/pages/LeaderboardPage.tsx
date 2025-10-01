@@ -204,7 +204,8 @@ export const LeaderboardPage = () => {
         <TableContainer
           component={Paper}
           className={classes.tableContainer}
-          elevation={3}>
+          elevation={3}
+          style={{ overflow: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow className={classes.tableHeader}>

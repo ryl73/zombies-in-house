@@ -3,8 +3,33 @@ import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { resolvePinwheel } from '../../slices/gameSlice'
+import { Box, Container, makeStyles } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+  pinwheelWrapper: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  pinwheelContainer: {
+    position: 'relative',
+  },
+  pinwheelImg: {
+    width: '1000px',
+  },
+  arrowImg: {
+    width: '60px',
+    height: '120px',
+  },
+}))
 
 export const Pinwheel = () => {
+  const classes = useStyles()
   const [isSpinning, setIsSpinning] = useState(false)
   const controls = useAnimation()
   const dispatch = useAppDispatch()
@@ -52,16 +77,24 @@ export const Pinwheel = () => {
       initial={{ opacity: 0 }}
       animate={{ opacity: isPinwheelOpen ? 1 : 0 }}
       transition={{ duration: 0.4 }}>
-      <PinwheelWrapper>
-        <PinwheelContainer>
-          <PinwheelImg src="/src/assets/spinwheel.webp" alt="spin wheel" />
+      <Container className={classes.pinwheelWrapper}>
+        <Box className={classes.pinwheelContainer}>
+          <img
+            src="/src/assets/spinwheel.webp"
+            className={classes.pinwheelImg}
+            alt="spin wheel"
+          />
           <Arrow
             animate={controls}
             onAnimationComplete={handleAnimationComplete}>
-            <ArrowImg src="/src/assets/spinner-arrow.webp" alt="spin arrow" />
+            <img
+              src="/src/assets/spinner-arrow.webp"
+              className={classes.arrowImg}
+              alt="spin arrow"
+            />
           </Arrow>
-        </PinwheelContainer>
-      </PinwheelWrapper>
+        </Box>
+      </Container>
     </PinwheelOverlay>
   )
 }
@@ -77,25 +110,6 @@ const PinwheelOverlay = styled(motion.div)<{ $isOpen: boolean }>`
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
 `
 
-const PinwheelWrapper = styled.div`
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  z-index: 1000;
-`
-
-const PinwheelContainer = styled.div`
-  position: relative;
-`
-
-const PinwheelImg = styled.img`
-  width: 1000px;
-`
-
 const Arrow = styled(motion.div)`
   position: absolute;
   width: 60px;
@@ -103,9 +117,4 @@ const Arrow = styled(motion.div)`
   top: calc(50% - 120px);
   left: calc(50% - 27px);
   transform-origin: bottom center;
-`
-
-const ArrowImg = styled.img`
-  width: 60px;
-  height: 120px;
 `

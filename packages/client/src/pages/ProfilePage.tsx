@@ -5,7 +5,6 @@ import { Box, Container, makeStyles, Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 import { Header } from '../components/Header/Header'
-import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -16,7 +15,6 @@ const useStyles = makeStyles(theme => ({
 
 export const ProfilePage = () => {
   const classes = useStyles()
-  const globalClasses = useGlobalStyles()
 
   return (
     <div>
