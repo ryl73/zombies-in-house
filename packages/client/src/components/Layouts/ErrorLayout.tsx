@@ -1,7 +1,7 @@
 import { Box, Typography, Button } from '@material-ui/core'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowBack } from '@material-ui/icons'
-import { Header } from '../Header'
+import { Header } from '../Header/Header'
 import { makeStyles } from '@material-ui/core/styles'
 import { Helmet } from 'react-helmet'
 import notFoundImage from '../../assets/notfound.webp'
@@ -15,6 +15,17 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'flex-start',
     position: 'relative',
+  },
+  backgroundImg: {
+    maxWidth: '80%',
+    width: '100%',
+    marginBottom: '2rem',
+  },
+  errorContent: {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    transform: 'translate(-50%)',
   },
 }))
 
@@ -51,15 +62,9 @@ export const ErrorLayout = ({
         <img
           src={notFoundImage}
           alt={title}
-          style={{ maxWidth: '80%', width: '100%', marginBottom: '2rem' }}
+          className={classes.backgroundImg}
         />
-        <Box
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '50%',
-            transform: 'translate(-50%)',
-          }}>
+        <Box className={classes.errorContent}>
           <Typography
             variant="h1"
             color="textPrimary"

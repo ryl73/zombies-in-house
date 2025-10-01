@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet'
 import { useEffect } from 'react'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
@@ -12,7 +12,6 @@ import {
   Grid,
   Card,
   CardContent,
-  useTheme,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { logout } from '../api/LoginAPI'
@@ -20,8 +19,35 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 import landing from '../assets/landing-first-screen.webp'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
+  wrapper: {
+    backgroundColor: theme.palette.background.default,
+    paddingBottom: theme.spacing(5),
+  },
+  card: {
+    height: '100%',
+  },
+  cardContent: {
+    padding: theme.spacing(3),
+  },
+  featureTitle: {
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
+  featureDescription: {
+    color: theme.palette.text.secondary,
+    marginTop: '20px',
+    fontSize: '18px',
+  },
+  readyBlockTitle: {
+    marginBottom: '2rem',
+    marginTop: '4rem',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
   firstScreen: {
     minHeight: 500,
     backgroundImage: `url(${landing})`,
@@ -47,30 +73,49 @@ const useStyles = makeStyles(theme => ({
   },
   iconWrapper: {
     display: 'inline-flex',
-    padding: '8px',
+    padding: theme.spacing(1),
     backgroundColor: '#355155',
-    borderRadius: '6px',
-    marginRight: '16px',
+    borderRadius: theme.spacing(0.75),
+    marginRight: theme.spacing(2),
     flexShrink: 0,
     '& svg': {
       color: '#121212',
       fontSize: '2rem',
     },
   },
-  readyButton: {
-    maxWidth: '250px',
+  readyBlockButton: {
     width: '100%',
-    padding: '12px 24px',
-    fontSize: '1.1rem',
+    maxWidth: '250px',
   },
 }))
+
+const features = [
+  {
+    icon: <span>🔍</span>,
+    title: 'Исследуй',
+    description:
+      'Обыскивай комнаты в\u00A0поисках оружия, аптечек и\u00A0ключей к\u00A0выходу. Каждый шаг может быть последним',
+  },
+  {
+    icon: <span>⚔️</span>,
+    title: 'Сражайся',
+    description:
+      'Отбивайся от\u00A0полчищ мертвецов. Используй всё, что\u00A0попадётся под\u00A0руку\u00A0— от\u00A0биты до\u00A0дробовика',
+  },
+  {
+    icon: <span>🛡️</span>,
+    title: 'Выживай',
+    description:
+      'Держись вместе с\u00A0другими выжившими. Только команда поможет вам\u00A0дожить до\u00A0рассвета',
+  },
+]
 
 export const MainPage = () => {
   usePage({ initPage: initMainPage })
   const { isLoggedIn, clearUser } = useAuth()
   const navigate = useNavigate()
-  const theme = useTheme()
   const classes = useStyles()
+  const globalClasses = useGlobalStyles()
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -78,29 +123,8 @@ export const MainPage = () => {
     }
   }, [isLoggedIn, navigate])
 
-  const features = [
-    {
-      icon: <span>🔍</span>,
-      title: 'Исследуй',
-      description:
-        'Обыскивай комнаты в\u00A0поисках оружия, аптечек и\u00A0ключей к\u00A0выходу. Каждый шаг может быть последним',
-    },
-    {
-      icon: <span>⚔️</span>,
-      title: 'Сражайся',
-      description:
-        'Отбивайся от\u00A0полчищ мертвецов. Используй всё, что\u00A0попадётся под\u00A0руку\u00A0— от\u00A0биты до\u00A0дробовика',
-    },
-    {
-      icon: <span>🛡️</span>,
-      title: 'Выживай',
-      description:
-        'Держись вместе с\u00A0другими выжившими. Только команда поможет вам\u00A0дожить до\u00A0рассвета',
-    },
-  ]
-
   return (
-    <Box style={{ backgroundColor: theme.palette.background.default }} pb={5}>
+    <Box className={classes.wrapper}>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Главная</title>
@@ -122,13 +146,7 @@ export const MainPage = () => {
             variant="contained"
             size="large"
             color="primary"
-            style={{
-              width: '100%',
-              maxWidth: '435px',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-            }}>
+            className={globalClasses.mainBtn}>
             Начать игру
           </Button>
         </Container>
@@ -146,29 +164,21 @@ export const MainPage = () => {
           <Grid container spacing={4}>
             {features.map((feature, index) => (
               <Grid item xs={12} md={4} key={index}>
-                <Card style={{ height: '100%' }}>
-                  <CardContent style={{ padding: '24px' }}>
+                <Card className={classes.card}>
+                  <CardContent className={classes.cardContent}>
                     <Box display="flex" alignItems="center" mb={2}>
                       <Box className={classes.iconWrapper}>{feature.icon}</Box>
                       <Typography
                         variant="h6"
                         component="h3"
-                        style={{
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}>
+                        className={classes.featureTitle}>
                         {feature.title}
                       </Typography>
                     </Box>
 
                     <Typography
                       variant="body1"
-                      style={{
-                        color: theme.palette.text.secondary,
-                        marginTop: '20px',
-                        fontSize: '18px',
-                      }}>
+                      className={classes.featureDescription}>
                       {feature.description}
                     </Typography>
                   </CardContent>
@@ -181,13 +191,7 @@ export const MainPage = () => {
         <Typography
           variant="h4"
           component="h4"
-          align="center"
-          gutterBottom
-          style={{
-            marginBottom: '2rem',
-            marginTop: '4rem',
-            fontWeight: 'bold',
-          }}>
+          className={classes.readyBlockTitle}>
           Готов проверить себя на прочность?
         </Typography>
 
@@ -197,7 +201,8 @@ export const MainPage = () => {
             to="/game"
             variant="contained"
             color="primary"
-            className={classes.readyButton}>
+            size="large"
+            className={classes.readyBlockButton}>
             Я готов!
           </Button>
           <Button
@@ -208,7 +213,8 @@ export const MainPage = () => {
             to="/signin"
             variant="contained"
             color="primary"
-            className={classes.readyButton}>
+            size="large"
+            className={classes.readyBlockButton}>
             Выход
           </Button>
         </Box>

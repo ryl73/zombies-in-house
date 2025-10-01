@@ -12,7 +12,6 @@ import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
 import { RootState } from '../store'
 import { Cell } from '../game/models/Cell'
-import { useNavigate } from 'react-router-dom'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },

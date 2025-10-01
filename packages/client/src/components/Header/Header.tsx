@@ -63,7 +63,6 @@ const useStyles = makeStyles((theme: Theme) =>
         backgroundColor: '#355155',
       },
     },
-
     button: {
       margin: theme.spacing(0, 0.5),
       transition: 'all .2s ease',

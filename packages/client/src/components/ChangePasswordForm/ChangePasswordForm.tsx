@@ -5,6 +5,7 @@ import { Formik } from 'formik'
 import { PasswordSchema, RepeatPasswordSchema } from '../../utils/validation'
 import { useNotification } from '../../hooks/useNotification'
 import { TextField, Button, FormControl } from '@material-ui/core'
+import { useGlobalStyles } from '../../styles/mui/GlobalStyles'
 
 const ChangePasswordSchema = Yup.object().shape({
   newPassword: PasswordSchema,
@@ -13,6 +14,7 @@ const ChangePasswordSchema = Yup.object().shape({
 })
 
 export const ChangePasswordForm = () => {
+  const globalClasses = useGlobalStyles()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const { showSuccess, showError } = useNotification()
   const onSubmit = (
@@ -28,7 +30,7 @@ export const ChangePasswordForm = () => {
     }: {
       setFieldValue: (
         field: string,
-        value: any,
+        value: string,
         shouldValidate?: boolean
       ) => void
     }
@@ -53,6 +55,7 @@ export const ChangePasswordForm = () => {
         setIsSubmitting(false)
       })
   }
+
   return (
     <Formik
       initialValues={{ newPassword: '', reNewPassword: '', password: '' }}
@@ -69,12 +72,7 @@ export const ChangePasswordForm = () => {
         <FormControl
           component="form"
           onSubmit={handleSubmit}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            width: 550,
-          }}>
+          className={globalClasses.form}>
           <TextField
             id="newPassword"
             name="newPassword"

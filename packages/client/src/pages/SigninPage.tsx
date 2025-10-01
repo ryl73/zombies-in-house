@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { PageContainer } from '../styles/PageContainer'
-import { ThemedHeader } from '../styles/ThemedHeader'
 import { signIn, type SignInRequest } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import * as Yup from 'yup'
@@ -12,7 +10,16 @@ import { useDispatch } from 'react-redux'
 import { setUser } from '../slices/userSlice'
 import { getUser } from '../api/UserAPI'
 import { Link } from 'react-router-dom'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  FormControl,
+  Typography,
+  Container,
+} from '@material-ui/core'
+import { useLoginStyles } from '../styles/mui/LoginStyles'
+import clsx from 'clsx'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
@@ -20,6 +27,8 @@ const SigninSchema = Yup.object().shape({
 })
 
 export const SigninPage = () => {
+  const classes = useLoginStyles()
+  const globalClasses = useGlobalStyles()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const { showError } = useNotification()
@@ -51,8 +60,14 @@ export const SigninPage = () => {
         <title>Вход</title>
         <meta name="description" content="Страница логина" />
       </Helmet>
-      <PageContainer>
-        <ThemedHeader>ВХОД</ThemedHeader>
+      <Container
+        maxWidth="lg"
+        className={clsx(classes.root, classes.pageContainer)}>
+        <Typography
+          variant="h1"
+          className={clsx(globalClasses.themedHeader, classes.themedHeader)}>
+          ВХОД
+        </Typography>
         <Formik
           initialValues={{ login: '', password: '' }}
           validationSchema={SigninSchema}
@@ -61,12 +76,7 @@ export const SigninPage = () => {
             <FormControl
               component="form"
               onSubmit={handleSubmit}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-                width: 550,
-              }}>
+              className={clsx(globalClasses.form, classes.form)}>
               <TextField
                 id="login"
                 name="login"
@@ -103,10 +113,12 @@ export const SigninPage = () => {
           to="/signup"
           variant="text"
           size="large"
-          color="default">
+          color="default"
+          fullWidth
+          style={{ maxWidth: 800 }}>
           Регистрация
         </Button>
-      </PageContainer>
+      </Container>
     </>
   )
 }

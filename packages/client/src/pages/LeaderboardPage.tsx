@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import {
   Container,
   Typography,
@@ -18,11 +18,15 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { EmojiEvents } from '@material-ui/icons'
 import { useState, useMemo } from 'react'
+import { mockLeaderboardData } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
+  },
+  container: {
+    paddingTop: '2rem',
   },
   tableContainer: {
     marginTop: theme.spacing(4),
@@ -112,7 +116,7 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-interface LeaderboardEntry {
+export interface LeaderboardEntry {
   username: string
   completions: number
   zombiesKilled: number
@@ -121,45 +125,6 @@ interface LeaderboardEntry {
 
 type SortField = 'completions' | 'zombiesKilled' | 'lootFound'
 type SortDirection = 'asc' | 'desc'
-
-const mockData: LeaderboardEntry[] = [
-  {
-    username: 'ryl73',
-    completions: 15,
-    zombiesKilled: 287,
-    lootFound: 72,
-  },
-  {
-    username: 'andreissh',
-    completions: 12,
-    zombiesKilled: 154,
-    lootFound: 103,
-  },
-  {
-    username: 'cyperus-papyrus',
-    completions: 9,
-    zombiesKilled: 221,
-    lootFound: 58,
-  },
-  {
-    username: 'MarsiKris76',
-    completions: 7,
-    zombiesKilled: 193,
-    lootFound: 91,
-  },
-  {
-    username: 'testuser',
-    completions: 1,
-    zombiesKilled: 5,
-    lootFound: 2,
-  },
-  {
-    username: 'testuser2',
-    completions: 0,
-    zombiesKilled: 0,
-    lootFound: 0,
-  },
-]
 
 export const LeaderboardPage = () => {
   const classes = useStyles()
@@ -176,7 +141,7 @@ export const LeaderboardPage = () => {
   }
 
   const sortedData = useMemo(() => {
-    return [...mockData].sort((a, b) => {
+    return [...mockLeaderboardData].sort((a, b) => {
       const aValue = a[sortField]
       const bValue = b[sortField]
 
@@ -223,7 +188,7 @@ export const LeaderboardPage = () => {
 
       <Header />
 
-      <Container maxWidth="lg" style={{ paddingTop: '2rem' }}>
+      <Container maxWidth="lg" className={classes.container}>
         <Typography variant="h2" component="h1" align="center" gutterBottom>
           Таблица лидеров
         </Typography>
@@ -239,7 +204,8 @@ export const LeaderboardPage = () => {
         <TableContainer
           component={Paper}
           className={classes.tableContainer}
-          elevation={3}>
+          elevation={3}
+          style={{ overflow: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow className={classes.tableHeader}>

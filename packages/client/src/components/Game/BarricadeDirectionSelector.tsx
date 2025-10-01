@@ -1,16 +1,38 @@
 import React from 'react'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { gameSlice } from '../../slices/gameSlice'
-import styled from 'styled-components'
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  makeStyles,
 } from '@material-ui/core'
 
+const useStyles = makeStyles(theme => ({
+  directions: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '20px',
+  },
+  directionButton: {
+    padding: '10px 20px',
+    border: '1px solid #ccc',
+    borderRadius: '5px',
+    background: '#f0f0f0',
+    cursor: 'pointer',
+    color: '#0B1727',
+
+    '&:hover': {
+      background: '#e0e0e0',
+    },
+  },
+}))
+
 export const BarricadeDirectionSelector: React.FC = () => {
+  const classes = useStyles()
   const dispatch = useAppDispatch()
   const { barricadeSelection, isAwaitingBarricadeDirection } = useAppSelector(
     state => state.game
@@ -35,13 +57,16 @@ export const BarricadeDirectionSelector: React.FC = () => {
     <Dialog open={isAwaitingBarricadeDirection && !!barricadeSelection}>
       <DialogTitle>Выберите направление для баррикады</DialogTitle>
       <DialogContent>
-        <Directions>
+        <Box className={classes.directions}>
           {barricadeSelection?.availableDirections.map(dir => (
-            <DirectionButton key={dir} onClick={() => handleSelect(dir)}>
+            <Button
+              key={dir}
+              className={classes.directionButton}
+              onClick={() => handleSelect(dir)}>
               {directionLabels[dir] || dir}
-            </DirectionButton>
+            </Button>
           ))}
-        </Directions>
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button
@@ -55,21 +80,3 @@ export const BarricadeDirectionSelector: React.FC = () => {
     </Dialog>
   )
 }
-
-const Directions = styled.div`
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-`
-
-const DirectionButton = styled.button`
-  padding: 10px 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #f0f0f0;
-  cursor: pointer;
-
-  &:hover {
-    background: #e0e0e0;
-  }
-`

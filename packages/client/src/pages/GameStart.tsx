@@ -2,49 +2,17 @@ import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
-import { Box, Container, Typography, Button, useTheme } from '@material-ui/core'
-import { makeStyles } from '@material-ui/core/styles'
-import landing from '../assets/landing-first-screen.webp'
-
-const useStyles = makeStyles(theme => ({
-  firstScreen: {
-    position: 'relative',
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-    textAlign: 'center',
-    '&::before': {
-      content: '""',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundImage: `url(${landing})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      filter: 'blur(4px)',
-      zIndex: 1,
-    },
-  },
-  contentContainer: {
-    paddingBottom: '4rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    maxWidth: '800px !important',
-    zIndex: 2,
-  },
-}))
+import { Box, Container, Typography, Button } from '@material-ui/core'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
+import { useGameStatusStyles } from '../styles/mui/GameStatusStyles'
 
 export const GameStart = () => {
   usePage({ initPage: initGameStart })
-  const theme = useTheme()
-  const classes = useStyles()
+  const classes = useGameStatusStyles()
+  const globalClasses = useGlobalStyles()
 
   return (
-    <Box style={{ backgroundColor: theme.palette.background.default }}>
+    <Box className={classes.wrapper}>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Начало игры</title>
@@ -53,7 +21,7 @@ export const GameStart = () => {
 
       <Box className={classes.firstScreen}>
         <Container maxWidth="lg" className={classes.contentContainer}>
-          <Typography variant="h1" gutterBottom style={{ fontSize: '120px' }}>
+          <Typography variant="h1" gutterBottom className={classes.header}>
             Зомби в&nbsp;доме
           </Typography>
           <Box position="absolute" top="20px" width="100%">
@@ -68,14 +36,7 @@ export const GameStart = () => {
             size="large"
             color="primary"
             fullWidth
-            style={{
-              width: '100%',
-              maxWidth: '435px',
-              fontWeight: 'bold',
-              textTransform: 'uppercase',
-              letterSpacing: 1,
-              marginBottom: 8,
-            }}>
+            className={globalClasses.mainBtn}>
             Старт
           </Button>
         </Container>
