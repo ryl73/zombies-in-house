@@ -18,6 +18,7 @@ import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
+import landing from '../assets/landing-first-screen.webp'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 const useStyles = makeStyles(theme => ({
@@ -49,7 +50,7 @@ const useStyles = makeStyles(theme => ({
   },
   firstScreen: {
     minHeight: 500,
-    backgroundImage: 'url(/src/assets/landing-first-screen.webp)',
+    backgroundImage: `url(${landing})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     display: 'flex',
