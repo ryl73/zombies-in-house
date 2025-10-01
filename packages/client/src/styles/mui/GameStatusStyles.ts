@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core'
+import landing from '../../assets/landing-first-screen.webp'
 
 export const useGameStatusStyles = makeStyles(theme => ({
   wrapper: {
@@ -36,7 +37,7 @@ export const useGameStatusStyles = makeStyles(theme => ({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundImage: 'url(src/assets/landing-first-screen.webp)',
+      backgroundImage: `url(${landing})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       filter: 'blur(4px)',

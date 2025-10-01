@@ -4,6 +4,8 @@ import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { resolvePinwheel } from '../../slices/gameSlice'
 import { Box, Container, makeStyles } from '@material-ui/core'
+import spinwheel from '../../assets/spinwheel.webp'
+import spinArrow from '../../assets/spinner-arrow.webp'
 
 const useStyles = makeStyles(theme => ({
   pinwheelWrapper: {
@@ -80,15 +82,15 @@ export const Pinwheel = () => {
       <Container className={classes.pinwheelWrapper}>
         <Box className={classes.pinwheelContainer}>
           <img
-            src="/src/assets/spinwheel.webp"
+            src={`${spinwheel}`}
             className={classes.pinwheelImg}
-            alt="spin wheel"
+            alt="spinwheel"
           />
           <Arrow
             animate={controls}
             onAnimationComplete={handleAnimationComplete}>
             <img
-              src="/src/assets/spinner-arrow.webp"
+              src={`${spinArrow}`}
               className={classes.arrowImg}
               alt="spin arrow"
             />
