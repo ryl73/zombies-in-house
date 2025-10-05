@@ -46,9 +46,7 @@ function Main() {
   )
 }
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <Main />
-)
+ReactDOM.hydrateRoot(document.getElementById('root') as HTMLElement, <Main />)
 
 if (process.env.NODE_ENV === 'production') {
   startServiceWorker()
