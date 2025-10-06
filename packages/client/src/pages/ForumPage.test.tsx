@@ -7,8 +7,8 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { theme } from '../theme/theme'
 import { ReactNode } from 'react'
-import { mockTopics } from '../components/Forum/TopicItem'
 import { configureStore } from '@reduxjs/toolkit'
+import { mockTopics } from '../utils/mockData'
 
 export const renderWithProviders = (
   ui: ReactNode,

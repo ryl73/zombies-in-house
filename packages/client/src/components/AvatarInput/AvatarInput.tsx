@@ -15,8 +15,8 @@ import {
 //визуал аватара будет изменёт согласно другой задаче
 const useStyles = makeStyles(theme => ({
   avatarContainer: {
-    position: 'relative',
-    display: 'inline-block',
+    display: 'flex',
+    justifyContent: 'center',
     cursor: 'pointer',
     margin: '20px',
   },

@@ -1,11 +1,24 @@
 import { Fragment } from 'react'
-import styled from 'styled-components'
 import { CellComponent } from './CellComponent'
 import { Cell } from '../../game/models/Cell'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { handleCellClick } from '../../slices/gameSlice'
+import { Grid, makeStyles } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+  grid: {
+    position: 'relative',
+    zIndex: 1,
+    display: 'grid',
+    borderCollapse: 'collapse',
+    gridTemplateColumns: 'repeat(12, 100px)',
+    gap: '2px',
+    padding: '174px 0 200px 167px',
+  },
+}))
 
 export const BoardComponent = () => {
+  const classes = useStyles()
   const dispatch = useAppDispatch()
 
   const { board } = useAppSelector(state => state.game)
@@ -15,7 +28,7 @@ export const BoardComponent = () => {
   }
 
   return (
-    <Grid>
+    <Grid className={classes.grid}>
       {board?.cells.map((row, index) => (
         <Fragment key={index}>
           {row.map(cell => (
@@ -26,13 +39,3 @@ export const BoardComponent = () => {
     </Grid>
   )
 }
-
-const Grid = styled.div`
-  position: relative;
-  z-index: 1;
-  display: grid;
-  border-collapse: collapse;
-  grid-template-columns: repeat(12, 100px);
-  gap: 2px;
-  padding: 174px 0 200px 167px;
-`
