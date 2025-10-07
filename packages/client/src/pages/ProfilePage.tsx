@@ -5,6 +5,7 @@ import { Box, Container, makeStyles, Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 import { Header } from '../components/Header/Header'
+import { fetchUser, selectUser } from '../slices/userSlice'
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -41,6 +42,8 @@ export const ProfilePage = () => {
   )
 }
 
-export const initProfilePage = async (_args: PageInitArgs) => {
-  return Promise.resolve()
+export const initProfilePage = async ({ dispatch, state }: PageInitArgs) => {
+  if (!selectUser(state)) {
+    return dispatch(fetchUser())
+  }
 }
