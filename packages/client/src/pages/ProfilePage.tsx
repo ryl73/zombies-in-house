@@ -7,7 +7,7 @@ import { Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
 import { Header } from '../components/Header'
-import { fetchUserThunk, selectUser } from '../slices/userSlice'
+import { fetchUser, selectUser } from '../slices/userSlice'
 
 export const ProfilePage = () => {
   return (
@@ -33,6 +33,6 @@ export const ProfilePage = () => {
 
 export const initProfilePage = async ({ dispatch, state }: PageInitArgs) => {
   if (!selectUser(state)) {
-    return dispatch(fetchUserThunk())
+    return dispatch(fetchUser())
   }
 }

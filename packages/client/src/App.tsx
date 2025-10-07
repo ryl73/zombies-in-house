@@ -1,4 +1,4 @@
-import { fetchUserThunk, selectUserLoading } from './slices/userSlice'
+import { fetchUser, selectUserLoading } from './slices/userSlice'
 import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { PageContainer } from './styles/PageContainer'
@@ -11,7 +11,7 @@ const App = () => {
   const isLoading = useAppSelector(selectUserLoading)
 
   useEffect(() => {
-    dispatch(fetchUserThunk())
+    dispatch(fetchUser())
   }, [dispatch])
 
   if (isLoading) {
