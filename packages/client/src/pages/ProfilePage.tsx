@@ -1,15 +1,22 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { ThemedHeader } from '../styles/ThemedHeader'
-import { PageContainer } from '../styles/PageContainer'
 import { ChangePasswordForm } from '../components/ChangePasswordForm/ChangePasswordForm'
-import { Typography } from '@material-ui/core'
+import { Box, Container, makeStyles, Typography } from '@material-ui/core'
 import { ChangeProfileForm } from '../components/ProfileForm/ProfileForm'
 import { AvatarInput } from '../components/AvatarInput/AvatarInput'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import { fetchUser, selectUser } from '../slices/userSlice'
 
+const useStyles = makeStyles(theme => ({
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+  },
+}))
+
 export const ProfilePage = () => {
+  const classes = useStyles()
+
   return (
     <div>
       <Helmet>
@@ -17,16 +24,20 @@ export const ProfilePage = () => {
         <title>Профиль</title>
         <meta name="description" content="Профиль пользователя" />
       </Helmet>
-      <PageContainer>
-        <Header />
-        <ThemedHeader>Профиль</ThemedHeader>
-        <AvatarInput />
-        <ChangeProfileForm />
-        <Typography variant="h2" component="h2" align="center" gutterBottom>
-          Смена пароля
-        </Typography>
-        <ChangePasswordForm />
-      </PageContainer>
+      <Header />
+      <Container maxWidth="lg" className={classes.container}>
+        <Box>
+          <Typography variant="h2" align="center" gutterBottom>
+            Профиль
+          </Typography>
+          <AvatarInput />
+          <ChangeProfileForm />
+          <Typography variant="h2" align="center" gutterBottom>
+            Смена пароля
+          </Typography>
+          <ChangePasswordForm />
+        </Box>
+      </Container>
     </div>
   )
 }

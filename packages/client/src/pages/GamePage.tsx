@@ -3,7 +3,6 @@ import { BoardComponent } from '../components/Board/BoardComponent'
 import { useEffect, useState } from 'react'
 import { Hud } from '../components/HUD/HUD'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
-import styled from 'styled-components'
 import { gameSlice, startGame } from '../slices/gameSlice'
 import { BarricadeDirectionSelector } from '../components/Game/BarricadeDirectionSelector'
 import { WinDialog } from '../components/Game/WinDialog'
@@ -11,8 +10,26 @@ import { StartDialog } from '../components/Game/StartDialog'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Pinwheel } from '../components/Pinwheel/Pinwheel'
+import { Box, makeStyles } from '@material-ui/core'
+
+const useStyles = makeStyles(theme => ({
+  boardImage: {
+    display: 'block',
+    position: 'absolute',
+    zIndex: 0,
+    width: '1557px',
+    aspectRatio: 1,
+  },
+  wrapper: {
+    margin: '0 auto',
+    maxWidth: '1557px',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+}))
 
 export const GamePage = () => {
+  const classes = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
   const { players, currentPlayerIndex, status } = useAppSelector(
@@ -40,7 +57,7 @@ export const GamePage = () => {
       navigate('/game-end')
       dispatch(gameSlice.actions.setGameStatus('idle'))
     }
-  }, [status])
+  }, [dispatch, navigate, status])
 
   return (
     <>
@@ -50,12 +67,17 @@ export const GamePage = () => {
         <meta name="description" content="Страница игры" />
       </Helmet>
       <main>
-        <Wrapper>
-          <BoardImage src="/images/game/board.jpg" alt="board" />
+        <Box className={classes.wrapper}>
+          <img
+            className={classes.boardImage}
+            src="/images/game/board.jpg"
+            alt="board"
+          />
           <BoardComponent />
           {currentPlayer && <Hud />}
           <Pinwheel />
-        </Wrapper>
+          <BarricadeDirectionSelector />
+        </Box>
         {portalRoot &&
           createPortal(
             <>
@@ -69,21 +91,6 @@ export const GamePage = () => {
     </>
   )
 }
-
-const BoardImage = styled.img`
-  display: block;
-  position: absolute;
-  z-index: 0;
-  width: 1557px;
-  aspect-ratio: 1;
-`
-
-const Wrapper = styled.div`
-  margin: 0 auto;
-  max-width: 1557px;
-  display: flex;
-  flex-direction: column;
-`
 
 export const initGamePage = async () => {
   return Promise.resolve()

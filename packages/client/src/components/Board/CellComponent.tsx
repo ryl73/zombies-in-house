@@ -1,14 +1,47 @@
 import { FC, useState } from 'react'
-import styled, { css, keyframes } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Cell } from '../../game/models/Cell'
 import { useAppSelector } from '../../hooks/useApp'
+import { Box, makeStyles } from '@material-ui/core'
+import { CellCard } from '../../styles/styledComponents/CellCard'
 
 type Props = {
   cell: Cell
   click: (cell: Cell) => void
 }
 
+const useStyles = makeStyles(() => ({
+  cellBlock: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 100,
+    height: 100,
+    transition: 'all 0.3s ease-in-out',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+  },
+  dot: {
+    width: 20,
+    height: 20,
+    borderRadius: '50%',
+    backgroundColor: 'black',
+    zIndex: 3,
+  },
+  barricadeImage: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    zIndex: 2,
+  },
+}))
+
 export const CellComponent: FC<Props> = ({ cell, click }) => {
+  const classes = useStyles()
   const { zombies, players, items } = useAppSelector(state => state.game)
 
   const [isOpen, setIsOpen] = useState(false)
@@ -40,8 +73,8 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
   }
 
   return (
-    <CellBlock
-      $isOpen={isOpen}
+    <Box
+      className={classes.cellBlock}
       onClick={() => click(cell)}
       onMouseOver={mouseOverHandler}
       onMouseLeave={mouseLeaveHandler}>
@@ -52,37 +85,30 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
 
           return (
             <CardWrapper $isOpen={isOpen} key={object.id}>
-              <Card $isOpen={isOpen} $isPlayer={isPlayer}>
+              <CellCard $isPlayer={isPlayer}>
                 {isVisible && (
-                  <CardImage src={object.image} alt={object.name} />
+                  <img
+                    className={classes.cardImage}
+                    src={object.image}
+                    alt={object.name}
+                  />
                 )}
-              </Card>
+              </CellCard>
             </CardWrapper>
           )
         })}
       </CellBlockCard>
-      {cell.isTraversable && <Dot />}
+      {cell.isTraversable && <Box className={classes.dot} />}
       {cell.hasBarricade && (
-        <BarricadeImage
+        <img
+          className={classes.barricadeImage}
           src="/images/game/cards/items/plank.png"
           alt="Barricade"
         />
       )}
-    </CellBlock>
+    </Box>
   )
 }
-
-const CellBlock = styled.div<{
-  $isOpen?: boolean
-}>`
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100px;
-  height: 100px;
-  transition: all 0.3s ease-in-out;
-`
 
 const CellBlockCard = styled.div<{
   $isOpen?: boolean
@@ -113,53 +139,4 @@ const CardWrapper = styled.div<{
       left: 50%;
       transform: translate(-50%, -50%);
     `};
-`
-
-export const Card = styled.div<{
-  $isOpen?: boolean
-  $isPlayer?: boolean
-  $animation?: boolean
-}>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(255, 255, 192);
-  width: 98px;
-  height: 98px;
-  border-radius: 20px;
-  ${props =>
-    props.$animation &&
-    css`
-      animation: ${ripple} 1s infinite ease-in-out;
-    `}
-  z-index: ${props => (props.$isPlayer ? '1' : '0')};
-`
-
-export const CardImage = styled.img`
-  width: 100%;
-  height: 100%;
-  border-radius: 20px;
-`
-
-const Dot = styled.div`
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background-color: black;
-  z-index: 3;
-`
-
-const ripple = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`
-const BarricadeImage = styled.img`
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  z-index: 2;
 `

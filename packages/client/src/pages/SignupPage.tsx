@@ -1,7 +1,5 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { PageContainer } from '../styles/PageContainer'
-import { ThemedHeader } from '../styles/ThemedHeader'
 import { signup } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { Formik } from 'formik'
@@ -16,7 +14,16 @@ import {
 } from '../utils/validation'
 import { useNotification } from '../hooks/useNotification'
 import { Link } from 'react-router-dom'
-import { TextField, Button, FormControl } from '@material-ui/core'
+import {
+  TextField,
+  Button,
+  FormControl,
+  Typography,
+  Container,
+} from '@material-ui/core'
+import { useLoginStyles } from '../styles/mui/LoginStyles'
+import clsx from 'clsx'
+import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 
 type FormValues = {
   login: string
@@ -39,6 +46,8 @@ const SignupSchema = Yup.object().shape({
 })
 
 export const SignupPage = () => {
+  const classes = useLoginStyles()
+  const globalClasses = useGlobalStyles()
   const navigate = useNavigate()
   const { showError } = useNotification()
   const onSubmit = async ({
@@ -66,8 +75,14 @@ export const SignupPage = () => {
         <title>Регистрация</title>
         <meta name="description" content="Страница регистрации" />
       </Helmet>
-      <PageContainer>
-        <ThemedHeader>РЕГИСТРАЦИЯ</ThemedHeader>
+      <Container
+        maxWidth="lg"
+        className={clsx(classes.root, classes.pageContainer)}>
+        <Typography
+          variant="h1"
+          className={clsx(globalClasses.themedHeader, classes.themedHeader)}>
+          РЕГИСТРАЦИЯ
+        </Typography>
         <Formik
           initialValues={{
             email: '',
@@ -84,12 +99,7 @@ export const SignupPage = () => {
             <FormControl
               component="form"
               onSubmit={handleSubmit}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '1rem',
-                width: 550,
-              }}>
+              className={clsx(globalClasses.form, classes.form)}>
               <TextField
                 name="email"
                 label="Почта"
@@ -173,10 +183,12 @@ export const SignupPage = () => {
           to="/signin"
           variant="text"
           size="large"
-          color="default">
+          color="default"
+          fullWidth
+          style={{ maxWidth: 800 }}>
           Есть аккаунт? Войти
         </Button>
-      </PageContainer>
+      </Container>
     </div>
   )
 }
