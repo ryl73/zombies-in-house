@@ -1,4 +1,3 @@
-import { LeaderboardEntry } from '../pages/LeaderboardPage'
 import { Comment, Topic } from '../types/types'
 
 export const mockTopics: Topic[] = [
@@ -149,7 +148,7 @@ export const mockComments: Record<number, Comment[]> = {
   ],
 }
 
-export const mockLeaderboardData: LeaderboardEntry[] = [
+export const mockLeaderboardData = [
   {
     username: 'ryl73',
     completions: 15,

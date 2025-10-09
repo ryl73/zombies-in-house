@@ -41,10 +41,11 @@ export const GamePage = () => {
 
   const currentPlayer = players[currentPlayerIndex]
 
-  const onStartGame = () => {
+  const onStartGame = (gameType: GameType, roomId?: string) => {
     setIsDialog(false)
     const scrollHeight = document.documentElement.scrollHeight
     window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' })
+    dispatch(gameSlice.actions.setGameType(gameType))
     dispatch(startGame())
   }
 
