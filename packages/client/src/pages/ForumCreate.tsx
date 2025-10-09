@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
 import { PageInitArgs } from '../routes'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import {
   Container,
   Typography,
@@ -22,6 +22,13 @@ const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
+  },
+  container: {
+    paddingTop: '2rem',
+    paddingBottom: '2rem',
+  },
+  divider: {
+    marginBottom: theme.spacing(3),
   },
   paper: {
     padding: theme.spacing(4),
@@ -151,9 +158,7 @@ export const ForumCreatePage = () => {
 
       <Header />
 
-      <Container
-        maxWidth="md"
-        style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Container maxWidth="md" className={classes.container}>
         <Button
           component={Link}
           to="/forum"
@@ -168,7 +173,7 @@ export const ForumCreatePage = () => {
             Создание нового топика
           </Typography>
 
-          <Divider style={{ marginBottom: 24 }} />
+          <Divider className={classes.divider} />
 
           <form onSubmit={handleSubmit} className={classes.form}>
             <TextField
