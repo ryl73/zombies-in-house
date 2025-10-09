@@ -17,8 +17,11 @@ import {
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { EmojiEvents } from '@material-ui/icons'
-import { useState, useMemo } from 'react'
-import { mockLeaderboardData } from '../utils/mockData'
+import { useState, useEffect } from 'react'
+import {
+  getAllLeaderboard,
+  GetLeaderboardResponseData,
+} from '../api/LeaderboardAPI'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -116,20 +119,17 @@ const useStyles = makeStyles(theme => ({
   },
 }))
 
-export interface LeaderboardEntry {
-  username: string
-  completions: number
-  zombiesKilled: number
-  lootFound: number
-}
-
-type SortField = 'completions' | 'zombiesKilled' | 'lootFound'
+type SortField = 'completions' | 'zombiesKilled' | 'lootFound' | 'totalPoints'
 type SortDirection = 'asc' | 'desc'
 
 export const LeaderboardPage = () => {
   const classes = useStyles()
-  const [sortField, setSortField] = useState<SortField>('completions')
+  const [sortField, setSortField] = useState<SortField>('totalPoints')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
+  const [leaderboardData, setLeaderboardData] = useState<
+    GetLeaderboardResponseData[]
+  >([])
+  const [sortedData, setSortedData] = useState<GetLeaderboardResponseData[]>([])
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -139,19 +139,6 @@ export const LeaderboardPage = () => {
       setSortDirection('desc')
     }
   }
-
-  const sortedData = useMemo(() => {
-    return [...mockLeaderboardData].sort((a, b) => {
-      const aValue = a[sortField]
-      const bValue = b[sortField]
-
-      if (sortDirection === 'asc') {
-        return aValue - bValue
-      } else {
-        return bValue - aValue
-      }
-    })
-  }, [sortField, sortDirection])
 
   const renderRankIcon = (index: number) => {
     switch (index) {
@@ -177,6 +164,31 @@ export const LeaderboardPage = () => {
         return <span>{index + 1}</span>
     }
   }
+
+  useEffect(() => {
+    getAllLeaderboard({ limit: 10, cursor: 0 })
+      .then(data => {
+        setLeaderboardData(data)
+      })
+      .catch(e => {
+        console.log(e)
+      })
+  }, [])
+
+  useEffect(() => {
+    const sorted = [...leaderboardData].sort((a, b) => {
+      const aValue = a.data[sortField]
+      const bValue = b.data[sortField]
+
+      if (sortDirection === 'asc') {
+        return aValue - bValue
+      } else {
+        return bValue - aValue
+      }
+    })
+
+    setSortedData(sorted)
+  }, [leaderboardData, sortField, sortDirection])
 
   return (
     <Box className={classes.root}>
@@ -214,6 +226,15 @@ export const LeaderboardPage = () => {
                 <TableCell align="right">
                   <TableSortLabel
                     className={classes.sortLabel}
+                    active={sortField === 'totalPoints'}
+                    direction={sortDirection}
+                    onClick={() => handleSort('totalPoints')}>
+                    Всего очков
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell align="right">
+                  <TableSortLabel
+                    className={classes.sortLabel}
                     active={sortField === 'completions'}
                     direction={sortDirection}
                     onClick={() => handleSort('completions')}>
@@ -243,7 +264,7 @@ export const LeaderboardPage = () => {
             <TableBody>
               {sortedData.map((row, index) => (
                 <TableRow
-                  key={row.username}
+                  key={row.data.login}
                   className={
                     index === 0
                       ? classes.firstPlace
@@ -260,16 +281,19 @@ export const LeaderboardPage = () => {
                     {renderRankIcon(index)}
                   </TableCell>
                   <TableCell className={classes.tableCell}>
-                    <div className={classes.usernameCell}>{row.username}</div>
+                    <div className={classes.usernameCell}>{row.data.login}</div>
                   </TableCell>
                   <TableCell className={classes.tableCell} align="right">
-                    {row.completions}
+                    {row.data.totalPoints}
                   </TableCell>
                   <TableCell className={classes.tableCell} align="right">
-                    {row.zombiesKilled}
+                    {row.data.completions}
                   </TableCell>
                   <TableCell className={classes.tableCell} align="right">
-                    {row.lootFound}
+                    {row.data.zombiesKilled}
+                  </TableCell>
+                  <TableCell className={classes.tableCell} align="right">
+                    {row.data.lootFound}
                   </TableCell>
                 </TableRow>
               ))}

@@ -10,8 +10,9 @@ import { PinWheelResult, getPinwheelResult } from '../game/models/PinWheel'
 import { getRandomInt, randomGenerator } from '../utils/random'
 import { createZombie, Zombie, ZombieType } from '../game/models/Zombie'
 import { createItem, Item, ItemType } from '../game/models/Item'
-import { RootState } from '../store'
+import { RootState, store } from '../store'
 import { Cell } from '../game/models/Cell'
+import { sendStats } from '../game/stats'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
@@ -51,8 +52,9 @@ export type CanFightType =
   | null
 
 export type GameStatus = 'idle' | 'playing' | 'won' | 'lost'
+export type GameType = 'local' | 'online'
 
-export interface GameState {
+export type GameState = {
   board: Board
   players: Player[]
   items: Item[]
@@ -74,6 +76,23 @@ export interface GameState {
   winningPlayerId: number | null
   pinwheelResult: PinWheelResult | null
   isPinwheelOpen: boolean
+  statistics: GameStatistics
+  type: GameType
+}
+
+export type GameStatistics = {
+  [key: string]: number
+  zombiesKilled: 0
+  lootFound: 0
+  completions: 0
+  totalPoints: 0
+}
+
+const initialStatisticsState: GameStatistics = {
+  zombiesKilled: 0,
+  lootFound: 0,
+  completions: 0,
+  totalPoints: 0,
 }
 
 const initialState: GameState = {
@@ -94,6 +113,8 @@ const initialState: GameState = {
   winningPlayerId: null,
   pinwheelResult: null,
   isPinwheelOpen: false,
+  statistics: initialStatisticsState,
+  type: 'local',
 }
 
 const getCurrentPlayer = (game: GameState) =>
@@ -211,6 +232,13 @@ export const winFight = createAsyncThunk(
   'game/winFight',
   async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.killZombie())
+
+    sendStats(
+      'zombiesKilled',
+      store.getState().game.statistics,
+      store.getState().user.data
+    )
+
     const { game } = getState() as { game: GameState }
 
     const player = getCurrentPlayer(game)
@@ -317,6 +345,11 @@ export const endTurn = createAsyncThunk(
 
     if (isItemsOnCar && isPlayerOnCar) {
       dispatch(gameSlice.actions.openWinDialog(player.id))
+      sendStats(
+        'completions',
+        store.getState().game.statistics,
+        store.getState().user.data
+      )
       return
     }
 
@@ -506,6 +539,11 @@ const handlePlayerCellClick = createAsyncThunk(
           continue
         }
         dispatch(gameSlice.actions.pickItem(item.id))
+        sendStats(
+          'lootFound',
+          store.getState().game.statistics,
+          store.getState().user.data
+        )
       }
     }
 
@@ -668,6 +706,7 @@ export const gameSlice = createSlice({
       state.isProcessing = false
       state.pinwheelResult = null
       state.isPinwheelOpen = false
+      state.statistics = initialStatisticsState
     },
 
     createCharacters(state) {
@@ -944,6 +983,10 @@ export const gameSlice = createSlice({
 
     setIsPinwheelOpen(state, action: PayloadAction<boolean>) {
       state.isPinwheelOpen = action.payload
+    },
+
+    setGameType(state, action: PayloadAction<GameType>) {
+      state.type = action.payload
     },
   },
 })

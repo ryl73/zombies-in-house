@@ -12,10 +12,11 @@ import {
 } from '@material-ui/core'
 import { KeyboardArrowLeft } from '@material-ui/icons'
 import { Link } from 'react-router-dom'
+import { GameType } from '../../slices/gameSlice'
 
 type Props = {
   isDialog: boolean
-  startGame: (isLocal: boolean, roomId?: string) => void
+  startGame: (type: GameType, roomId?: string) => void
 }
 
 const useStyles = makeStyles(() => ({
@@ -60,7 +61,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
                 variant="contained"
                 color="primary"
                 size="large"
-                onClick={() => startGame(false)}>
+                onClick={() => startGame('online')}>
                 Создать комнату
               </Button>
               <Box display="flex" flexDirection="column" gridGap="12px">
@@ -76,7 +77,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
                   color="primary"
                   size="large"
                   disabled={!roomIdInput}
-                  onClick={() => startGame(true, roomIdInput)}>
+                  onClick={() => startGame('local', roomIdInput)}>
                   Подключиться к комнате
                 </Button>
               </Box>
@@ -96,7 +97,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
                 variant="contained"
                 color="primary"
                 size="large"
-                onClick={() => startGame(true)}>
+                onClick={() => startGame('local')}>
                 Начать игру
               </Button>
             </Box>
