@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon ../server/src/index.ts",
-    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist/server && node src/utils/generateImages.js",
+    "build": "vite build && vite build --ssr src/entry-server.tsx --outDir dist/server && node src/utils/generateImages.mjs",
     "preview": "node ../server/dist/index.js",
     "lint": "eslint .",
     "format": "prettier --write .",
