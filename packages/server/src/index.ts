@@ -19,9 +19,13 @@ async function startServer() {
     const app = express()
     app.use(cookieParser())
     app.use(cors())
+    app.use(express.json())
+
     app.use('/api', router)
 
     if (isDev) {
+      // await sequelize.sync({ force: true })
+
       const vite = await import('vite')
       const viteServer = await vite.createServer({
         root: path.resolve(__dirname, '../../client'),

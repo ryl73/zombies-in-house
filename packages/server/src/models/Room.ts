@@ -18,11 +18,7 @@ export type Room = {
   status: GameStatus
   isZombieMove: boolean
   isProcessing: boolean
-  barricadeSelection: {
-    cellId: number
-    availableDirections: string[]
-    itemId: number
-  } | null
+  barricadeSelection: string
   isAwaitingBarricadeDirection: boolean
   canSkipTurn: boolean
 }

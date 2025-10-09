@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Pinwheel } from '../components/Pinwheel/Pinwheel'
 import { Box, makeStyles } from '@material-ui/core'
+import { createRoom } from '../api/GameAPI'
 
 const useStyles = makeStyles(theme => ({
   boardImage: {
@@ -32,20 +33,33 @@ export const GamePage = () => {
   const classes = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const { players, currentPlayerIndex, status } = useAppSelector(
-    state => state.game
-  )
+  const gameState = useAppSelector(state => state.game)
+  const { data: userData } = useAppSelector(state => state.user)
 
   const [isDialog, setIsDialog] = useState(true)
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
 
-  const currentPlayer = players[currentPlayerIndex]
+  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
 
-  const onStartGame = () => {
+  const onStartGame = async (isLocal: boolean, roomId?: string) => {
     setIsDialog(false)
     const scrollHeight = document.documentElement.scrollHeight
     window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' })
-    dispatch(startGame())
+    await dispatch(startGame())
+
+    if (!isLocal) {
+      await createRoomRequest()
+    }
+  }
+
+  const createRoomRequest = async () => {
+    if (!userData) return
+    try {
+      const { id } = await createRoom({ hostId: userData.id, state: gameState })
+      console.log(id)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   useEffect(() => {
@@ -53,11 +67,11 @@ export const GamePage = () => {
   }, [])
 
   useEffect(() => {
-    if (status === 'lost') {
+    if (gameState.status === 'lost') {
       navigate('/game-end')
       dispatch(gameSlice.actions.setGameStatus('idle'))
     }
-  }, [dispatch, navigate, status])
+  }, [dispatch, navigate, gameState.status])
 
   return (
     <>
