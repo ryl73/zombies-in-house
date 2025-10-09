@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet'
 import { PageInitArgs } from '../routes'
-import { Header } from '../components/Header'
+import { Header } from '../components/Header/Header'
 import {
   Container,
   Typography,
@@ -27,6 +27,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
+  },
+  container: {
+    paddingTop: '2rem',
   },
   tableContainer: {
     marginTop: theme.spacing(4),
@@ -197,7 +200,7 @@ export const LeaderboardPage = () => {
 
       <Header />
 
-      <Container maxWidth="lg" style={{ paddingTop: '2rem' }}>
+      <Container maxWidth="lg" className={classes.container}>
         <Typography variant="h2" component="h1" align="center" gutterBottom>
           Таблица лидеров
         </Typography>
@@ -213,7 +216,8 @@ export const LeaderboardPage = () => {
         <TableContainer
           component={Paper}
           className={classes.tableContainer}
-          elevation={3}>
+          elevation={3}
+          style={{ overflow: 'auto' }}>
           <Table>
             <TableHead>
               <TableRow className={classes.tableHeader}>

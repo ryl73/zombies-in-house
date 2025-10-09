@@ -15,8 +15,8 @@ import {
 //визуал аватара будет изменёт согласно другой задаче
 const useStyles = makeStyles(theme => ({
   avatarContainer: {
-    position: 'relative',
-    display: 'inline-block',
+    display: 'flex',
+    justifyContent: 'center',
     cursor: 'pointer',
     margin: '20px',
   },
@@ -32,7 +32,7 @@ const useStyles = makeStyles(theme => ({
 
 export const AvatarInput = () => {
   const classes = useStyles()
-  const { showError } = useNotification()
+  const { showError, showSuccess } = useNotification()
   const userData = useAppSelector(selectUser)
   const [preview, setPreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -63,17 +63,21 @@ export const AvatarInput = () => {
       }
       const formData = new FormData()
       formData.append('avatar', file)
-      changeAvatar(formData).catch(err => {
-        const errorMessage = err.response?.data?.reason
-          ? err.response.data?.reason
-          : 'Ошибка при смене аватара'
-        showError(errorMessage)
-      })
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
+      changeAvatar(formData)
+        .then(() => {
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            setPreview(reader.result as string)
+          }
+          reader.readAsDataURL(file)
+          showSuccess('Аватар успешно изменён')
+        })
+        .catch(err => {
+          const errorMessage = err.response?.data?.reason
+            ? err.response.data?.reason
+            : 'Ошибка при смене аватара'
+          showError(errorMessage)
+        })
     }
   }
 

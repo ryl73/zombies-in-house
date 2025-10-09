@@ -21,9 +21,6 @@ type Props = {
 
 const useStyles = makeStyles(() => ({
   root: {
-    '& .MuiOutlinedInput-root': {
-      width: '100%',
-    },
     '& .MuiButton-root': {
       margin: '0',
     },
@@ -51,8 +48,8 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
         </Box>
 
         <Box display="grid" gridTemplateColumns="1fr 1px 1fr" gridGap="24px">
-          <div className="">
-            <Typography variant="h6" style={{ textAlign: 'center' }}>
+          <div>
+            <Typography variant="h6" align="center">
               Играть по сети
             </Typography>
             <Box
@@ -88,7 +85,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
           </div>
           <Divider orientation="vertical" flexItem />
           <div className="">
-            <Typography variant="h6" style={{ textAlign: 'center' }}>
+            <Typography variant="h6" align="center">
               Играть локально
             </Typography>
             <Box

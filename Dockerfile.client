@@ -1,5 +1,7 @@
 ARG NODE_VERSION=18
 ARG CLIENT_PORT=3001
+ARG EXTERNAL_SERVER_URL
+ARG INTERNAL_SERVER_URL
 
 FROM node:$NODE_VERSION-buster as base
 
@@ -9,7 +11,8 @@ FROM base as builder
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
-
+ENV EXTERNAL_SERVER_URL=$EXTERNAL_SERVER_URL
+ENV INTERNAL_SERVER_URL=$INTERNAL_SERVER_URL
 COPY . .
 
 RUN yarn lerna bootstrap

@@ -31,8 +31,8 @@ interface ApiError {
   details?: unknown
 }
 
-export const fetchUserThunk = createAsyncThunk(
-  'user/fetchUserThunk',
+export const fetchUser = createAsyncThunk(
+  'user/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
       return await getUser()
@@ -61,18 +61,18 @@ export const userSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(fetchUserThunk.pending, state => {
+      .addCase(fetchUser.pending, state => {
         state.data = null
         state.isLoading = true
       })
       .addCase(
-        fetchUserThunk.fulfilled,
+        fetchUser.fulfilled,
         (state, { payload }: PayloadAction<User>) => {
           state.data = payload
           state.isLoading = false
         }
       )
-      .addCase(fetchUserThunk.rejected, (state, action) => {
+      .addCase(fetchUser.rejected, (state, action) => {
         state.isLoading = false
         state.error = action.error.message
         console.error('Ошибка загрузки пользователя:', action.payload)

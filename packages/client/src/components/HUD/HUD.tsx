@@ -1,4 +1,3 @@
-import styled from 'styled-components'
 import { Item } from '../../game/models/Item'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import {
@@ -6,15 +5,87 @@ import {
   usePlayerItem,
   skipTurn,
 } from '../../slices/gameSlice'
-import { Card, CardImage } from '../Board/CellComponent'
-import { Button } from '../../styles/Buttons'
+import { Box, Button, makeStyles } from '@material-ui/core'
+import { CellCard } from '../../styles/styledComponents/CellCard'
 import hud from '../../assets/hud.webp'
+
+const useStyles = makeStyles(theme => ({
+  hudWrapper: (props: { isOpen: boolean }) => ({
+    position: 'fixed',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    width: 'calc(100% - 60px)',
+    maxWidth: '1000px',
+    bottom: 0,
+    padding: '10px 32px',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: '8px',
+    zIndex: 999,
+    background: `url(${hud}) center 50% no-repeat`,
+    borderTopLeftRadius: '10px',
+    borderTopRightRadius: '10px',
+    display: props.isOpen ? 'none' : 'flex',
+  }),
+  playerWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px',
+    minWidth: '150px',
+  },
+  playerCard: {
+    width: '70px',
+    height: '70px',
+  },
+  items: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '20px',
+  },
+  lifeImage: {
+    width: '50px',
+    height: '50px',
+  },
+  skipTurnButton: {
+    padding: '10px 20px',
+    backgroundColor: '#ff6b6b',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+
+    '&:hover': {
+      backgroundColor: '#ff5252',
+    },
+
+    '&:disabled': {
+      backgroundColor: '#ccc',
+      cursor: 'not-allowed',
+    },
+  },
+  spinButton: {
+    backgroundColor: 'var(--color-button-primary)',
+    border: 'none',
+    padding: '16px 12px',
+    color: 'var(--color-primary)',
+    margin: 0,
+    borderRadius: '20px',
+    cursor: 'pointer',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+  },
+}))
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
-
   const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
     useAppSelector(state => state.game)
+  const classes = useStyles({ isOpen: isPinwheelOpen })
 
   const player = players[currentPlayerIndex]
 
@@ -27,107 +98,57 @@ export const Hud = () => {
   const isAnimation = (item: Item) => canFight === item.type
 
   return (
-    <HudWrapper $isOpen={isPinwheelOpen}>
-      <PlayerCardWrapper>
-        <CardWrapper>
-          <HudCard>
-            <CardImage src={player.image} alt={player.name} />
-          </HudCard>
-          {player.name}
-        </CardWrapper>
-        {Array.from({ length: player.lifeCount }, (_, i) => (
-          <LifeImage src="/images/game/cards/life.png" alt="life" key={i} />
-        ))}
-      </PlayerCardWrapper>
+    <Box className={classes.hudWrapper}>
+      <Box className={classes.playerWrapper}>
+        <CellCard className={classes.playerCard}>
+          <img
+            className={classes.cardImage}
+            src={player.image}
+            alt={player.name}
+          />
+        </CellCard>
+        {player.name}
+        {player.lifeCount > 0 && (
+          <Box>
+            {Array.from({ length: player.lifeCount }, (_, i) => (
+              <img
+                className={classes.lifeImage}
+                src="/images/game/cards/life.png"
+                alt="life"
+                key={i}
+              />
+            ))}
+          </Box>
+        )}
+      </Box>
       {game.canSkipTurn && !game.isProcessing && (
-        <SkipTurnButton onClick={() => dispatch(skipTurn())}>
+        <Button
+          className={classes.skipTurnButton}
+          onClick={() => dispatch(skipTurn())}>
           Пропустить ход
-        </SkipTurnButton>
+        </Button>
       )}
-      <Items>
+      <Box className={classes.items}>
         {player.items.map(item => (
-          <Card
+          <CellCard
             $animation={isAnimation(item)}
             key={item.id}
             onClick={() => clickHandler(item)}>
-            <CardImage src={item.image} alt={item.name} />
-          </Card>
+            <img
+              className={classes.cardImage}
+              src={item.image}
+              alt={item.name}
+            />
+          </CellCard>
         ))}
         {canFight === 'grenade' && (
-          <SpinButton onClick={() => dispatch(manualSpinPinwheel())}>
+          <Button
+            className={classes.spinButton}
+            onClick={() => dispatch(manualSpinPinwheel())}>
             Spin pinwheel
-          </SpinButton>
+          </Button>
         )}
-      </Items>
-    </HudWrapper>
+      </Box>
+    </Box>
   )
 }
-
-const HudWrapper = styled.div<{ $isOpen: boolean }>`
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 60px);
-  max-width: 1000px;
-  bottom: 0;
-  padding: 10px 32px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  z-index: 999;
-  background: url(${hud}) center 50% no-repeat;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  display: ${({ $isOpen }) => ($isOpen ? 'none' : 'flex')};
-`
-
-const PlayerCardWrapper = styled.div`
-  min-width: 150px;
-`
-
-const Items = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-`
-
-const CardWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 5px;
-`
-
-const HudCard = styled(Card)`
-  width: 70px;
-  height: 70px;
-`
-
-const LifeImage = styled.img`
-  width: 50px;
-  height: 50px;
-`
-const SkipTurnButton = styled.button`
-  padding: 10px 20px;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-
-  &:hover {
-    background-color: #ff5252;
-  }
-
-  &:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-  }
-`
-
-const SpinButton = styled(Button)`
-  margin: 0;
-  border-radius: 20px;
-  cursor: pointer;
-`

@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import {
   setUser,
   User,
-  fetchUserThunk,
+  fetchUser,
   clearUser as cl,
   isUserLoggedIn,
   selectUserLoading,
@@ -16,7 +16,7 @@ export const useAuth = () => {
 
   useEffect(() => {
     if (isLoading) {
-      dispatch(fetchUserThunk())
+      dispatch(fetchUser())
     }
   }, [dispatch, isLoading])
 
