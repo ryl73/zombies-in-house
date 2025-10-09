@@ -33,19 +33,21 @@ export const GamePage = () => {
   const classes = useStyles()
   const navigate = useNavigate()
   const dispatch = useAppDispatch()
-  const gameState = useAppSelector(state => state.game)
+  const { players, currentPlayerIndex, status } = useAppSelector(
+    state => state.game
+  )
   const { data: userData } = useAppSelector(state => state.user)
 
   const [isDialog, setIsDialog] = useState(true)
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
 
-  const currentPlayer = gameState.players[gameState.currentPlayerIndex]
+  const currentPlayer = players[currentPlayerIndex]
 
   const onStartGame = async (isLocal: boolean, roomId?: string) => {
     setIsDialog(false)
     const scrollHeight = document.documentElement.scrollHeight
     window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' })
-    await dispatch(startGame())
+    dispatch(startGame())
 
     if (!isLocal) {
       await createRoomRequest()
@@ -55,6 +57,7 @@ export const GamePage = () => {
   const createRoomRequest = async () => {
     if (!userData) return
     try {
+      const gameState = useAppSelector(state => state.game)
       const { id } = await createRoom({ hostId: userData.id, state: gameState })
       console.log(id)
     } catch (e) {
@@ -67,11 +70,11 @@ export const GamePage = () => {
   }, [])
 
   useEffect(() => {
-    if (gameState.status === 'lost') {
+    if (status === 'lost') {
       navigate('/game-end')
       dispatch(gameSlice.actions.setGameStatus('idle'))
     }
-  }, [dispatch, navigate, gameState.status])
+  }, [dispatch, navigate, status])
 
   return (
     <>

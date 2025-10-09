@@ -21,7 +21,7 @@ export default class RoomController {
 
       const room = await Room.create({ hostId, ...stateObj })
 
-      await Player.bulkCreate(state.players)
+      await Player.bulkCreate(state.players, { validate: true })
 
       res.status(201).json({ id: room.id })
     } catch (e) {
