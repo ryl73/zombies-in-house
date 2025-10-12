@@ -4,11 +4,10 @@ import { ForumPage } from './ForumPage'
 import { Provider } from 'react-redux'
 import { reducer } from '../store'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { ThemeProvider } from '@material-ui/core/styles'
-import { theme } from '../theme/theme'
 import { ReactNode } from 'react'
 import { configureStore } from '@reduxjs/toolkit'
 import { mockTopics } from '../utils/mockData'
+import { ThemeProviderCustom } from '../theme/ThemeContext'
 
 export const renderWithProviders = (
   ui: ReactNode,
@@ -17,7 +16,7 @@ export const renderWithProviders = (
 ) =>
   render(
     <Provider store={customStore}>
-      <ThemeProvider theme={theme}>
+      <ThemeProviderCustom>
         <MemoryRouter initialEntries={['/forum']}>
           {withRoutes ? (
             <Routes>
@@ -29,7 +28,7 @@ export const renderWithProviders = (
             ui
           )}
         </MemoryRouter>
-      </ThemeProvider>
+      </ThemeProviderCustom>
     </Provider>
   )
 

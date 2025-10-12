@@ -11,7 +11,7 @@ import {
 } from 'react-router-dom/server'
 import { matchRoutes } from 'react-router-dom'
 import { configureStore } from '@reduxjs/toolkit'
-import { ServerStyleSheets, ThemeProvider } from '@material-ui/core/styles' // Добавлен ServerStyleSheets
+import { ServerStyleSheets } from '@material-ui/core/styles'
 
 import {
   createContext,
@@ -22,9 +22,9 @@ import { reducer } from './store'
 import { routes } from './routes'
 import './index.css'
 import { setPageHasBeenInitializedOnServer } from './slices/ssrSlice'
-import { theme } from './theme/theme'
 import { NotificationProvider } from './hooks/useNotification'
 import { CssBaseline } from '@material-ui/core'
+import { ThemeProviderCustom } from './theme/ThemeContext'
 
 export const render = async (req: ExpressRequest) => {
   const { query, dataRoutes } = createStaticHandler(routes)
@@ -77,12 +77,12 @@ export const render = async (req: ExpressRequest) => {
         styledComponentsSheet.collectStyles(
           // Собираем стили styled-components
           <Provider store={store}>
-            <ThemeProvider theme={theme}>
+            <ThemeProviderCustom initialMode="dark">
               <CssBaseline />
               <NotificationProvider>
                 <StaticRouterProvider router={router} context={context} />
               </NotificationProvider>
-            </ThemeProvider>
+            </ThemeProviderCustom>
           </Provider>
         )
       )

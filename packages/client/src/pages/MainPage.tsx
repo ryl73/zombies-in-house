@@ -20,8 +20,12 @@ import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 import landing from '../assets/landing-first-screen.webp'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
+import { ThemeToggleButton } from '../components/ThemeToggle/ThemeToggleButton'
 
 const useStyles = makeStyles(theme => ({
+  title: {
+    color: theme.palette.text.primary,
+  },
   wrapper: {
     backgroundColor: theme.palette.background.default,
     paddingBottom: theme.spacing(5),
@@ -33,6 +37,7 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(3),
   },
   featureTitle: {
+    color: theme.palette.text.secondary,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -43,6 +48,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: '18px',
   },
   readyBlockTitle: {
+    color: theme.palette.text.primary,
     marginBottom: '2rem',
     marginTop: '4rem',
     fontWeight: 'bold',
@@ -135,6 +141,7 @@ export const MainPage = () => {
       </Helmet>
 
       <Box className={classes.firstScreen}>
+        <ThemeToggleButton />
         <FullscreenToggle />
         <Container maxWidth="lg" className={classes.contentContainer}>
           <Typography variant="h1" gutterBottom>
@@ -156,7 +163,12 @@ export const MainPage = () => {
 
       <Container maxWidth="lg" className={classes.featuresSection}>
         <Box mt={8}>
-          <Typography variant="h2" component="h2" align="center" gutterBottom>
+          <Typography
+            variant="h2"
+            component="h2"
+            align="center"
+            gutterBottom
+            className={classes.title}>
             Правила Выживания
           </Typography>
         </Box>
