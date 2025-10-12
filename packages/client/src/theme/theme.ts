@@ -94,7 +94,13 @@ const darkTheme = createTheme({
   overrides: {
     MuiCssBaseline: {
       '@global': {
+        ':root': {
+          '--text-white': '#fff',
+        },
         body: {
+          fontFamily: 'Rubik, sans-serif',
+          fontSize: '18px',
+          lineHeight: '24px',
           backgroundColor: '#0B1727',
           color: '#F7F4F3',
         },
@@ -235,11 +241,11 @@ const lightTheme = createTheme({
     },
     background: {
       default: '#f7f4f3',
-      paper: '#1D333B',
+      paper: '#ffffff',
     },
     text: {
       primary: '#0B1727',
-      secondary: '#D3E4DC',
+      secondary: '#0B1727',
     },
     error: {
       main: red.A400,
@@ -273,7 +279,7 @@ const lightTheme = createTheme({
     h2: {
       fontFamily: 'Rubik, sans-serif',
       fontWeight: 600,
-      color: '#F7F4F3',
+      color: '#0B1727',
       fontSize: '2.5rem',
       marginBottom: '3rem',
       '@media (max-width: 768px)': {
@@ -312,9 +318,15 @@ const lightTheme = createTheme({
   overrides: {
     MuiCssBaseline: {
       '@global': {
+        ':root': {
+          '--text-white': '#fff',
+        },
         body: {
-          backgroundColor: '#0B1727',
-          color: '#F7F4F3',
+          fontFamily: 'Rubik, sans-serif',
+          fontSize: '18px',
+          lineHeight: '24px',
+          backgroundColor: '#F7F4F3',
+          color: '#0B1727',
         },
       },
     },
@@ -323,7 +335,7 @@ const lightTheme = createTheme({
         boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
       },
       colorPrimary: {
-        backgroundColor: '#0B1727',
+        backgroundColor: '#ffffff',
       },
     },
     MuiToolbar: {
@@ -358,9 +370,10 @@ const lightTheme = createTheme({
         },
       },
       text: {
-        color: '#ffffff',
+        color: '#0b1727',
         '&:hover': {
           backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          boxShadow: '0px 1px 5px 0px rgba(0,0,0,0.1)',
         },
       },
       sizeLarge: {
@@ -388,8 +401,8 @@ const lightTheme = createTheme({
       root: {
         '& .MuiOutlinedInput-root': {
           borderRadius: 8,
-          backgroundColor: '#1D333B',
-          color: '#F7F4F3',
+          backgroundColor: '#F7F4F3',
+          color: '#1D333B',
           '& fieldset': {
             borderColor: '#355155',
           },
@@ -401,7 +414,7 @@ const lightTheme = createTheme({
           },
         },
         '& .MuiInputLabel-root': {
-          color: '#D3E4DC',
+          color: '#1D333B',
         },
       },
     },
@@ -427,9 +440,6 @@ const lightTheme = createTheme({
     },
     MuiAppBar: {
       elevation: 4,
-    },
-    MuiButton: {
-      disableElevation: true,
     },
     MuiCard: {
       elevation: 2,

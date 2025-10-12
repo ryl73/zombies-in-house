@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { Comment as CommentIcon } from '@material-ui/icons'
 import { Topic } from '../../types/types'
+
 const useStyles = makeStyles(theme => ({
   card: {
     marginBottom: theme.spacing(2),
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.light,
     marginRight: theme.spacing(1),
   },
+  title: {
+    color: theme.palette.text.secondary,
+  },
   contentPreview: {
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -35,6 +39,7 @@ const useStyles = makeStyles(theme => ({
   commentIcon: {
     marginRight: theme.spacing(0.5),
     marginLeft: theme.spacing(1),
+    color: theme.palette.text.secondary,
   },
 }))
 
@@ -65,7 +70,9 @@ export const TopicItem: React.FC<TopicItemProps> = ({
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" mb={1}>
-            <Typography variant="h6">{topic.title}</Typography>
+            <Typography variant="h6" className={classes.title}>
+              {topic.title}
+            </Typography>
           </Box>
           {isContent !== false && (
             <Typography

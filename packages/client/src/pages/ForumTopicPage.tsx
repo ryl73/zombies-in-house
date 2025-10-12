@@ -57,6 +57,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     marginBottom: theme.spacing(2),
   },
+  title: {
+    color: theme.palette.text.primary,
+  },
   avatar: {
     width: theme.spacing(3),
     height: theme.spacing(3),
@@ -210,7 +213,7 @@ export const ForumTopicPage = () => {
 
         <Paper className={classes.paper} elevation={3}>
           <Box className={classes.header}>
-            <Typography variant="h4" component="h1">
+            <Typography variant="h4" component="h1" className={classes.title}>
               {topic.title}
             </Typography>
           </Box>

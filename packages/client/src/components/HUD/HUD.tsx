@@ -38,6 +38,9 @@ const useStyles = makeStyles(theme => ({
     width: '70px',
     height: '70px',
   },
+  playerName: {
+    color: 'var(--text-white)',
+  },
   items: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -66,10 +69,8 @@ const useStyles = makeStyles(theme => ({
     },
   },
   spinButton: {
-    backgroundColor: 'var(--color-button-primary)',
     border: 'none',
     padding: '16px 12px',
-    color: 'var(--color-primary)',
     margin: 0,
     borderRadius: '20px',
     cursor: 'pointer',
@@ -107,7 +108,7 @@ export const Hud = () => {
             alt={player.name}
           />
         </CellCard>
-        {player.name}
+        <span className={classes.playerName}>{player.name}</span>
         {player.lifeCount > 0 && (
           <Box>
             {Array.from({ length: player.lifeCount }, (_, i) => (
@@ -143,6 +144,8 @@ export const Hud = () => {
         ))}
         {canFight === 'grenade' && (
           <Button
+            variant="contained"
+            color="primary"
             className={classes.spinButton}
             onClick={() => dispatch(manualSpinPinwheel())}>
             Spin pinwheel

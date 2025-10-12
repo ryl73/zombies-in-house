@@ -32,12 +32,13 @@ const useStyles = makeStyles(theme => ({
   },
   card: {
     height: '100%',
+    backgroundColor: theme.palette.background.paper,
   },
   cardContent: {
     padding: theme.spacing(3),
   },
   featureTitle: {
-    color: theme.palette.text.secondary,
+    color: theme.palette.text.primary,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

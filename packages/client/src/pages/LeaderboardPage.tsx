@@ -31,6 +31,9 @@ const useStyles = makeStyles(theme => ({
   container: {
     paddingTop: '2rem',
   },
+  description: {
+    color: theme.palette.text.primary,
+  },
   tableContainer: {
     marginTop: theme.spacing(4),
     borderRadius: theme.shape.borderRadius,
@@ -47,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   tableCell: {
-    color: theme.palette.text.primary,
+    color: theme.palette.text.secondary,
     borderBottom: `1px solid ${theme.palette.primary.dark}`,
   },
   firstPlace: {
@@ -208,7 +211,7 @@ export const LeaderboardPage = () => {
         <Typography
           variant="body1"
           align="center"
-          color="textSecondary"
+          className={classes.description}
           paragraph>
           Рейтинг игроков по результатам прохождения Зомби в доме
         </Typography>

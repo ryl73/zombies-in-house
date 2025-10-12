@@ -17,13 +17,13 @@ const useStyles = makeStyles(theme => ({
   avatarContainer: {
     display: 'flex',
     justifyContent: 'center',
-    cursor: 'pointer',
     margin: '20px',
   },
   avatar: {
     width: theme.spacing(20),
     height: theme.spacing(20),
     border: `2px solid ${theme.palette.primary.main}`,
+    cursor: 'pointer',
   },
   input: {
     display: 'none',

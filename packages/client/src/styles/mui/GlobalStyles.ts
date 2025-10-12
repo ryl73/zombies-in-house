@@ -12,7 +12,7 @@ export const useGlobalStyles = makeStyles(theme => ({
   themedHeader: {
     fontFamily: 'Rubik Wet Paint, cursive',
     textAlign: 'center',
-    color: 'var(--color-primary)',
+    color: theme.palette.text.primary,
     fontSize: 36,
     lineHeight: '64px',
     [theme.breakpoints.up('sm')]: {
