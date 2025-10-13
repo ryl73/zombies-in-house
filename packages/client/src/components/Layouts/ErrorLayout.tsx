@@ -5,6 +5,8 @@ import { Header } from '../Header/Header'
 import { makeStyles } from '@material-ui/core/styles'
 import { Helmet } from 'react-helmet'
 import notFoundImage from '../../assets/notfound.webp'
+import notFoundImageLight from '../../assets/notfound-light.webp'
+import { useThemeSwitcher } from '../../theme/ThemeContext'
 
 const useStyles = makeStyles(theme => ({
   errorSection: {
@@ -48,6 +50,7 @@ export const ErrorLayout = ({
 }: ErrorLayoutProps) => {
   const classes = useStyles()
   const navigate = useNavigate()
+  const { mode } = useThemeSwitcher()
 
   return (
     <div className="App">
@@ -60,7 +63,7 @@ export const ErrorLayout = ({
       <Box className={classes.errorSection}>
         <Header />
         <img
-          src={notFoundImage}
+          src={mode === 'dark' ? notFoundImage : notFoundImageLight}
           alt={title}
           className={classes.backgroundImg}
         />

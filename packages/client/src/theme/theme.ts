@@ -97,6 +97,18 @@ const darkTheme = createTheme({
         ':root': {
           '--text-white': '#fff',
         },
+        'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active':
+          {
+            WebkitBoxShadow: '0 0 0 30px transparent inset !important',
+            WebkitTextFillColor: '#f7f4f3 !important',
+            transition: 'background-color 5000s ease-in-out 0s',
+          },
+        '.MuiTextField-root input:-webkit-autofill, .MuiTextField-root input:-webkit-autofill:hover, .MuiTextField-root input:-webkit-autofill:focus, .MuiTextField-root input:-webkit-autofill:active':
+          {
+            WebkitBoxShadow: '0 0 0 30px transparent inset !important',
+            WebkitTextFillColor: ' #f7f4f3 !important',
+            borderRadius: '4px',
+          },
         body: {
           fontFamily: 'Rubik, sans-serif',
           fontSize: '18px',
@@ -298,7 +310,7 @@ const lightTheme = createTheme({
     h4: {
       fontFamily: 'Rubik, sans-serif',
       fontWeight: 600,
-      color: '#F7F4F3',
+      color: '#0B1727',
       fontSize: '1.5rem',
       marginBottom: '2rem',
       '@media (max-width: 768px)': {
@@ -321,6 +333,18 @@ const lightTheme = createTheme({
         ':root': {
           '--text-white': '#fff',
         },
+        'input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, input:-webkit-autofill:active':
+          {
+            WebkitBoxShadow: '0 0 0 30px transparent inset !important',
+            WebkitTextFillColor: '#0B1727 !important',
+            transition: 'background-color 5000s ease-in-out 0s',
+          },
+        '.MuiTextField-root input:-webkit-autofill, .MuiTextField-root input:-webkit-autofill:hover, .MuiTextField-root input:-webkit-autofill:focus, .MuiTextField-root input:-webkit-autofill:active':
+          {
+            WebkitBoxShadow: '0 0 0 30px transparent inset !important',
+            WebkitTextFillColor: ' #0B1727 !important',
+            borderRadius: '4px',
+          },
         body: {
           fontFamily: 'Rubik, sans-serif',
           fontSize: '18px',
