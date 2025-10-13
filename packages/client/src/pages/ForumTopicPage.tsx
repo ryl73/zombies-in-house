@@ -22,7 +22,6 @@ import { mockComments, mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {

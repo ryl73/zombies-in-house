@@ -21,7 +21,8 @@ export const ThemeToggleButton = () => {
       <IconButton onClick={toggleTheme} size="medium">
         <span className="material-symbols-outlined">
           <span className={classes.mode}>
-            {mode === 'dark' ? 'light_mode' : 'dark_mode'}
+            {/* {mode === 'dark' ? 'light_mode' : 'dark_mode'} */}
+            {mode === 'halloween' ? 'light_mode' : 'dark_mode'}
           </span>
         </span>
       </IconButton>

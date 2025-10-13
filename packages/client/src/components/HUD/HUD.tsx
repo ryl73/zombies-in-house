@@ -7,7 +7,8 @@ import {
 } from '../../slices/gameSlice'
 import { Box, Button, makeStyles } from '@material-ui/core'
 import { CellCard } from '../../styles/styledComponents/CellCard'
-import hud from '../../assets/hud.webp'
+import hud from '../../assets/hud.png'
+import hudHalloween from '../../assets/hud-halloween.png'
 
 const useStyles = makeStyles(theme => ({
   hudWrapper: (props: { isOpen: boolean }) => ({
@@ -22,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     gap: '8px',
     zIndex: 999,
-    background: `url(${hud}) center 50% no-repeat`,
+    background: `url(${hudHalloween}) center 50% no-repeat`,
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
     display: props.isOpen ? 'none' : 'flex',

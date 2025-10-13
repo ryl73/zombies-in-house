@@ -20,7 +20,6 @@ import { validation } from '../utils/validation'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {

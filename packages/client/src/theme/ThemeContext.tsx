@@ -1,14 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
-import { darkTheme, lightTheme } from './theme'
+import { darkTheme, lightTheme, halloweenTheme } from './theme'
 
-type ThemeMode = 'light' | 'dark'
+export type ThemeMode = 'light' | 'dark' | 'halloween'
 
 const ThemeContext = createContext<{
   mode: ThemeMode
   toggleTheme: () => void
 }>({
-  mode: 'dark',
+  // mode: 'dark',
+  mode: 'halloween',
   toggleTheme: () => {
     throw new Error('useThemeSwitcher must be used within ThemeProviderCustom')
   },
@@ -19,7 +20,7 @@ export const useThemeSwitcher = () => useContext(ThemeContext)
 export const ThemeProviderCustom: React.FC<{
   children: React.ReactNode
   initialMode?: ThemeMode
-}> = ({ children, initialMode = 'dark' }) => {
+}> = ({ children, initialMode = 'halloween' }) => {
   const [mode, setMode] = useState<ThemeMode>(initialMode)
 
   useEffect(() => {
@@ -34,12 +35,13 @@ export const ThemeProviderCustom: React.FC<{
   }, [mode])
 
   const toggleTheme = () => {
-    setMode(prev => (prev === 'dark' ? 'light' : 'dark'))
+    // setMode(prev => (prev === 'dark' ? 'light' : 'dark'))
+    setMode(prev => (prev === 'halloween' ? 'light' : 'halloween'))
   }
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
-      <ThemeProvider theme={mode === 'dark' ? darkTheme : lightTheme}>
+      <ThemeProvider theme={mode === 'halloween' ? halloweenTheme : lightTheme}>
         {children}
       </ThemeProvider>
     </ThemeContext.Provider>
