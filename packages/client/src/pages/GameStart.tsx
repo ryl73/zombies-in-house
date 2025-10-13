@@ -12,7 +12,7 @@ export const GameStart = () => {
   const globalClasses = useGlobalStyles()
 
   return (
-    <Box className={classes.wrapper}>
+    <Box>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Начало игры</title>

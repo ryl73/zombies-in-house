@@ -488,7 +488,7 @@ const halloweenTheme = createTheme({
       contrastText: '#ffffff',
     },
     background: {
-      default: 'none',
+      default: '#0B1727',
       paper: '#1D333B',
     },
     text: {

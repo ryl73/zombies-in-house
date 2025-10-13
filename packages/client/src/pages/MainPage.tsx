@@ -22,6 +22,7 @@ import landing from '../assets/landing-first-screen.webp'
 import landingHalloween from '../assets/landing-first-screen-halloween.png'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 import { ThemeToggleButton } from '../components/ThemeToggle/ThemeToggleButton'
+import { ThemeMode, useThemeSwitcher } from '../theme/ThemeContext'
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -76,9 +77,12 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     maxWidth: '435px !important',
   },
-  featuresSection: {
-    backgroundColor: theme.palette.background.default,
-  },
+  featuresSection: (props: { mode: ThemeMode }) => ({
+    backgroundColor:
+      props.mode === 'halloween'
+        ? 'transparent'
+        : theme.palette.background.default,
+  }),
   iconWrapper: {
     display: 'inline-flex',
     padding: theme.spacing(1),
@@ -122,7 +126,8 @@ export const MainPage = () => {
   usePage({ initPage: initMainPage })
   const { isLoggedIn, clearUser } = useAuth()
   const navigate = useNavigate()
-  const classes = useStyles()
+  const { mode } = useThemeSwitcher()
+  const classes = useStyles({ mode })
   const globalClasses = useGlobalStyles()
 
   useEffect(() => {
