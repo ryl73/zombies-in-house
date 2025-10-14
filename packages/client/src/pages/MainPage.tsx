@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
 import landing from '../assets/landing-first-screen.webp'
-import landingHalloween from '../assets/landing-first-screen-halloween.png'
+import landingHalloween from '../assets/halloween/landing-first-screen-halloween.webp'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 import { ThemeToggleButton } from '../components/ThemeToggle/ThemeToggleButton'
 import { ThemeMode, useThemeSwitcher } from '../theme/ThemeContext'
@@ -62,6 +62,7 @@ const useStyles = makeStyles(theme => ({
     backgroundImage: `url(${landingHalloween})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundColor: theme.palette.background.default,
     display: 'flex',
     alignItems: 'flex-end',
     justifyContent: 'center',

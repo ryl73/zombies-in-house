@@ -9,7 +9,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { mockTopics } from '../utils/mockData'
 import { ThemeProviderCustom } from '../theme/ThemeContext'
 
-jest.mock('../assets/bg-halloween.png', () => 'bg-halloween.png')
+jest.mock('../assets/halloween/bg-halloween.webp', () => 'bg-halloween.webp')
 
 export const renderWithProviders = (
   ui: ReactNode,
