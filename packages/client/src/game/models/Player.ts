@@ -26,11 +26,16 @@ export function createPlayer({
   name,
   type,
 }: PlayerProps): Player {
+  const mode = localStorage.getItem('theme') || 'dark'
+
   const player = {
     cellId,
     lifeCount,
     name,
-    image: `/images/game/cards/characters/${type}.png`,
+    image:
+      mode === 'halloween'
+        ? `src/assets/halloween/characters/${type}.webp`
+        : `/images/game/cards/characters/${type}.png`,
     type,
     items: [],
     id: Math.random(),
