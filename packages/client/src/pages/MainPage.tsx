@@ -56,10 +56,12 @@ const useStyles = makeStyles(theme => ({
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  firstScreen: {
+  firstScreen: (props: { mode: ThemeMode }) => ({
     minHeight: 500,
-    // backgroundImage: `url(${landing})`,
-    backgroundImage: `url(${landingHalloween})`,
+    backgroundImage:
+      props.mode === 'halloween'
+        ? `url(${landingHalloween})`
+        : `url(${landing})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundColor: theme.palette.background.default,
@@ -70,7 +72,7 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('md')]: {
       minHeight: 660,
     },
-  },
+  }),
   contentContainer: {
     paddingBottom: '4rem',
     display: 'flex',

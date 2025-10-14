@@ -9,9 +9,10 @@ import { Box, Button, makeStyles } from '@material-ui/core'
 import { CellCard } from '../../styles/styledComponents/CellCard'
 import hud from '../../assets/hud.webp'
 import hudHalloween from '../../assets/halloween/hud-halloween.webp'
+import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
 
 const useStyles = makeStyles(theme => ({
-  hudWrapper: (props: { isOpen: boolean }) => ({
+  hudWrapper: (props: { isOpen: boolean; mode: ThemeMode }) => ({
     position: 'fixed',
     left: '50%',
     transform: 'translateX(-50%)',
@@ -23,7 +24,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     gap: '8px',
     zIndex: 999,
-    background: `url(${hudHalloween}) center 50% no-repeat`,
+    background: `url(${
+      props.mode === 'halloween' ? hudHalloween : hud
+    }) center 50% no-repeat`,
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
     display: props.isOpen ? 'none' : 'flex',
@@ -87,7 +90,8 @@ export const Hud = () => {
   const dispatch = useAppDispatch()
   const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
     useAppSelector(state => state.game)
-  const classes = useStyles({ isOpen: isPinwheelOpen })
+  const { mode } = useThemeSwitcher()
+  const classes = useStyles({ isOpen: isPinwheelOpen, mode })
 
   const player = players[currentPlayerIndex]
 

@@ -63,8 +63,7 @@ export const ErrorLayout = ({
       <Box className={classes.errorSection}>
         <Header />
         <img
-          // src={mode === 'dark' ? notFoundImage : notFoundImageLight}
-          src={mode === 'halloween' ? notFoundImage : notFoundImageLight}
+          src={mode === 'light' ? notFoundImageLight : notFoundImage}
           alt={title}
           className={classes.backgroundImg}
         />

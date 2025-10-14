@@ -476,9 +476,11 @@ const lightTheme = createTheme({
 const halloweenTheme = createTheme({
   palette: {
     primary: {
-      main: '#823329',
+      // main: '#823329',
+      main: '#C26A00',
       light: '#a55c52',
-      dark: '#5a1f1e',
+      // dark: '#5a1f1e',
+      dark: '#A85C00',
       contrastText: '#ffffff',
     },
     secondary: {
@@ -490,6 +492,7 @@ const halloweenTheme = createTheme({
     background: {
       default: '#0B1727',
       paper: '#1D333B',
+      // paper: '#036747',
     },
     text: {
       primary: '#F7F4F3',
@@ -585,10 +588,11 @@ const halloweenTheme = createTheme({
           fontFamily: 'Rubik, sans-serif',
           fontSize: '18px',
           lineHeight: '24px',
-          backgroundColor: '#0B1727',
-          backgroundImage: `url(${bgHalloween})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
+          backgroundColor: '#220D2C',
+          // backgroundColor: '#0B1727',
+          // backgroundImage: `url(${bgHalloween})`,
+          // backgroundRepeat: 'no-repeat',
+          // backgroundSize: 'cover',
           color: '#F7F4F3',
         },
       },
@@ -598,7 +602,8 @@ const halloweenTheme = createTheme({
         boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
       },
       colorPrimary: {
-        backgroundColor: '#0B1727',
+        // backgroundColor: '#0B1727',
+        backgroundColor: '#220D2C',
       },
     },
     MuiToolbar: {
@@ -617,7 +622,8 @@ const halloweenTheme = createTheme({
         margin: '4px',
         '&:hover': {
           transform: 'translateY(-1px)',
-          backgroundColor: '#355155',
+          // backgroundColor: '#355155',
+          backgroundColor: '#C26A00',
         },
       },
       contained: {
@@ -627,9 +633,11 @@ const halloweenTheme = createTheme({
         },
       },
       containedPrimary: {
-        background: 'linear-gradient(45deg, #823329 30%, #6a2921 90%)',
+        // background: 'linear-gradient(45deg, #823329 30%, #6a2921 90%)',
+        background: '#C26A00',
         '&:hover': {
-          background: 'linear-gradient(45deg, #6a2921 30%, #4a1c1c 90%)',
+          // background: 'linear-gradient(45deg, #6a2921 30%, #4a1c1c 90%)',
+          background: '#C26A00',
         },
       },
       text: {
