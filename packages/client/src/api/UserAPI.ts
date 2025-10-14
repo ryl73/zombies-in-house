@@ -1,4 +1,4 @@
-import apiClient from './APIClient'
+import { apiYandex } from './APIYandex'
 import { setUser, User } from '../slices/userSlice'
 import { SimpleResponse } from './LoginAPI'
 
@@ -39,7 +39,7 @@ const mapUserResponseToUser = (response: UserResponse): User => ({
 })
 
 export const getUser = async (): Promise<User> => {
-  const response = await apiClient.get<UserResponse>('/auth/user')
+  const response = await apiYandex.get<UserResponse>('/auth/user')
   const user: User = mapUserResponseToUser(response.data)
   setUser(user)
   return user
@@ -48,19 +48,19 @@ export const getUser = async (): Promise<User> => {
 export const changePassword = async (
   data: ChangePasswordRequest
 ): Promise<SimpleResponse> => {
-  const response = await apiClient.put<SimpleResponse>('/user/password', data)
+  const response = await apiYandex.put<SimpleResponse>('/user/password', data)
   return response.data
 }
 
 export const changeUser = async (data: ChangeUserRequest): Promise<User> => {
-  const response = await apiClient.put<UserResponse>('/user/profile', data)
+  const response = await apiYandex.put<UserResponse>('/user/profile', data)
   const user: User = mapUserResponseToUser(response.data)
   setUser(user)
   return user
 }
 
 export const changeAvatar = async (data: FormData): Promise<User> => {
-  const response = await apiClient.put<UserResponse>(
+  const response = await apiYandex.put<UserResponse>(
     '/user/profile/avatar',
     data
   )
