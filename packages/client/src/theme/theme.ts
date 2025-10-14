@@ -490,7 +490,8 @@ const halloweenTheme = createTheme({
       contrastText: '#ffffff',
     },
     background: {
-      default: '#0B1727',
+      // default: '#0B1727',
+      default: '#220D2C',
       paper: '#1D333B',
       // paper: '#036747',
     },
@@ -630,6 +631,11 @@ const halloweenTheme = createTheme({
         boxShadow: '0 2px 6px rgba(11, 23, 39, 0.3)',
         '&:hover': {
           boxShadow: '0 3px 8px rgba(11, 23, 39, 0.4)',
+        },
+        '&.Mui-disabled': {
+          color: '#ffffff88',
+          backgroundColor: '#C26A00',
+          boxShadow: 'none',
         },
       },
       containedPrimary: {

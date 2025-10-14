@@ -20,6 +20,7 @@ export const useThemeSwitcher = () => useContext(ThemeContext)
 export const ThemeProviderCustom: React.FC<{
   children: React.ReactNode
   initialMode?: ThemeMode
+  // change initialMode to 'dark' mode
 }> = ({ children, initialMode = 'halloween' }) => {
   const [mode, setMode] = useState<ThemeMode>(initialMode)
 
@@ -41,6 +42,7 @@ export const ThemeProviderCustom: React.FC<{
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme }}>
+      {/* change to 'dark' mode and 'darkTheme' */}
       <ThemeProvider theme={mode === 'halloween' ? halloweenTheme : lightTheme}>
         {children}
       </ThemeProvider>
