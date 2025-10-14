@@ -7,7 +7,6 @@ export type SimpleResponse = {
 
 export type CreateRoomRequest = {
   hostId: number
-  state: GameState
 }
 
 export type CreateRoomResponse = {
@@ -18,5 +17,13 @@ export const createRoom = async (
   data: CreateRoomRequest
 ): Promise<CreateRoomResponse> => {
   const response = await api.post<CreateRoomResponse>('/room', data)
+  return response.data
+}
+
+export const updateRoomById = async (
+  id: string,
+  data: GameState
+): Promise<CreateRoomResponse> => {
+  const response = await api.post<CreateRoomResponse>(`/room/${id}`, data)
   return response.data
 }

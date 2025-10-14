@@ -196,7 +196,7 @@ export function findAllPaths(
     { dx: 0, dy: -1 },
   ]
 
-  function dfs(current: Cell, steps: number, visited: Set<number>) {
+  function dfs(current: Cell, steps: number, visited: Set<string>) {
     const playersOnCell = game.players.filter(p => p.cellId === current.id)
     const zombieOnCell = game.zombies.find(z => z.cellId === current.id)
 

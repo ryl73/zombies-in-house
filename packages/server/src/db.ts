@@ -1,4 +1,9 @@
 import { Sequelize, type SequelizeOptions } from 'sequelize-typescript'
+import Room from './models/game/Room'
+import Cell from './models/game/Cell'
+import Item from './models/game/Item'
+import Player from './models/game/Player'
+import Zombie from './models/game/Zombie'
 
 const { POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_PORT } =
   process.env
@@ -10,6 +15,7 @@ const sequelizeOptions: SequelizeOptions = {
   password: POSTGRES_PASSWORD,
   database: POSTGRES_DB,
   dialect: 'postgres',
+  models: [Room, Cell, Item, Player, Zombie],
 }
 
 export const sequelize = new Sequelize(sequelizeOptions)

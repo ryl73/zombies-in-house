@@ -3,11 +3,12 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs/promises'
-import { dbConnect } from './db'
+import { dbConnect, sequelize } from './db'
 import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
-import './models'
 import { router } from './routes'
+import http from 'http'
+import { setupWebSocket } from './ws'
 
 dotenv.config()
 
@@ -15,81 +16,44 @@ const isDev = process.env.NODE_ENV === 'development'
 const port = Number(process.env.SERVER_PORT) || 3001
 
 async function startServer() {
-  dbConnect().then(async () => {
-    const app = express()
-    app.use(cookieParser())
-    app.use(cors())
-    app.use(express.json())
+  await dbConnect()
 
-    app.use('/api', router)
+  const app = express()
+  const server = http.createServer(app)
 
-    if (isDev) {
-      // await sequelize.sync({ force: true })
+  app.use(cookieParser())
+  app.use(cors())
+  app.use(express.json())
 
-      const vite = await import('vite')
-      const viteServer = await vite.createServer({
-        root: path.resolve(__dirname, '../../client'),
-        server: { middlewareMode: true },
-        appType: 'custom',
-      })
+  app.use('/api', router)
 
-      app.use(viteServer.middlewares)
+  setupWebSocket(server)
 
-      app.get('*', async (req, res, next) => {
-        try {
-          const url = req.originalUrl
-          const templatePath = path.resolve(
-            __dirname,
-            '../../client/index.html'
-          )
-          let template = await fs.readFile(templatePath, 'utf-8')
-          template = await viteServer.transformIndexHtml(url, template)
+  if (isDev) {
+    await sequelize.sync()
 
-          const { render } = await viteServer.ssrLoadModule(
-            '/src/entry-server.tsx'
-          )
-          const { html, styleTags, helmet, initialState } = await render(req)
+    const vite = await import('vite')
+    const viteServer = await vite.createServer({
+      root: path.resolve(__dirname, '../../client'),
+      server: { middlewareMode: true },
+      appType: 'custom',
+    })
 
-          const page = template
-            .replace('<!--ssr-styles-->', styleTags || '')
-            .replace(
-              '<!--ssr-helmet-->',
-              helmet
-                ? `${helmet.meta.toString()} ${helmet.title.toString()} ${helmet.link.toString()}`
-                : ''
-            )
-            .replace('<!--ssr-outlet-->', html)
-            .replace(
-              '<!--ssr-initial-state-->',
-              `<script>window.__INITIAL_STATE__=${serialize(initialState, {
-                isJSON: true,
-              })}</script>`
-            )
+    app.use(viteServer.middlewares)
 
-          res.status(200).set({ 'Content-Type': 'text/html' }).end(page)
-        } catch (e) {
-          viteServer.ssrFixStacktrace(e as Error)
-          next(e)
-        }
-      })
-    } else {
-      const clientDist = path.resolve(__dirname, '../../client/dist/client')
-      const ssrBundlePath = path.resolve(
-        __dirname,
-        '../../client/dist/server/entry-server.js'
-      )
-
-      app.use(express.static(clientDist))
-
-      const { render } = await import(ssrBundlePath)
-
-      app.get('*', async (req, res) => {
-        const templatePath = path.join(clientDist, 'index.html')
+    app.get('*', async (req, res, next) => {
+      try {
+        const url = req.originalUrl
+        const templatePath = path.resolve(__dirname, '../../client/index.html')
         let template = await fs.readFile(templatePath, 'utf-8')
+        template = await viteServer.transformIndexHtml(url, template)
 
+        const { render } = await viteServer.ssrLoadModule(
+          '/src/entry-server.tsx'
+        )
         const { html, styleTags, helmet, initialState } = await render(req)
 
-        template = template
+        const page = template
           .replace('<!--ssr-styles-->', styleTags || '')
           .replace(
             '<!--ssr-helmet-->',
@@ -105,14 +69,52 @@ async function startServer() {
             })}</script>`
           )
 
-        res.setHeader('Content-Type', 'text/html')
-        res.status(200).send(template)
-      })
-    }
-
-    app.listen(port, () => {
-      console.log(`➜ 🎸 Server is listening on http://localhost:${port}`)
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(page)
+      } catch (e) {
+        viteServer.ssrFixStacktrace(e as Error)
+        next(e)
+      }
     })
+  } else {
+    const clientDist = path.resolve(__dirname, '../../client/dist/client')
+    const ssrBundlePath = path.resolve(
+      __dirname,
+      '../../client/dist/server/entry-server.js'
+    )
+
+    app.use(express.static(clientDist))
+
+    const { render } = await import(ssrBundlePath)
+
+    app.get('*', async (req, res) => {
+      const templatePath = path.join(clientDist, 'index.html')
+      let template = await fs.readFile(templatePath, 'utf-8')
+
+      const { html, styleTags, helmet, initialState } = await render(req)
+
+      template = template
+        .replace('<!--ssr-styles-->', styleTags || '')
+        .replace(
+          '<!--ssr-helmet-->',
+          helmet
+            ? `${helmet.meta.toString()} ${helmet.title.toString()} ${helmet.link.toString()}`
+            : ''
+        )
+        .replace('<!--ssr-outlet-->', html)
+        .replace(
+          '<!--ssr-initial-state-->',
+          `<script>window.__INITIAL_STATE__=${serialize(initialState, {
+            isJSON: true,
+          })}</script>`
+        )
+
+      res.setHeader('Content-Type', 'text/html')
+      res.status(200).send(template)
+    })
+  }
+
+  server.listen(port, () => {
+    console.log(`➜ 🎸 Server is listening on http://localhost:${port}`)
   })
 }
 
