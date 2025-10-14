@@ -1,6 +1,5 @@
 import { createTheme } from '@material-ui/core/styles'
 import { red } from '@material-ui/core/colors'
-import bgHalloween from '../assets/halloween/bg-halloween.webp'
 
 const darkTheme = createTheme({
   palette: {
@@ -398,7 +397,8 @@ const lightTheme = createTheme({
       text: {
         color: '#0b1727',
         '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.15)',
+          color: '#F7F4F3',
+          backgroundColor: '#355155',
           boxShadow: '0px 1px 5px 0px rgba(0,0,0,0.1)',
         },
       },
@@ -476,10 +476,8 @@ const lightTheme = createTheme({
 const halloweenTheme = createTheme({
   palette: {
     primary: {
-      // main: '#823329',
       main: '#C26A00',
       light: '#a55c52',
-      // dark: '#5a1f1e',
       dark: '#A85C00',
       contrastText: '#ffffff',
     },
@@ -490,10 +488,8 @@ const halloweenTheme = createTheme({
       contrastText: '#ffffff',
     },
     background: {
-      // default: '#0B1727',
       default: '#220D2C',
       paper: '#1D333B',
-      // paper: '#036747',
     },
     text: {
       primary: '#F7F4F3',
@@ -590,10 +586,6 @@ const halloweenTheme = createTheme({
           fontSize: '18px',
           lineHeight: '24px',
           backgroundColor: '#220D2C',
-          // backgroundColor: '#0B1727',
-          // backgroundImage: `url(${bgHalloween})`,
-          // backgroundRepeat: 'no-repeat',
-          // backgroundSize: 'cover',
           color: '#F7F4F3',
         },
       },
@@ -603,7 +595,6 @@ const halloweenTheme = createTheme({
         boxShadow: '0 2px 12px rgba(0,0,0,0.15)',
       },
       colorPrimary: {
-        // backgroundColor: '#0B1727',
         backgroundColor: '#220D2C',
       },
     },
@@ -623,7 +614,6 @@ const halloweenTheme = createTheme({
         margin: '4px',
         '&:hover': {
           transform: 'translateY(-1px)',
-          // backgroundColor: '#355155',
           backgroundColor: '#C26A00',
         },
       },
@@ -639,10 +629,8 @@ const halloweenTheme = createTheme({
         },
       },
       containedPrimary: {
-        // background: 'linear-gradient(45deg, #823329 30%, #6a2921 90%)',
         background: '#C26A00',
         '&:hover': {
-          // background: 'linear-gradient(45deg, #6a2921 30%, #4a1c1c 90%)',
           background: '#C26A00',
         },
       },

@@ -65,13 +65,6 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     button: {
       margin: theme.spacing(0, 0.5),
-      transition: 'all .2s ease',
-      '&:hover': {
-        backgroundColor: '#355155 !important',
-        '& $link': {
-          color: '#CBAC51 !important',
-        },
-      },
       [theme.breakpoints.down('sm')]: {
         display: 'none',
       },
