@@ -1,15 +1,17 @@
+import { v4 as uuidv4 } from 'uuid'
+
 export type ZombieType = 'ordinary' | 'dog' | 'spider' | 'boss'
 
 type ZombieProps = {
-  cellId: number
+  cellId: string
   type: ZombieType
   name: string
 }
 
 export type Zombie = {
-  cellId: number | null
+  cellId: string | null
   type: ZombieType
-  id: number
+  id: string
   name: string
   image: string
   opened: boolean
@@ -21,7 +23,7 @@ export function createZombie({ cellId, type, name }: ZombieProps): Zombie {
     type,
     image: `/images/game/cards/zombies/${type}.png`,
     name,
-    id: Math.random(),
+    id: uuidv4(),
     opened: false,
   }
 }

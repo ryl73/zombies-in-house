@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { ChangeEvent, FC, useState } from 'react'
 import {
   Box,
   Button,
@@ -7,12 +7,14 @@ import {
   DialogContent,
   Divider,
   makeStyles,
+  Slider,
   TextField,
   Typography,
 } from '@material-ui/core'
 import { KeyboardArrowLeft } from '@material-ui/icons'
 import { Link } from 'react-router-dom'
-import { GameType } from '../../slices/gameSlice'
+import { GameType, setLocalNumberOfPlayers } from '../../slices/gameSlice'
+import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 
 type Props = {
   isDialog: boolean
@@ -29,6 +31,16 @@ const useStyles = makeStyles(() => ({
 
 export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
   const classes = useStyles()
+  const dispatch = useAppDispatch()
+
+  const { localNumberOfPlayers } = useAppSelector(state => state.game)
+
+  const handleSliderChange = (
+    e: ChangeEvent<unknown>,
+    newValue: number | number[]
+  ) => {
+    dispatch(setLocalNumberOfPlayers(newValue as number))
+  }
 
   const [roomIdInput, setRoomIdInput] = useState('')
 
@@ -88,6 +100,20 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
             <Typography variant="h6" align="center">
               Играть локально
             </Typography>
+            <Box marginTop="32px">
+              <Slider
+                value={localNumberOfPlayers}
+                defaultValue={2}
+                step={1}
+                min={2}
+                max={5}
+                valueLabelDisplay="auto"
+                onChange={handleSliderChange}
+              />
+              <Typography variant="h6">
+                Кол-во игроков: {localNumberOfPlayers}
+              </Typography>
+            </Box>
             <Box
               display="flex"
               flexDirection="column"

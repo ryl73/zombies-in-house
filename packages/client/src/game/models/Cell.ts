@@ -1,7 +1,8 @@
 export type CellType = 'car' | 'plankPlace' | 'start'
+import { v4 as uuidv4 } from 'uuid'
 
 export type Cell = {
-  id: number
+  id: string
   x: number
   y: number
   isTraversable: boolean
@@ -47,7 +48,7 @@ export function createCell(x: number, y: number): Cell {
       bottom: false,
       left: false,
     },
-    id: Math.random(),
+    id: uuidv4(),
     walls: {
       top: false,
       right: false,

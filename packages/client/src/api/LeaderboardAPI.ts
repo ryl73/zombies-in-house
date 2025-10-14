@@ -1,4 +1,4 @@
-import apiClient from './APIClient'
+import { apiYandex } from './APIYandex'
 
 export type SimpleResponse = {
   response?: string
@@ -39,7 +39,7 @@ const commonData: Omit<SendLeaderboardRequest, 'data'> = {
 export const sendLeaderboardResults = async (
   data: SendLeaderboardRequestData
 ): Promise<SimpleResponse> => {
-  const response = await apiClient.post<SimpleResponse>('/leaderboard', {
+  const response = await apiYandex.post<SimpleResponse>('/leaderboard', {
     ...commonData,
     data: data,
   })
@@ -49,7 +49,7 @@ export const sendLeaderboardResults = async (
 export const getTeamLeaderboard = async (
   data: GetLeaderboardRequest
 ): Promise<GetLeaderboardResponseData[]> => {
-  const response = await apiClient.post<GetLeaderboardResponse>(
+  const response = await apiYandex.post<GetLeaderboardResponse>(
     `/leaderboard/${commonData.teamName}`,
     {
       ...data,
@@ -62,7 +62,7 @@ export const getTeamLeaderboard = async (
 export const getAllLeaderboard = async (
   data: GetLeaderboardRequest
 ): Promise<GetLeaderboardResponseData[]> => {
-  const response = await apiClient.post<GetLeaderboardResponse>(
+  const response = await apiYandex.post<GetLeaderboardResponse>(
     `/leaderboard/all`,
     {
       ...data,

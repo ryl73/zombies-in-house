@@ -13,6 +13,9 @@ import { createItem, Item, ItemType } from '../game/models/Item'
 import { RootState, store } from '../store'
 import { Cell } from '../game/models/Cell'
 import { sendStats } from '../game/stats'
+import { updateRoomRequest } from '../game/online'
+import { User } from './userSlice'
+import { UserInfo } from '../api/ws'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
@@ -58,6 +61,7 @@ export type GameState = {
   board: Board
   players: Player[]
   items: Item[]
+  localNumberOfPlayers: number
   zombies: Zombie[]
   turn: number
   currentPlayerIndex: number
@@ -66,18 +70,20 @@ export type GameState = {
   isZombieMove: boolean
   isProcessing: boolean
   barricadeSelection: {
-    cellId: number
+    cellId: string
     availableDirections: string[]
-    itemId: number
+    itemId: string
   } | null
   isAwaitingBarricadeDirection: boolean
   canSkipTurn: boolean
   isWinDialogOpen: boolean
-  winningPlayerId: number | null
+  winningPlayerId: string | null
   pinwheelResult: PinWheelResult | null
   isPinwheelOpen: boolean
   statistics: GameStatistics
   type: GameType
+  roomId: string | null
+  users: Partial<User>[]
 }
 
 export type GameStatistics = {
@@ -98,6 +104,7 @@ const initialStatisticsState: GameStatistics = {
 const initialState: GameState = {
   board: createBoard(),
   players: [],
+  localNumberOfPlayers: 2,
   items: [],
   zombies: [],
   turn: 1,
@@ -115,21 +122,23 @@ const initialState: GameState = {
   isPinwheelOpen: false,
   statistics: initialStatisticsState,
   type: 'local',
+  roomId: null,
+  users: [],
 }
 
 const getCurrentPlayer = (game: GameState) =>
   game.players[game.currentPlayerIndex]
 
-const getCellById = (game: GameState, id: number) =>
+const getCellById = (game: GameState, id: string) =>
   game.board.cells.flat().find(cell => cell.id === id)
 
-const getItemById = (game: GameState, id: number) =>
+const getItemById = (game: GameState, id: string) =>
   game.items.find(item => item.id === id)
 
-const getZombieById = (game: GameState, id: number) =>
+const getZombieById = (game: GameState, id: string) =>
   game.zombies.find(zombie => zombie.id === id)
 
-const getZombieByCellId = (game: GameState, cellId: number) =>
+const getZombieByCellId = (game: GameState, cellId: string) =>
   game.zombies.find(zombie => zombie.cellId === cellId)
 
 const hasPlayerItem = (game: GameState, itemType: ItemType) =>
@@ -139,11 +148,15 @@ const hasPlayerItem = (game: GameState, itemType: ItemType) =>
 
 export const startGame = createAsyncThunk(
   'game/start',
-  async (_, { dispatch }) => {
+  async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.resetBoard())
     dispatch(gameSlice.actions.createCharacters())
     dispatch(gameSlice.actions.createItems())
     dispatch(gameSlice.actions.createZombies())
+    const { game } = getState() as { game: GameState }
+    if (game.type === 'online' && game.roomId) {
+      await updateRoomRequest(game.roomId)
+    }
     await dispatch(moveStage())
   }
 )
@@ -617,7 +630,7 @@ export const manualSpinPinwheel = createAsyncThunk(
 export const handleBarricadeDirectionSelection = createAsyncThunk(
   'game/barricadeDirectionSelection',
   async (
-    { cellId, itemId }: { cellId: number; itemId: number },
+    { cellId, itemId }: { cellId: string; itemId: string },
     { getState, dispatch }
   ) => {
     const { game } = getState() as { game: GameState }
@@ -715,7 +728,12 @@ export const gameSlice = createSlice({
       const max = Math.max(...keys)
       const nextRandom = randomGenerator(min, max)
 
-      for (let i = 0; i < 2; i++) {
+      const numberOfPlayers =
+        state.type === 'online'
+          ? state.users.length
+          : state.localNumberOfPlayers
+
+      for (let i = 0; i < numberOfPlayers; i++) {
         const result = nextRandom.next()
         if (result.done) break
 
@@ -723,6 +741,7 @@ export const gameSlice = createSlice({
         const player = createPlayer({
           ...CharacterMap[result.value],
           cellId: startCell.id,
+          userId: state.type === 'online' ? state.users[i].id : null,
         })
         startCell.isEmpty = false
         state.players.push(player)
@@ -775,7 +794,7 @@ export const gameSlice = createSlice({
       })
     },
 
-    setCanMoveCells(state, action: PayloadAction<number[]>) {
+    setCanMoveCells(state, action: PayloadAction<string[]>) {
       state.board.cells.flat().forEach(cell => {
         cell.isTraversable = action.payload.includes(cell.id)
       })
@@ -801,11 +820,11 @@ export const gameSlice = createSlice({
       })
     },
 
-    movePlayer(state, action: PayloadAction<number>) {
+    movePlayer(state, action: PayloadAction<string>) {
       getCurrentPlayer(state).cellId = action.payload
     },
 
-    moveZombie(state, action: PayloadAction<number>) {
+    moveZombie(state, action: PayloadAction<string>) {
       const currentPlayer = state.players[state.currentPlayerIndex]
 
       if (currentPlayer.cellId) {
@@ -829,21 +848,21 @@ export const gameSlice = createSlice({
       getCurrentPlayer(state).cellId = null
     },
 
-    setZombieOpen(state, action: PayloadAction<number>) {
+    setZombieOpen(state, action: PayloadAction<string>) {
       const zombie = getZombieById(state, action.payload)
       if (zombie) {
         zombie.opened = true
       }
     },
 
-    setItemOpen(state, action: PayloadAction<number>) {
+    setItemOpen(state, action: PayloadAction<string>) {
       const item = getItemById(state, action.payload)
       if (item) {
         item.opened = true
       }
     },
 
-    pickItem(state, action: PayloadAction<number>) {
+    pickItem(state, action: PayloadAction<string>) {
       const currentPlayer = getCurrentPlayer(state)
 
       const item = getItemById(state, action.payload)
@@ -856,7 +875,7 @@ export const gameSlice = createSlice({
       }
     },
 
-    useItem(state, action: PayloadAction<number>) {
+    useItem(state, action: PayloadAction<string>) {
       const currentPlayer = getCurrentPlayer(state)
       const item = getItemById(state, action.payload)
       if (item) {
@@ -867,7 +886,7 @@ export const gameSlice = createSlice({
 
     setItemCell(
       state,
-      action: PayloadAction<{ itemId: number; cellId: number }>
+      action: PayloadAction<{ itemId: string; cellId: string }>
     ) {
       const item = getItemById(state, action.payload.itemId)
       if (item) {
@@ -890,7 +909,7 @@ export const gameSlice = createSlice({
       }
     },
 
-    setPlayerCell(state, action: PayloadAction<number>) {
+    setPlayerCell(state, action: PayloadAction<string>) {
       getCurrentPlayer(state).cellId = action.payload
     },
 
@@ -904,9 +923,9 @@ export const gameSlice = createSlice({
     startBarricadeSelection(
       state,
       action: PayloadAction<{
-        cellId: number
+        cellId: string
         availableDirections: string[]
-        itemId: number
+        itemId: string
       }>
     ) {
       state.barricadeSelection = action.payload
@@ -937,9 +956,9 @@ export const gameSlice = createSlice({
     installBarricade(
       state,
       action: PayloadAction<{
-        cellId: number
+        cellId: string
         direction: string
-        itemId: number
+        itemId: string
       }>
     ) {
       const cell = state.board.cells
@@ -960,7 +979,7 @@ export const gameSlice = createSlice({
     setCanSkipTurn(state, action: PayloadAction<boolean>) {
       state.canSkipTurn = action.payload
     },
-    openWinDialog(state, action: PayloadAction<number>) {
+    openWinDialog(state, action: PayloadAction<string>) {
       state.isWinDialogOpen = true
       state.winningPlayerId = action.payload
     },
@@ -988,10 +1007,24 @@ export const gameSlice = createSlice({
     setGameType(state, action: PayloadAction<GameType>) {
       state.type = action.payload
     },
+
+    setUsers(state, action: PayloadAction<UserInfo[]>) {
+      state.users = action.payload
+    },
+
+    setRoomId(state, action: PayloadAction<string>) {
+      state.roomId = action.payload
+    },
+
+    setLocalNumberOfPlayers(state, action: PayloadAction<number>) {
+      state.localNumberOfPlayers = action.payload
+    },
   },
 })
 
 export default gameSlice.reducer
+
+export const { setLocalNumberOfPlayers } = gameSlice.actions
 
 export const currentPlayer = (state: RootState) =>
   state.game.players[state.game.currentPlayerIndex]
