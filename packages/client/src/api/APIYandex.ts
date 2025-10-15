@@ -4,12 +4,12 @@ import { logout } from './LoginAPI'
 
 const USER_IN_SYSTEM = 'User already in system'
 
-export const apiClient = axios.create({
+export const apiYandex = axios.create({
   baseURL: 'https://ya-praktikum.tech/api/v2', // базовый URL
   withCredentials: true,
 })
 
-apiClient.interceptors.response.use(
+apiYandex.interceptors.response.use(
   response => response,
   error => {
     if (typeof window !== 'undefined') {
@@ -32,4 +32,4 @@ apiClient.interceptors.response.use(
   }
 )
 
-export default apiClient
+export default apiYandex

@@ -3,9 +3,12 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs/promises'
-import { createClientAndConnect } from './db'
+import { dbConnect, sequelize } from './db'
 import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
+import { router } from './routes'
+import http from 'http'
+import { setupWebSocket } from './ws'
 
 dotenv.config()
 
@@ -13,13 +16,22 @@ const isDev = process.env.NODE_ENV === 'development'
 const port = Number(process.env.SERVER_PORT) || 3001
 
 async function startServer() {
+  await dbConnect()
+
   const app = express()
+  const server = http.createServer(app)
+
   app.use(cookieParser())
   app.use(cors())
+  app.use(express.json())
 
-  createClientAndConnect()
+  app.use('/api', router)
+
+  setupWebSocket(server)
 
   if (isDev) {
+    await sequelize.sync()
+
     const vite = await import('vite')
     const viteServer = await vite.createServer({
       root: path.resolve(__dirname, '../../client'),
@@ -101,7 +113,7 @@ async function startServer() {
     })
   }
 
-  app.listen(port, () => {
+  server.listen(port, () => {
     console.log(`➜ 🎸 Server is listening on http://localhost:${port}`)
   })
 }
