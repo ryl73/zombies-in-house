@@ -17,8 +17,10 @@ import { makeStyles } from '@material-ui/core/styles'
 import { ArrowBack } from '@material-ui/icons'
 import { CommentList } from '../components/Forum/CommentList'
 import { CommentForm } from '../components/Forum/CommentForm'
-import { Comment, Topic } from '../types/types'
+import { Comment, Topic } from '../types/forum'
 import { mockComments, mockTopics } from '../utils/mockData'
+import { useAppSelector } from '../hooks/useApp'
+import { selectUser } from '../slices/userSlice'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -87,6 +89,7 @@ export const ForumTopicPage = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const currentUser = useAppSelector(selectUser)
 
   useEffect(() => {
     const loadData = async () => {
@@ -119,16 +122,17 @@ export const ForumTopicPage = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 500))
 
-      const newComment: Comment = {
-        id: Date.now(),
-        author: 'new_user_999',
-        content,
-        createdAt: new Date(),
-      }
-
-      setComments(prev => [...prev, newComment])
-
       if (topic) {
+        const newComment: Comment = {
+          id: Date.now(),
+          topicId: topic.id,
+          author: 'new_user_999',
+          content,
+          createdAt: new Date(),
+        }
+
+        setComments(prev => [...prev, newComment])
+
         setTopic({
           ...topic,
           commentsCount: topic.commentsCount + 1,
@@ -237,7 +241,12 @@ export const ForumTopicPage = () => {
           </Box>
         </Paper>
 
-        <CommentList comments={comments} />
+        <CommentList
+          comments={comments}
+          currentUser={
+            currentUser?.displayName || currentUser?.login || 'unknown'
+          }
+        />
 
         <CommentForm onSubmit={handleAddComment} isSubmitting={isSubmitting} />
         {submitError && (

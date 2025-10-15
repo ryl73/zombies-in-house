@@ -4,7 +4,8 @@ import { Card, CardContent, Typography, Box, Avatar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import { Comment as CommentIcon } from '@material-ui/icons'
-import { Topic } from '../../types/types'
+import { Topic } from '../../types/forum'
+
 const useStyles = makeStyles(theme => ({
   card: {
     marginBottom: theme.spacing(2),

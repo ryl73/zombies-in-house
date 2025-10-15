@@ -15,7 +15,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles'
 import { Search } from '@material-ui/icons'
 import { TopicItem } from '../components/Forum/TopicItem'
-import { Topic } from '../types/types'
+import { Topic } from '../types/forum'
 import { mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
