@@ -67,4 +67,52 @@ export default class ReplyController {
       next(ApiError.badRequest('Failed to get reply', e))
     }
   }
+
+  static async deleteById(
+    req: Request<{ id: string }, unknown, unknown>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params
+
+      const reply = await Reply.findByPk(id)
+
+      if (!reply) {
+        return next(ApiError.badRequest('Reply not found'))
+      }
+
+      await reply.destroy()
+
+      res.status(201).json({ message: 'Reply deleted' })
+    } catch (e) {
+      next(ApiError.badRequest('Failed to delete reply', e))
+    }
+  }
+
+  static async updateById(
+    req: Request<
+      { id: string },
+      unknown,
+      Omit<ReplyCreateRequest, 'commentId'>
+    >,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params
+
+      const reply = await Reply.findByPk(id)
+
+      if (!reply) {
+        return next(ApiError.badRequest('Reply not found'))
+      }
+
+      await reply.update(req.body)
+
+      res.status(200).json(reply)
+    } catch (e) {
+      next(ApiError.badRequest('Failed to get reply', e))
+    }
+  }
 }

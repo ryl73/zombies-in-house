@@ -66,4 +66,26 @@ export default class ReactionController {
       next(ApiError.badRequest('Failed to get reaction', e))
     }
   }
+
+  static async deleteById(
+    req: Request<{ id: string }, unknown, unknown>,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const { id } = req.params
+
+      const reaction = await Reaction.findByPk(id)
+
+      if (!reaction) {
+        return next(ApiError.badRequest('Reaction not found'))
+      }
+
+      await reaction.destroy()
+
+      res.status(200).json({ message: 'Reaction deleted' })
+    } catch (e) {
+      next(ApiError.badRequest('Failed to delete reaction', e))
+    }
+  }
 }

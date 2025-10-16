@@ -7,5 +7,7 @@ export const router = Router()
 
 router.post('/', CommentController.create)
 router.get('/:id', CommentController.getById)
+router.delete('/:id', CommentController.deleteById)
+router.put('/:id', CommentController.updateById)
 router.get('/:commentId/replies', ReplyController.getByCommentId)
 router.get('/:commentId/reactions', ReactionController.getByCommentId)

@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   ForeignKey,
   BelongsTo,
+  HasMany,
 } from 'sequelize-typescript'
 import Comment from './Comment'
 
@@ -27,6 +28,14 @@ export default class Reply extends Model {
   })
   commentId!: string
 
+  @ForeignKey(() => Reply)
+  @Column({
+    type: DataType.UUID,
+    field: 'parent_reply_id',
+    allowNull: true,
+  })
+  parentReplyId!: string | null
+
   @Column({
     type: DataType.STRING,
     field: 'author_login',
@@ -45,4 +54,10 @@ export default class Reply extends Model {
 
   @BelongsTo(() => Comment)
   comment!: Comment
+
+  @BelongsTo(() => Reply, { foreignKey: 'parentReplyId', as: 'parentReply' })
+  parentReply!: Reply
+
+  @HasMany(() => Reply, { foreignKey: 'parentReplyId', as: 'childReplies' })
+  childReplies!: Reply[]
 }

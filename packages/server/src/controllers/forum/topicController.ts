@@ -6,6 +6,7 @@ import Reaction from '../../models/forum/Reaction'
 import ApiError from '../../error/ApiError'
 import UserController from '../user/userController'
 import type { RequestWithCookie } from '../../middleware/AuthMiddleware'
+import { paginateAndSearch } from '../../helpers/paginationAndSearch'
 
 export type TopicCreateRequest = {
   title: string
@@ -36,14 +37,16 @@ export default class TopicController {
   }
 
   static async getAll(
-    _: Request,
+    req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const topics = await Topic.findAll()
+      const paginatedTopics = await paginateAndSearch(Topic, req.query, {
+        order: [['createdAt', 'DESC']],
+      })
 
-      res.status(200).json(topics)
+      res.status(200).json(paginatedTopics)
     } catch (e) {
       next(ApiError.badRequest('Failed to get all topics', e))
     }
@@ -61,7 +64,19 @@ export default class TopicController {
         include: [
           {
             model: Comment,
-            include: [{ model: Reply }, { model: Reaction }],
+            include: [
+              {
+                model: Reply,
+                include: [
+                  {
+                    model: Reply,
+                    as: 'childReplies',
+                    include: [{ model: Reply, as: 'childReplies' }],
+                  },
+                ],
+              },
+              { model: Reaction },
+            ],
           },
         ],
       })
@@ -73,6 +88,50 @@ export default class TopicController {
       res.status(200).json(topic)
     } catch (e) {
       next(ApiError.badRequest('Failed to get topic', e))
+    }
+  }
+
+  static async deleteById(
+    req: Request<{ id: string }, unknown, unknown>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params
+
+      const topic = await Topic.findByPk(id)
+
+      if (!topic) {
+        return next(ApiError.notFound('Topic not found'))
+      }
+
+      await topic.destroy()
+
+      res.status(200).json({ message: 'Topic deleted' })
+    } catch (e) {
+      next(ApiError.badRequest('Failed to delete topic', e))
+    }
+  }
+
+  static async updateById(
+    req: Request<{ id: string }, unknown, TopicCreateRequest>,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { id } = req.params
+
+      const topic = await Topic.findByPk(id)
+
+      if (!topic) {
+        return next(ApiError.notFound('Topic not found'))
+      }
+
+      await topic.update(req.body)
+
+      res.status(200).json(topic)
+    } catch (e) {
+      next(ApiError.badRequest('Failed to update topic', e))
     }
   }
 }
