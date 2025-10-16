@@ -1,22 +1,15 @@
 import type { NextFunction, Request, Response } from 'express'
 import ApiError from '../error/ApiError'
 
-export type RequestWithCookie<
-  params = unknown,
-  res = unknown,
-  req = unknown
-> = Request<params, res, req> & {
-  userCookie?: string
-}
-
 export const authMiddleware = (
-  req: RequestWithCookie,
+  req: Request,
   _: Response,
   next: NextFunction
 ) => {
-  if (!req.headers.cookie) {
+  const { authCookie, uuid } = req.cookies
+
+  if (!authCookie || !uuid) {
     return next(ApiError.forbidden('User is not authenticated'))
   }
-  req.userCookie = req.headers.cookie
   next()
 }

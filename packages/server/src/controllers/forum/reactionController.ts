@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from 'express'
 import Reaction from '../../models/forum/Reaction'
 import ApiError from '../../error/ApiError'
 import UserController from '../user/userController'
-import type { RequestWithCookie } from '../../middleware/AuthMiddleware'
 
 export type ReactionCreateRequest = {
   commentId: string
@@ -11,7 +10,7 @@ export type ReactionCreateRequest = {
 
 export default class ReactionController {
   static async create(
-    req: RequestWithCookie<unknown, unknown, ReactionCreateRequest>,
+    req: Request<unknown, unknown, ReactionCreateRequest>,
     res: Response,
     next: NextFunction
   ) {

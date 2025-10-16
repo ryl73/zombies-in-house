@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from 'express'
 import Comment from '../../models/forum/Comment'
 import ApiError from '../../error/ApiError'
 import UserController from '../user/userController'
-import type { RequestWithCookie } from '../../middleware/AuthMiddleware'
 import Reply from '../../models/forum/Reply'
 import Reaction from '../../models/forum/Reaction'
 import { paginateAndSearch } from '../../helpers/paginationAndSearch'
@@ -14,7 +13,7 @@ export type CommentCreateRequest = {
 
 export default class CommentController {
   static async create(
-    req: RequestWithCookie<unknown, unknown, CommentCreateRequest>,
+    req: Request<unknown, unknown, CommentCreateRequest>,
     res: Response,
     next: NextFunction
   ) {

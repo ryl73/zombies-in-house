@@ -2,7 +2,6 @@ import type { NextFunction, Request, Response } from 'express'
 import Reply from '../../models/forum/Reply'
 import ApiError from '../../error/ApiError'
 import UserController from '../user/userController'
-import type { RequestWithCookie } from '../../middleware/AuthMiddleware'
 
 export type ReplyCreateRequest = {
   message: string
@@ -11,7 +10,7 @@ export type ReplyCreateRequest = {
 
 export default class ReplyController {
   static async create(
-    req: RequestWithCookie<unknown, unknown, ReplyCreateRequest>,
+    req: Request<unknown, unknown, ReplyCreateRequest>,
     res: Response,
     next: NextFunction
   ) {

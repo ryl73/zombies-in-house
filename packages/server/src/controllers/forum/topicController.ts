@@ -5,7 +5,6 @@ import Reply from '../../models/forum/Reply'
 import Reaction from '../../models/forum/Reaction'
 import ApiError from '../../error/ApiError'
 import UserController from '../user/userController'
-import type { RequestWithCookie } from '../../middleware/AuthMiddleware'
 import { paginateAndSearch } from '../../helpers/paginationAndSearch'
 
 export type TopicCreateRequest = {
@@ -15,7 +14,7 @@ export type TopicCreateRequest = {
 
 export default class TopicController {
   static async create(
-    req: RequestWithCookie<unknown, unknown, TopicCreateRequest>,
+    req: Request<unknown, unknown, TopicCreateRequest>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
