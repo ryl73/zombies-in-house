@@ -1,4 +1,4 @@
-import apiClient from './APIClient'
+import apiYandex from './APIYandex'
 
 export type OAuthServiceIdResponse = {
   service_id: string
@@ -7,7 +7,7 @@ export type OAuthServiceIdResponse = {
 export const getYandexServiceId = (
   redirectUri: string
 ): Promise<OAuthServiceIdResponse> => {
-  return apiClient
+  return apiYandex
     .get<OAuthServiceIdResponse>(
       `/oauth/yandex/service-id?redirect_uri=${encodeURIComponent(redirectUri)}`
     )
@@ -18,5 +18,5 @@ export const signInWithYandex = (
   code: string,
   redirectUri: string
 ): Promise<void> => {
-  return apiClient.post('/oauth/yandex', { code, redirect_uri: redirectUri })
+  return apiYandex.post('/oauth/yandex', { code, redirect_uri: redirectUri })
 }

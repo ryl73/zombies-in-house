@@ -20,9 +20,7 @@ export const OAuthPage = () => {
 
     if (code) {
       signInWithYandex(code, redirectUri)
-        .then(() => {
-          return getUser()
-        })
+        .then(getUser)
         .then(user => {
           dispatch(setUser(user))
           navigate('/')
