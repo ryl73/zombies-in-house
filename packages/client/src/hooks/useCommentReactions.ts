@@ -1,86 +1,89 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { forumAPI } from '../api/forumAPI'
-import { ReactionStats } from '../types/forum'
+import { useAppSelector } from './useApp'
+import { selectUser } from '../slices/userSlice'
+import { Reaction } from '../types/forum'
 
 interface UseCommentReactionsProps {
-  commentId: number
-  currentUser: string
-  initialReactions?: ReactionStats
+  commentId: string
 }
 
 export const useCommentReactions = ({
   commentId,
-  currentUser,
-  initialReactions = {},
 }: UseCommentReactionsProps) => {
-  const [reactions, setReactions] = useState<ReactionStats>(initialReactions)
+  const [reactions, setReactions] = useState<Reaction[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const currentUser = useAppSelector(selectUser)
+
+  const loadReactions = useCallback(async () => {
+    try {
+      setLoading(true)
+      const response = await forumAPI.getCommentReactions(commentId)
+      if (response.success && response.data) {
+        setReactions(response.data)
+      } else {
+        setError(response.message || 'Ошибка загрузки реакций')
+      }
+    } catch (err) {
+      setError('Ошибка загрузки реакций')
+    } finally {
+      setLoading(false)
+    }
+  }, [commentId])
 
   useEffect(() => {
-    const loadReactions = async () => {
-      try {
-        const response = await forumAPI.getCommentReactions(commentId)
-        if (response.success) {
-          setReactions(response.data)
-        }
-      } catch (err) {
-        console.error('Error loading reactions:', err)
-      }
-    }
-
     loadReactions()
-  }, [commentId])
+  }, [loadReactions])
 
   const handleReactionClick = useCallback(
     async (emoji: string) => {
+      if (!currentUser) {
+        setError('Необходимо авторизоваться')
+        return
+      }
+
+      setLoading(true)
       setError(null)
 
-      const previousReactions = { ...reactions }
-      const updatedReactions = { ...reactions }
-
-      if (updatedReactions[emoji]?.includes(currentUser)) {
-        updatedReactions[emoji] = updatedReactions[emoji].filter(
-          user => user !== currentUser
-        )
-        if (updatedReactions[emoji].length === 0) {
-          delete updatedReactions[emoji]
-        }
-      } else {
-        updatedReactions[emoji] = [
-          ...(updatedReactions[emoji] || []),
-          currentUser,
-        ]
-      }
-
-      setReactions(updatedReactions)
-
       try {
-        const response = await forumAPI.toggleReaction(
-          commentId,
-          emoji,
-          currentUser
+        const existingReaction = reactions.find(
+          reaction =>
+            reaction.code === emoji &&
+            reaction.authorLogin === currentUser.login
         )
 
-        if (!response.success) {
-          setReactions(previousReactions)
-          setError(response.message || 'Ошибка при обновлении реакции')
+        if (existingReaction) {
+          await forumAPI.deleteReaction(existingReaction.id)
+        } else {
+          await forumAPI.addReaction(commentId, emoji)
         }
+
+        await loadReactions()
       } catch (err) {
-        setReactions(previousReactions)
         setError('Ошибка при обновлении реакции')
+      } finally {
+        setLoading(false)
       }
     },
-    [commentId, currentUser, reactions]
+    [commentId, reactions, currentUser, loadReactions]
   )
 
-  const userReactions = Object.keys(reactions).filter(emoji =>
-    reactions[emoji].includes(currentUser)
-  )
+  const reactionStats = useMemo(() => {
+    const stats: { [emoji: string]: string[] } = {}
+    reactions.forEach(reaction => {
+      if (!stats[reaction.code]) {
+        stats[reaction.code] = []
+      }
+      stats[reaction.code].push(reaction.authorLogin)
+    })
+    return stats
+  }, [reactions])
 
   return {
-    reactions,
-    userReactions,
+    reactions: reactionStats,
     error,
+    loading,
     handleReactionClick,
   }
 }

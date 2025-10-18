@@ -1,10 +1,23 @@
-import React from 'react'
-import { Box, Typography, Divider, Avatar } from '@material-ui/core'
+import React, { useState } from 'react'
+import {
+  Box,
+  Typography,
+  Divider,
+  Avatar,
+  CircularProgress,
+  IconButton,
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { Comment } from '../../types/forum'
 import { ReactionDisplay } from './ReactionDisplay'
 import { EmojiPicker } from './EmojiPicker'
 import { useCommentReactions } from '../../hooks/useCommentReactions'
+import { useAppSelector } from '../../hooks/useApp'
+import { selectUser } from '../../slices/userSlice'
+import { forumAPI } from '../../api/forumAPI'
+import { CommentMenu } from './CommentMenu'
+import { EditCommentDialog } from './EditCommentDialog'
+import { MoreVert } from '@material-ui/icons'
 
 const useStyles = makeStyles(theme => ({
   comment: {
@@ -19,10 +32,18 @@ const useStyles = makeStyles(theme => ({
   commentHeader: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: theme.spacing(1),
+  },
+  authorInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
   },
   commentContent: {
     marginLeft: theme.spacing(6),
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-word',
   },
   topDivider: {
     marginBottom: theme.spacing(3),
@@ -47,12 +68,14 @@ const useStyles = makeStyles(theme => ({
 
 interface CommentListProps {
   comments: Comment[]
-  currentUser: string
+  onCommentUpdate?: (commentId: string, newMessage: string) => void
+  onCommentDelete?: (commentId: string) => void
 }
 
 export const CommentList: React.FC<CommentListProps> = ({
   comments,
-  currentUser,
+  onCommentUpdate,
+  onCommentDelete,
 }) => {
   const classes = useStyles()
 
@@ -77,8 +100,9 @@ export const CommentList: React.FC<CommentListProps> = ({
         <CommentItem
           key={comment.id}
           comment={comment}
-          currentUser={currentUser}
           showDivider={index < comments.length - 1}
+          onCommentUpdate={onCommentUpdate}
+          onCommentDelete={onCommentDelete}
         />
       ))}
     </Box>
@@ -87,61 +111,147 @@ export const CommentList: React.FC<CommentListProps> = ({
 
 interface CommentItemProps {
   comment: Comment
-  currentUser: string
   showDivider: boolean
+  onCommentUpdate?: (commentId: string, newMessage: string) => void
+  onCommentDelete?: (commentId: string) => void
 }
 
 const CommentItem: React.FC<CommentItemProps> = ({
   comment,
-  currentUser,
   showDivider,
+  onCommentUpdate,
+  onCommentDelete,
 }) => {
   const classes = useStyles()
+  const currentUser = useAppSelector(selectUser)
 
-  const { reactions, userReactions, error, handleReactionClick } =
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [editMessage, setEditMessage] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const { reactions, error, loading, handleReactionClick } =
     useCommentReactions({
       commentId: comment.id,
-      currentUser,
-      initialReactions: comment.reactions || {},
     })
+
+  const isCommentAuthor = currentUser?.login === comment.authorLogin
+
+  const handleEditComment = async () => {
+    setIsEditing(true)
+    try {
+      const response = await forumAPI.updateComment(comment.id, editMessage)
+
+      if (response.success && response.data) {
+        setEditDialogOpen(false)
+        setMenuAnchor(null)
+        if (onCommentUpdate) {
+          onCommentUpdate(comment.id, editMessage)
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при редактировании комментария:', error)
+    } finally {
+      setIsEditing(false)
+    }
+  }
+
+  const handleDeleteComment = async () => {
+    setIsDeleting(true)
+    try {
+      const response = await forumAPI.deleteComment(comment.id)
+
+      if (response.success) {
+        setMenuAnchor(null)
+        if (onCommentDelete) {
+          onCommentDelete(comment.id)
+        }
+      }
+    } catch (error) {
+      console.error('Ошибка при удалении комментария:', error)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
+  const handleOpenEditDialog = () => {
+    setEditMessage(comment.message)
+    setEditDialogOpen(true)
+    setMenuAnchor(null)
+  }
 
   return (
     <Box className={classes.comment}>
       <Box className={classes.commentHeader}>
-        <Avatar className={classes.avatar}>
-          {comment.author.charAt(0).toUpperCase()}
-        </Avatar>
-        <Box>
-          <Typography variant="subtitle2" color="textPrimary">
-            {comment.author}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            {comment.createdAt.toLocaleDateString()}
-          </Typography>
+        <Box className={classes.authorInfo}>
+          <Avatar
+            className={classes.avatar}
+            src={`https://ya-praktikum.tech/api/v2/resources${comment.authorAvatar}`}>
+            {comment.authorLogin?.charAt(0).toUpperCase()}
+          </Avatar>
+          <Box>
+            <Typography variant="subtitle2" color="textPrimary">
+              {comment.authorLogin}
+            </Typography>
+            <Typography variant="caption" color="textSecondary">
+              {new Date(comment.createdAt).toLocaleDateString()}
+            </Typography>
+          </Box>
         </Box>
+
+        {isCommentAuthor && (
+          <>
+            <IconButton
+              size="small"
+              onClick={e => setMenuAnchor(e.currentTarget)}
+              aria-label="Действия с комментарием">
+              <MoreVert color="secondary" />
+            </IconButton>
+
+            <CommentMenu
+              anchorEl={menuAnchor}
+              isDeleting={isDeleting}
+              onClose={() => setMenuAnchor(null)}
+              onEdit={handleOpenEditDialog}
+              onDelete={handleDeleteComment}
+            />
+          </>
+        )}
       </Box>
 
       <Typography
         variant="body1"
         color="textPrimary"
         className={classes.commentContent}>
-        {comment.content}
+        {comment.message}
       </Typography>
+
       <Box className={classes.reactionSection}>
         <Box display="flex" alignItems="center">
-          <EmojiPicker onEmojiSelect={handleReactionClick} />
+          {loading && <CircularProgress size={16} style={{ marginRight: 8 }} />}
+          <EmojiPicker onEmojiSelect={handleReactionClick} disabled={loading} />
         </Box>
         <Box display="flex" flexDirection="column">
           <ReactionDisplay
             reactions={reactions}
-            userReactions={userReactions}
             onReactionClick={handleReactionClick}
+            disabled={loading}
           />
           {error && (
             <Typography className={classes.errorText}>{error}</Typography>
           )}
         </Box>
       </Box>
+
+      <EditCommentDialog
+        open={editDialogOpen}
+        message={editMessage}
+        isEditing={isEditing}
+        onClose={() => setEditDialogOpen(false)}
+        onSave={handleEditComment}
+        onMessageChange={setEditMessage}
+      />
 
       {showDivider && <Divider className={classes.commentDivider} />}
     </Box>

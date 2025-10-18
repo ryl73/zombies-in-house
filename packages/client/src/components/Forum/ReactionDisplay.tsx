@@ -1,7 +1,6 @@
 import React from 'react'
 import { Chip, Box, Tooltip } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { ReactionStats } from '../../types/forum'
 
 const useStyles = makeStyles(theme => ({
   reactionChip: {
@@ -22,7 +21,7 @@ const useStyles = makeStyles(theme => ({
 }))
 
 interface ReactionDisplayProps {
-  reactions: ReactionStats
+  reactions: { [emoji: string]: string[] }
   onReactionClick: (emoji: string) => void
   userReactions?: string[]
   disabled?: boolean
@@ -31,7 +30,6 @@ interface ReactionDisplayProps {
 export const ReactionDisplay: React.FC<ReactionDisplayProps> = ({
   reactions,
   onReactionClick,
-  userReactions = [],
   disabled = false,
 }) => {
   const classes = useStyles()
@@ -44,9 +42,8 @@ export const ReactionDisplay: React.FC<ReactionDisplayProps> = ({
             icon={<span>{emoji}</span>}
             label={users.length}
             clickable
-            className={`${classes.reactionChip} ${
-              userReactions.includes(emoji) ? classes.selectedReaction : ''
-            } ${disabled ? classes.disabled : ''}`}
+            className={`${classes.reactionChip}
+             ${disabled ? classes.disabled : ''}`}
             onClick={() => !disabled && onReactionClick(emoji)}
             size="small"
           />

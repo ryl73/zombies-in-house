@@ -17,7 +17,7 @@ export default class CommentController extends ForumController {
     res: Response,
     next: NextFunction
   ) {
-    await this.add<Comment>(Comment, req, res, next)
+    await ForumController.add<Comment>(Comment, req, res, next)
   }
 
   static async getByTopicId(
@@ -83,7 +83,7 @@ export default class CommentController extends ForumController {
         },
       ],
     }
-    await this.findById(Comment, req, res, next, options)
+    await ForumController.findById(Comment, req, res, next, options)
   }
 
   static async deleteById(
@@ -91,7 +91,7 @@ export default class CommentController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.removeById(Comment, req, res, next)
+    await ForumController.removeById(Comment, req, res, next)
   }
 
   static async updateById(
@@ -99,6 +99,6 @@ export default class CommentController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.changeById(Comment, req, res, next)
+    await ForumController.changeById(Comment, req, res, next)
   }
 }

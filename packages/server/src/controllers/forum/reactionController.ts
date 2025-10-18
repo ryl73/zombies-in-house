@@ -13,7 +13,7 @@ export default class ReactionController extends ForumController {
     res: Response,
     next: NextFunction
   ) {
-    await this.add(Reaction, req, res, next)
+    await ForumController.add(Reaction, req, res, next)
   }
 
   static async getByCommentId(
@@ -21,7 +21,7 @@ export default class ReactionController extends ForumController {
     res: Response,
     next: NextFunction
   ) {
-    await this.getByField(Reaction, 'commentId', req, res, next)
+    await ForumController.getByField(Reaction, 'commentId', req, res, next)
   }
 
   static async getById(
@@ -29,7 +29,7 @@ export default class ReactionController extends ForumController {
     res: Response,
     next: NextFunction
   ) {
-    await this.findById(Reaction, req, res, next)
+    await ForumController.findById(Reaction, req, res, next)
   }
 
   static async deleteById(
@@ -37,6 +37,6 @@ export default class ReactionController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.removeById(Reaction, req, res, next)
+    await ForumController.removeById(Reaction, req, res, next)
   }
 }
