@@ -1,4 +1,4 @@
-import apiClient from './APIClient'
+import { apiYandex } from './APIYandex'
 import { clearUser } from '../slices/userSlice'
 
 export type SimpleResponse = {
@@ -24,17 +24,17 @@ export type SignUpResponse = {
 } & SimpleResponse
 
 export const signIn = async (data: SignInRequest): Promise<SimpleResponse> => {
-  const response = await apiClient.post<SimpleResponse>('/auth/signin', data)
+  const response = await apiYandex.post<SimpleResponse>('/auth/signin', data)
   return response.data
 }
 
 export const logout = async (): Promise<SimpleResponse> => {
-  const response = await apiClient.post<SimpleResponse>('/auth/logout')
+  const response = await apiYandex.post<SimpleResponse>('/auth/logout')
   clearUser()
   return response.data
 }
 
 export const signup = async (data: SignUpRequest): Promise<SignUpResponse> => {
-  const response = await apiClient.post<SignUpResponse>('/auth/signup', data)
+  const response = await apiYandex.post<SignUpResponse>('/auth/signup', data)
   return response.data
 }

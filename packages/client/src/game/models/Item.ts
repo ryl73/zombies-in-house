@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid'
+
 export type ItemType =
   | 'coldWeapon'
   | 'gunWeapon'
@@ -9,17 +11,17 @@ export type ItemType =
   | 'gasoline'
 
 export type ItemProps = {
-  cellId?: number | null
+  cellId?: string | null
   name: string
   type: ItemType
 }
 
 export type Item = {
-  cellId: number | null
+  cellId: string | null
   name: string
   image: string
   opened: boolean
-  id: number
+  id: string
   type: ItemType
 }
 
@@ -30,10 +32,6 @@ export function createItem({ name, type, cellId = null }: ItemProps): Item {
     image: `/images/game/cards/items/${name}.png`,
     type,
     opened: false,
-    id: Math.random(),
+    id: uuidv4(),
   }
-}
-
-export function getItemById(items: Item[], itemId: number): Item | undefined {
-  return items.find(item => item.id === itemId)
 }

@@ -18,6 +18,11 @@ import { ToolkitStore } from '@reduxjs/toolkit/dist/configureStore'
 import { Cell } from '../game/models/Cell'
 import * as gameSliceModule from '../slices/gameSlice'
 
+let counter = 0
+jest.mock('uuid', () => ({
+  v4: () => `test-uuid-${Date.now()}-${counter++}`,
+}))
+
 jest.spyOn(gameSliceModule, 'spinPinwheel').mockImplementation((): any => {
   return (dispatch: any) => {
     dispatch(

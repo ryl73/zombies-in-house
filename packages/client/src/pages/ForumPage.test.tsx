@@ -10,6 +10,11 @@ import { ReactNode } from 'react'
 import { configureStore } from '@reduxjs/toolkit'
 import { mockTopics } from '../utils/mockData'
 
+let counter = 0
+jest.mock('uuid', () => ({
+  v4: () => `test-uuid-${Date.now()}-${counter++}`,
+}))
+
 export const renderWithProviders = (
   ui: ReactNode,
   withRoutes = false,

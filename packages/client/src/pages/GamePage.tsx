@@ -3,7 +3,7 @@ import { BoardComponent } from '../components/Board/BoardComponent'
 import { useEffect, useState } from 'react'
 import { Hud } from '../components/HUD/HUD'
 import { useAppDispatch, useAppSelector } from '../hooks/useApp'
-import { gameSlice, startGame } from '../slices/gameSlice'
+import { gameSlice, GameType, startGame } from '../slices/gameSlice'
 import { BarricadeDirectionSelector } from '../components/Game/BarricadeDirectionSelector'
 import { WinDialog } from '../components/Game/WinDialog'
 import { StartDialog } from '../components/Game/StartDialog'
@@ -11,6 +11,8 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { Pinwheel } from '../components/Pinwheel/Pinwheel'
 import { Box, makeStyles } from '@material-ui/core'
+import { LobbyDialog } from '../components/Game/LobbyDialog'
+import { createRoomRequest } from '../game/online'
 
 const useStyles = makeStyles(theme => ({
   boardImage: {
@@ -36,16 +38,31 @@ export const GamePage = () => {
     state => state.game
   )
 
-  const [isDialog, setIsDialog] = useState(true)
+  const [isStartDialog, setIsStartDialog] = useState(true)
+  const [isLobbyDialog, setIsLobbyDialog] = useState(false)
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null)
 
   const currentPlayer = players[currentPlayerIndex]
 
-  const onStartGame = (gameType: GameType, roomId?: string) => {
-    setIsDialog(false)
+  const onPreStartGame = async (gameType: GameType, userRoomId?: string) => {
+    setIsStartDialog(false)
+    dispatch(gameSlice.actions.setGameType(gameType))
+    if (gameType === 'online') {
+      if (!userRoomId) {
+        const roomId = await createRoomRequest()
+        if (roomId) {
+          setIsLobbyDialog(true)
+        }
+        return
+      }
+    }
     const scrollHeight = document.documentElement.scrollHeight
     window.scrollTo({ top: scrollHeight, left: 0, behavior: 'smooth' })
-    dispatch(gameSlice.actions.setGameType(gameType))
+    dispatch(startGame())
+  }
+
+  const onStartGame = async () => {
+    setIsLobbyDialog(false)
     dispatch(startGame())
   }
 
@@ -84,7 +101,11 @@ export const GamePage = () => {
             <>
               <BarricadeDirectionSelector />
               <WinDialog />
-              <StartDialog isDialog={isDialog} startGame={onStartGame} />
+              <StartDialog
+                isDialog={isStartDialog}
+                startGame={onPreStartGame}
+              />
+              <LobbyDialog isDialog={isLobbyDialog} startGame={onStartGame} />
             </>,
             portalRoot
           )}
