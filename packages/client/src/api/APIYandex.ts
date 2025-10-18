@@ -13,10 +13,10 @@ apiYandex.interceptors.response.use(
   response => response,
   error => {
     if (typeof window !== 'undefined') {
-      if (
-        error.response?.status === 401 &&
-        window.location.pathname !== '/signin'
-      ) {
+      const currentPath = window.location.pathname
+      const isPublicPage = currentPath === '/signin' || currentPath === '/oauth'
+
+      if (error.response?.status === 401 && !isPublicPage) {
         // если не авторизован, то делаем редирект на страницу логина
         clearUser()
         window.location.replace('/signin')
