@@ -1,33 +1,19 @@
 import type { NextFunction, Request, Response } from 'express'
 import Reaction from '../../models/forum/Reaction'
-import ApiError from '../../error/ApiError'
-import UserController from '../user/userController'
+import ForumController from './forumController'
 
 export type ReactionCreateRequest = {
   commentId: string
   code: string
 }
 
-export default class ReactionController {
+export default class ReactionController extends ForumController {
   static async create(
     req: Request<unknown, unknown, ReactionCreateRequest>,
     res: Response,
     next: NextFunction
   ) {
-    try {
-      const user = await UserController.get(req)
-      const { commentId, code } = req.body
-
-      const reaction = await Reaction.create({
-        authorLogin: user.login,
-        commentId,
-        code,
-      })
-
-      res.status(201).json({ id: reaction.id })
-    } catch (e) {
-      next(ApiError.badRequest('Failed to create reaction', e))
-    }
+    await this.add(Reaction, req, res, next)
   }
 
   static async getByCommentId(
@@ -35,15 +21,7 @@ export default class ReactionController {
     res: Response,
     next: NextFunction
   ) {
-    try {
-      const { commentId } = req.params
-
-      const commentReactions = await Reaction.findAll({ where: { commentId } })
-
-      res.status(200).json(commentReactions)
-    } catch (e) {
-      next(ApiError.badRequest('Failed to get all reactions', e))
-    }
+    await this.getByField(Reaction, 'commentId', req, res, next)
   }
 
   static async getById(
@@ -51,40 +29,14 @@ export default class ReactionController {
     res: Response,
     next: NextFunction
   ) {
-    try {
-      const { id } = req.params
-
-      const reaction = await Reaction.findByPk(id)
-
-      if (!reaction) {
-        return next(ApiError.badRequest('Reaction not found'))
-      }
-
-      res.status(200).json(reaction)
-    } catch (e) {
-      next(ApiError.badRequest('Failed to get reaction', e))
-    }
+    await this.findById(Reaction, req, res, next)
   }
 
   static async deleteById(
     req: Request<{ id: string }, unknown, unknown>,
     res: Response,
     next: NextFunction
-  ) {
-    try {
-      const { id } = req.params
-
-      const reaction = await Reaction.findByPk(id)
-
-      if (!reaction) {
-        return next(ApiError.badRequest('Reaction not found'))
-      }
-
-      await reaction.destroy()
-
-      res.status(200).json({ message: 'Reaction deleted' })
-    } catch (e) {
-      next(ApiError.badRequest('Failed to delete reaction', e))
-    }
+  ): Promise<void> {
+    await this.removeById(Reaction, req, res, next)
   }
 }

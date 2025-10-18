@@ -4,35 +4,21 @@ import Comment from '../../models/forum/Comment'
 import Reply from '../../models/forum/Reply'
 import Reaction from '../../models/forum/Reaction'
 import ApiError from '../../error/ApiError'
-import UserController from '../user/userController'
 import { paginateAndSearch } from '../../helpers/paginationAndSearch'
+import ForumController from './forumController'
 
 export type TopicCreateRequest = {
   title: string
   description: string
 }
 
-export default class TopicController {
+export default class TopicController extends ForumController {
   static async create(
     req: Request<unknown, unknown, TopicCreateRequest>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    try {
-      const user = await UserController.get(req)
-      const { title, description } = req.body
-
-      const topic = await Topic.create({
-        authorLogin: user.login,
-        authorAvatar: user.avatar,
-        title,
-        description,
-      })
-
-      res.status(201).json({ id: topic.id })
-    } catch (e) {
-      next(ApiError.badRequest('Failed to create topic', e))
-    }
+    await this.add(Topic, req, res, next)
   }
 
   static async getAll(
@@ -56,38 +42,27 @@ export default class TopicController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    try {
-      const { id } = req.params
-
-      const topic = await Topic.findByPk(id, {
-        include: [
-          {
-            model: Comment,
-            include: [
-              {
-                model: Reply,
-                include: [
-                  {
-                    model: Reply,
-                    as: 'childReplies',
-                    include: [{ model: Reply, as: 'childReplies' }],
-                  },
-                ],
-              },
-              { model: Reaction },
-            ],
-          },
-        ],
-      })
-
-      if (!topic) {
-        return next(ApiError.notFound('Topic not found'))
-      }
-
-      res.status(200).json(topic)
-    } catch (e) {
-      next(ApiError.badRequest('Failed to get topic', e))
+    const options = {
+      include: [
+        {
+          model: Comment,
+          include: [
+            {
+              model: Reply,
+              include: [
+                {
+                  model: Reply,
+                  as: 'childReplies',
+                  include: [{ model: Reply, as: 'childReplies' }],
+                },
+              ],
+            },
+            { model: Reaction },
+          ],
+        },
+      ],
     }
+    await this.findById(Topic, req, res, next, options)
   }
 
   static async deleteById(
@@ -95,21 +70,7 @@ export default class TopicController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    try {
-      const { id } = req.params
-
-      const topic = await Topic.findByPk(id)
-
-      if (!topic) {
-        return next(ApiError.notFound('Topic not found'))
-      }
-
-      await topic.destroy()
-
-      res.status(200).json({ message: 'Topic deleted' })
-    } catch (e) {
-      next(ApiError.badRequest('Failed to delete topic', e))
-    }
+    await this.removeById(Topic, req, res, next)
   }
 
   static async updateById(
@@ -117,20 +78,6 @@ export default class TopicController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    try {
-      const { id } = req.params
-
-      const topic = await Topic.findByPk(id)
-
-      if (!topic) {
-        return next(ApiError.notFound('Topic not found'))
-      }
-
-      await topic.update(req.body)
-
-      res.status(200).json(topic)
-    } catch (e) {
-      next(ApiError.badRequest('Failed to update topic', e))
-    }
+    await this.changeById(Topic, req, res, next)
   }
 }

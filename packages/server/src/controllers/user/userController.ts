@@ -1,5 +1,5 @@
 import ApiError from '../../error/ApiError'
-import type { Request } from 'express'
+import type { NextFunction, Request } from 'express'
 
 const YANDEX_API_ENDPOINT = 'https://ya-praktikum.tech/api/v2'
 
@@ -15,16 +15,19 @@ export type UserInfo = {
 }
 
 export default class UserController {
-  static async get(req: Request<unknown, unknown, unknown>): Promise<UserInfo> {
+  static async get(
+    req: Request<unknown, unknown, unknown>,
+    next: NextFunction
+  ): Promise<UserInfo> {
     const { authCookie, uuid } = req.cookies
 
     if (!authCookie || !uuid) {
-      throw ApiError.forbidden('User is not authenticated')
+      next(ApiError.forbidden('User is not authenticated'))
     }
 
     const forwardedCookies = [
-      authCookie && `sessionId=${authCookie}`,
-      uuid && `authToken=${uuid}`,
+      authCookie && `authCookie=${authCookie}`,
+      uuid && `uuid=${uuid}`,
     ]
       .filter(Boolean)
       .join('; ')
@@ -39,6 +42,6 @@ export default class UserController {
       throw ApiError.create(response.status, response.statusText)
     }
 
-    return response.json()
+    return await response.json()
   }
 }

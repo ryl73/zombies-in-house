@@ -34,7 +34,7 @@ export default class Reply extends Model {
     field: 'parent_reply_id',
     allowNull: true,
   })
-  parentReplyId!: string | null
+  parentReplyId!: string
 
   @Column({
     type: DataType.STRING,
