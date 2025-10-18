@@ -33,7 +33,7 @@ export const OAuthPage = () => {
       showError('Не получен код авторизации')
       navigate('/signin')
     }
-  }, [])
+  }, [dispatch, navigate, searchParams, showError])
 
   return <div>Обработка авторизации...</div>
 }
