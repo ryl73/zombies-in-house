@@ -14,6 +14,7 @@ import { ForumCreatePage, initForumCreatePage } from './pages/ForumCreate'
 import { ForumTopicPage, initForumTopicPage } from './pages/ForumTopicPage'
 import { RouteErrorFallback } from './components/ErrorBoundary/RouteErrorFallback'
 import { GameEnd, initGameEnd } from './pages/GameEnd'
+import { OAuthPage, initOAuthPage } from './pages/OAuthPage'
 
 export type PageInitContext = {
   clientToken?: string
@@ -47,6 +48,11 @@ export const routes: Route[] = [
     path: '/signup',
     Component: SignupPage,
     fetchData: initSignupPage,
+  },
+  {
+    path: '/oauth',
+    Component: OAuthPage,
+    fetchData: initOAuthPage,
   },
   {
     path: '/profile',

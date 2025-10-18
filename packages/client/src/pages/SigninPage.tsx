@@ -20,6 +20,7 @@ import {
 import { useLoginStyles } from '../styles/mui/LoginStyles'
 import clsx from 'clsx'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
+import { getYandexServiceId } from '../api/OAuthAPI'
 
 const SigninSchema = Yup.object().shape({
   login: LoginSchema,
@@ -51,6 +52,20 @@ export const SigninPage = () => {
           : 'Ошибка при входе'
         showError(errorMessage)
       })
+  }
+
+  const handleYandexOAuth = async () => {
+    const redirectUri = `${window.location.origin}/oauth`
+
+    try {
+      const { service_id } = await getYandexServiceId(redirectUri)
+      const oauthUrl = `https://oauth.yandex.ru/authorize?response_type=code&client_id=${service_id}&redirect_uri=${encodeURIComponent(
+        redirectUri
+      )}`
+      window.location.href = oauthUrl
+    } catch (error) {
+      showError('Не удалось начать авторизацию через Яндекс.')
+    }
   }
 
   return (
@@ -117,6 +132,15 @@ export const SigninPage = () => {
           fullWidth
           style={{ maxWidth: 800 }}>
           Регистрация
+        </Button>
+        <Button
+          onClick={handleYandexOAuth}
+          variant="outlined"
+          color="primary"
+          size="large"
+          fullWidth
+          style={{ maxWidth: 800, marginTop: 16 }}>
+          Войти через Яндекс
         </Button>
       </Container>
     </>
