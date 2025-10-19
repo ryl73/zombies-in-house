@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
-    "build": "tsc --p ./tsconfig.prod.json",
+    "build": "tsc --p ./tsconfig.prod.json --outDir dist/server",
     "preview": "node ./dist/index.js",
     "lint": "eslint .",
     "format": "prettier --write .",
