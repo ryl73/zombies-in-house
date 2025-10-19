@@ -4,7 +4,7 @@ import { ArrowBack } from '@material-ui/icons'
 import { Header } from '../Header/Header'
 import { makeStyles } from '@material-ui/core/styles'
 import { Helmet } from 'react-helmet'
-import notFoundImage from '../../assets/notfound.webp'
+import { themeManager } from '../../theme/ThemeManager'
 
 const useStyles = makeStyles(theme => ({
   errorSection: {
@@ -48,6 +48,7 @@ export const ErrorLayout = ({
 }: ErrorLayoutProps) => {
   const classes = useStyles()
   const navigate = useNavigate()
+  const assets = themeManager.getAssets()
 
   return (
     <div className="App">
@@ -60,7 +61,7 @@ export const ErrorLayout = ({
       <Box className={classes.errorSection}>
         <Header />
         <img
-          src={notFoundImage}
+          src={assets.notFound}
           alt={title}
           className={classes.backgroundImg}
         />

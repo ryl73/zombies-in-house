@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { motion, useAnimation } from 'motion/react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
-import { resolvePinwheel } from '../../slices/gameSlice'
+import { getCurrentPlayer, resolvePinwheel } from '../../slices/gameSlice'
 import { Box, Container, makeStyles } from '@material-ui/core'
-import spinwheel from '../../assets/spinwheel.webp'
 import spinArrow from '../../assets/spinner-arrow.webp'
+import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
+import { themeManager } from '../../theme/ThemeManager'
 
 const useStyles = makeStyles(theme => ({
   pinwheelWrapper: {
@@ -17,6 +18,12 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     zIndex: 1000,
+  },
+  action: {
+    backgroundColor: theme.palette.background.default,
+    borderRadius: '8px',
+    padding: '16px 12px',
+    color: theme.palette.text.primary,
   },
   pinwheelContainer: {
     position: 'relative',
@@ -31,12 +38,18 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export const Pinwheel = () => {
+  const { mode } = useThemeSwitcher()
   const classes = useStyles()
   const [isSpinning, setIsSpinning] = useState(false)
   const controls = useAnimation()
   const dispatch = useAppDispatch()
+  const assets = themeManager.getAssets()
 
-  const { pinwheelResult, isPinwheelOpen } = useAppSelector(state => state.game)
+  const { pinwheelResult, isPinwheelOpen, stage } = useAppSelector(
+    state => state.game
+  )
+  const player = useAppSelector(state => getCurrentPlayer(state.game))
+  const name = player?.name ?? ''
 
   const handleAnimationComplete = () => {
     if (isSpinning) {
@@ -80,13 +93,17 @@ export const Pinwheel = () => {
       animate={{ opacity: isPinwheelOpen ? 1 : 0 }}
       transition={{ duration: 0.4 }}>
       <Container className={classes.pinwheelWrapper}>
+        <Box className={classes.action}>{`${name}: ${
+          stage === 'move' ? 'перемещение' : 'бой'
+        }`}</Box>
         <Box className={classes.pinwheelContainer}>
           <img
-            src={`${spinwheel}`}
+            src={assets.spinwheel}
             className={classes.pinwheelImg}
             alt="spinwheel"
           />
           <Arrow
+            $mode={mode}
             animate={controls}
             onAnimationComplete={handleAnimationComplete}>
             <img
@@ -112,11 +129,13 @@ const PinwheelOverlay = styled(motion.div)<{ $isOpen: boolean }>`
   display: ${({ $isOpen }) => ($isOpen ? 'block' : 'none')};
 `
 
-const Arrow = styled(motion.div)`
+const Arrow = styled(motion.div)<{ $mode: ThemeMode }>`
   position: absolute;
   width: 60px;
   height: 120px;
-  top: calc(50% - 120px);
-  left: calc(50% - 27px);
+  top: ${({ $mode }) =>
+    $mode === 'halloween' ? 'calc(50% - 125px)' : 'calc(50% - 115px)'};
+  left: ${({ $mode }) =>
+    $mode === 'halloween' ? 'calc(50% - 32px)' : 'calc(50% - 29px)'};
   transform-origin: bottom center;
 `

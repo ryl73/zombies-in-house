@@ -30,7 +30,6 @@ import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {
@@ -67,7 +66,7 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2),
   },
   title: {
-    margin: 0,
+    color: theme.palette.text.primary,
   },
   avatar: {
     width: theme.spacing(3),

@@ -21,12 +21,14 @@ import { forumAPI } from '../api/forumAPI'
 import { useNavigate } from 'react-router-dom'
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {
     paddingTop: '2rem',
     paddingBottom: '2rem',
+  },
+  title: {
+    color: theme.palette.text.primary,
   },
   divider: {
     marginBottom: theme.spacing(3),
@@ -180,7 +182,11 @@ export const ForumCreatePage = () => {
         </Button>
 
         <Paper className={classes.paper} elevation={3}>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+            className={classes.title}>
             Создание нового топика
           </Typography>
 
