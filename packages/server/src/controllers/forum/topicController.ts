@@ -18,7 +18,7 @@ export default class TopicController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.add(Topic, req, res, next)
+    await ForumController.add(Topic, req, res, next)
   }
 
   static async getAll(
@@ -62,7 +62,7 @@ export default class TopicController extends ForumController {
         },
       ],
     }
-    await this.findById(Topic, req, res, next, options)
+    await ForumController.findById(Topic, req, res, next, options)
   }
 
   static async deleteById(
@@ -70,7 +70,7 @@ export default class TopicController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.removeById(Topic, req, res, next)
+    await ForumController.removeById(Topic, req, res, next)
   }
 
   static async updateById(
@@ -78,6 +78,6 @@ export default class TopicController extends ForumController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    await this.changeById(Topic, req, res, next)
+    await ForumController.changeById(Topic, req, res, next)
   }
 }

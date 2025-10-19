@@ -12,13 +12,21 @@ import {
   Paper,
   Avatar,
   CircularProgress,
+  IconButton,
 } from '@material-ui/core'
+import { TopicMenu } from '../components/Forum/TopicMenu'
+import { EditTopicDialog } from '../components/Forum/EditTopicDialog'
+import { DeleteTopicDialog } from '../components/Forum/DeleteTopicDialog'
+import { MoreVert } from '@material-ui/icons'
 import { makeStyles } from '@material-ui/core/styles'
 import { ArrowBack } from '@material-ui/icons'
 import { CommentList } from '../components/Forum/CommentList'
 import { CommentForm } from '../components/Forum/CommentForm'
-import { Comment, Topic } from '../types/types'
-import { mockComments, mockTopics } from '../utils/mockData'
+import { Comment, Topic } from '../types/forum'
+import { useAppSelector } from '../hooks/useApp'
+import { selectUser } from '../slices/userSlice'
+import { forumAPI } from '../api/forumAPI'
+import { useNavigate } from 'react-router-dom'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,7 +61,8 @@ const useStyles = makeStyles(theme => ({
   },
   header: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
     marginBottom: theme.spacing(2),
   },
   title: {
@@ -83,58 +92,158 @@ export const ForumTopicPage = () => {
   usePage({ initPage: initForumTopicPage })
   const classes = useStyles()
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
 
   const [topic, setTopic] = useState<Topic>()
   const [comments, setComments] = useState<Comment[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const currentUser = useAppSelector(selectUser)
+  const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editDescription, setEditDescription] = useState('')
+  const [isEditing, setIsEditing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const isTopicAuthor = currentUser?.login === topic?.authorLogin
+
+  const handleOpenEditDialog = () => {
+    if (topic) {
+      setEditTitle(topic.title)
+      setEditDescription(topic.description)
+    }
+    setEditDialogOpen(true)
+    setMenuAnchor(null)
+  }
+
+  const handleOpenDeleteDialog = () => {
+    setDeleteDialogOpen(true)
+    setMenuAnchor(null)
+  }
+
+  const handleEditTopic = async () => {
+    if (!topic) return
+
+    setIsEditing(true)
+    try {
+      const response = await forumAPI.updateTopic(topic.id, {
+        title: editTitle,
+        description: editDescription,
+      })
+
+      if (response.success && response.data) {
+        setTopic(response.data)
+        setEditDialogOpen(false)
+      } else {
+        setSubmitError(response.message || 'Ошибка обновления топика')
+      }
+    } catch (error) {
+      console.error('Ошибка при редактировании топика:', error)
+      setSubmitError('Не удалось обновить топик')
+    } finally {
+      setIsEditing(false)
+    }
+  }
+
+  const handleDeleteTopic = async () => {
+    if (!topic) return
+
+    setIsDeleting(true)
+    try {
+      const response = await forumAPI.deleteTopic(topic.id)
+
+      if (response.success) {
+        navigate('/forum')
+      } else {
+        setSubmitError(response.message || 'Ошибка удаления топика')
+      }
+    } catch (error) {
+      console.error('Ошибка при удалении топика:', error)
+      setSubmitError('Не удалось удалить топик')
+    } finally {
+      setIsDeleting(false)
+      setDeleteDialogOpen(false)
+    }
+  }
+  const handleCommentUpdate = (commentId: string, newMessage: string) => {
+    setComments(prev =>
+      prev.map(comment =>
+        comment.id === commentId ? { ...comment, message: newMessage } : comment
+      )
+    )
+  }
+
+  const handleCommentDelete = (commentId: string) => {
+    setComments(prev => prev.filter(comment => comment.id !== commentId))
+    setTopic(prev =>
+      prev ? { ...prev, commentsCount: (prev.commentsCount || 1) - 1 } : prev
+    )
+  }
 
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
-      // Делаю имитацию загрузки данных
-      await new Promise(resolve => setTimeout(resolve, 500))
 
-      const topicId = Number(id)
-      if (!topicId) {
+      if (!id) {
         setIsLoading(false)
         return
       }
-      const foundTopic = mockTopics.find(t => t.id === topicId)
 
-      if (foundTopic) {
-        setTopic(foundTopic)
-        setComments(mockComments[topicId] || [])
+      try {
+        const [topicResponse, commentsResponse] = await Promise.all([
+          forumAPI.getTopic(id),
+          forumAPI.getComments(id),
+        ])
+
+        if (topicResponse.success && topicResponse.data) {
+          setTopic(topicResponse.data)
+        } else {
+          console.error('Топик не найден')
+        }
+
+        if (commentsResponse.success && commentsResponse.data) {
+          setComments(commentsResponse.data.data)
+        }
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error)
+      } finally {
+        setIsLoading(false)
       }
-
-      setIsLoading(false)
     }
-
     loadData()
-  }, [id])
+  }, [id, navigate])
 
   const handleAddComment = async (content: string) => {
     setIsSubmitting(true)
     setSubmitError('')
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      const newComment: Comment = {
-        id: Date.now(),
-        author: 'new_user_999',
-        content,
-        createdAt: new Date(),
-      }
-
-      setComments(prev => [...prev, newComment])
-
       if (topic) {
-        setTopic({
-          ...topic,
-          commentsCount: topic.commentsCount + 1,
+        const response = await forumAPI.createComment({
+          topicId: topic.id,
+          message: content,
         })
+
+        if (response.success && response.data) {
+          const commentsResponse = await forumAPI.getComments(topic.id)
+          if (commentsResponse.success && commentsResponse.data) {
+            setComments(commentsResponse.data.data)
+          }
+
+          setTopic(prev =>
+            prev
+              ? {
+                  ...prev,
+                  commentsCount: (prev.commentsCount || 0) + 1,
+                }
+              : prev
+          )
+        } else {
+          setSubmitError(response.message || 'Не удалось добавить комментарий')
+        }
       }
     } catch (error) {
       console.error('Ошибка при добавлении комментария:', error)
@@ -193,7 +302,9 @@ export const ForumTopicPage = () => {
         <meta
           name="description"
           content={
-            topic.content ? topic.content.slice(0, 150) : 'Описание отсутствует'
+            topic.description
+              ? topic.description.slice(0, 150)
+              : 'Описание отсутствует'
           }
         />
       </Helmet>
@@ -215,31 +326,54 @@ export const ForumTopicPage = () => {
             <Typography variant="h4" component="h1" className={classes.title}>
               {topic.title}
             </Typography>
+
+            {isTopicAuthor && (
+              <>
+                <IconButton
+                  onClick={e => setMenuAnchor(e.currentTarget)}
+                  aria-label="Действия с топиком">
+                  <MoreVert color="secondary" />
+                </IconButton>
+
+                <TopicMenu
+                  anchorEl={menuAnchor}
+                  onClose={() => setMenuAnchor(null)}
+                  onEdit={handleOpenEditDialog}
+                  onDelete={handleOpenDeleteDialog}
+                />
+              </>
+            )}
           </Box>
 
           <Typography
             variant="body1"
             paragraph
             className={classes.topicContent}>
-            {topic.content}
+            {topic.description}
           </Typography>
 
           <Box className={classes.metaInfo}>
             <Box display="flex" alignItems="center">
-              <Avatar className={classes.avatar}>
-                {topic.author.charAt(0).toUpperCase()}
+              <Avatar
+                className={classes.avatar}
+                src={`https://ya-praktikum.tech/api/v2/resources${topic.authorAvatar}`}>
+                {topic.authorLogin?.charAt(0).toUpperCase()}
               </Avatar>
               <Typography variant="caption" color="textSecondary">
-                {topic.author}
+                {topic.authorLogin}
               </Typography>
             </Box>
             <Typography variant="caption" color="textSecondary">
-              {topic.createdAt.toLocaleDateString()}
+              {new Date(topic.createdAt).toLocaleDateString()}
             </Typography>
           </Box>
         </Paper>
 
-        <CommentList comments={comments} />
+        <CommentList
+          comments={comments}
+          onCommentUpdate={handleCommentUpdate}
+          onCommentDelete={handleCommentDelete}
+        />
 
         <CommentForm onSubmit={handleAddComment} isSubmitting={isSubmitting} />
         {submitError && (
@@ -250,6 +384,25 @@ export const ForumTopicPage = () => {
             {submitError}
           </Typography>
         )}
+
+        <EditTopicDialog
+          open={editDialogOpen}
+          title={editTitle}
+          description={editDescription}
+          isEditing={isEditing}
+          onClose={() => setEditDialogOpen(false)}
+          onSave={handleEditTopic}
+          onTitleChange={setEditTitle}
+          onDescriptionChange={setEditDescription}
+        />
+
+        <DeleteTopicDialog
+          open={deleteDialogOpen}
+          topicTitle={topic?.title || ''}
+          isDeleting={isDeleting}
+          onClose={() => setDeleteDialogOpen(false)}
+          onConfirm={handleDeleteTopic}
+        />
       </Container>
     </Box>
   )

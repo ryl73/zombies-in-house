@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import { Link } from 'react-router-dom'
 import { usePage } from '../hooks/usePage'
@@ -9,19 +9,17 @@ import {
   Typography,
   Box,
   Button,
-  TextField,
-  InputAdornment,
+  CircularProgress,
 } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
-import { Search } from '@material-ui/icons'
 import { TopicItem } from '../components/Forum/TopicItem'
-import { Topic } from '../types/types'
-import { mockTopics } from '../utils/mockData'
+import { ForumPagination } from '../components/Forum/ForumPagination'
+import { Topic, PaginatedResponse } from '../types/forum'
+import { forumAPI } from '../api/forumAPI'
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
     minHeight: '100vh',
-    fontSize: '20px',
   },
   container: {
     paddingTop: '2rem',
@@ -35,13 +33,6 @@ const useStyles = makeStyles(theme => ({
     flexWrap: 'wrap',
     gap: theme.spacing(2),
   },
-  searchField: {
-    backgroundColor: theme.palette.background.paper,
-    borderRadius: theme.shape.borderRadius,
-    '& .MuiOutlinedInput-root': {
-      borderRadius: theme.shape.borderRadius,
-    },
-  },
   emptyState: {
     textAlign: 'center',
     padding: theme.spacing(8, 2),
@@ -50,20 +41,97 @@ const useStyles = makeStyles(theme => ({
     whiteSpace: 'nowrap',
     minWidth: '175px',
   },
+  topicsList: {
+    '& > *': {
+      marginBottom: theme.spacing(2),
+    },
+  },
 }))
 
 export const ForumPage = () => {
   usePage({ initPage: initForumPage })
   const classes = useStyles()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [topics] = useState<Topic[]>(mockTopics)
-  const filteredTopics = useMemo(() => {
-    return topics.filter(
-      topic =>
-        topic.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        topic.content.toLowerCase().includes(searchQuery.toLowerCase())
+  const [topicsData, setTopicsData] = useState<PaginatedResponse<
+    Topic[]
+  > | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageSize] = useState(10)
+  const [commentsCount, setCommentsCount] = useState<Record<string, number>>({})
+
+  const topics = topicsData?.data || []
+  const pagination = topicsData?.pagination
+
+  const loadTopics = async (page = 1, limit = pageSize) => {
+    try {
+      setIsLoading(true)
+      const response = await forumAPI.getTopics({ page, limit })
+      console.log('Topics API response:', response)
+
+      if (response.success && response.data) {
+        setTopicsData(response.data)
+        loadCommentsCount(response.data.data)
+      } else {
+        setTopicsData(null)
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки топиков:', error)
+      setTopicsData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const loadCommentsCount = async (topicsList: Topic[]) => {
+    const counts: Record<string, number> = {}
+
+    const promises = topicsList.map(async topic => {
+      try {
+        const response = await forumAPI.getComments(topic.id, {
+          page: 1,
+          limit: 1,
+        })
+        if (response.success && response.data) {
+          counts[topic.id] = response.data.pagination.total
+        }
+      } catch (error) {
+        console.error(
+          `Ошибка загрузки комментариев для топика ${topic.id}:`,
+          error
+        )
+        counts[topic.id] = 0
+      }
+    })
+
+    await Promise.all(promises)
+    setCommentsCount(prev => ({ ...prev, ...counts }))
+  }
+
+  useEffect(() => {
+    loadTopics(1, pageSize)
+  }, [pageSize])
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    loadTopics(page, pageSize)
+  }
+
+  if (isLoading) {
+    return (
+      <Box className={classes.wrapper}>
+        <Header />
+        <Container maxWidth="lg" className={classes.container}>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="200px">
+            <CircularProgress />
+          </Box>
+        </Container>
+      </Box>
     )
-  }, [searchQuery, topics])
+  }
 
   return (
     <Box className={classes.wrapper}>
@@ -82,59 +150,54 @@ export const ForumPage = () => {
           <Typography variant="h2" component="h1">
             Форум
           </Typography>
-          <Box display="flex" alignItems="center">
-            <TextField
-              placeholder="Поиск по форуму..."
-              variant="outlined"
-              size="small"
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              className={classes.searchField}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Search color="inherit" />
-                  </InputAdornment>
-                ),
-              }}
-            />
+          <Button
+            component={Link}
+            to="/forum/create"
+            variant="contained"
+            color="primary"
+            className={classes.createTopicBtn}>
+            Создать топик
+          </Button>
+        </Box>
+
+        {topics.length === 0 ? (
+          <Box className={classes.emptyState}>
+            <Typography variant="h5" color="textPrimary" gutterBottom>
+              Пока нет топиков
+            </Typography>
+            <Typography variant="body1" color="textSecondary" paragraph>
+              Будьте первым, кто создаст топик для обсуждения!
+            </Typography>
             <Button
               component={Link}
               to="/forum/create"
               variant="contained"
               color="primary"
-              className={classes.createTopicBtn}>
-              Создать топик
+              size="large">
+              Создать первый топик
             </Button>
-          </Box>
-        </Box>
-
-        {filteredTopics.length === 0 ? (
-          <Box className={classes.emptyState}>
-            <Typography variant="h5" color="textPrimary" gutterBottom>
-              {searchQuery ? 'Ничего не найдено' : 'Пока нет топиков'}
-            </Typography>
-            <Typography variant="body1" color="textSecondary" paragraph>
-              {searchQuery
-                ? 'Попробуйте изменить поисковый запрос'
-                : 'Будьте первым, кто создаст топик для обсуждения!'}
-            </Typography>
-            {!searchQuery && (
-              <Button
-                component={Link}
-                to="/forum/create"
-                variant="contained"
-                color="primary"
-                size="large">
-                Создать первый топик
-              </Button>
-            )}
           </Box>
         ) : (
           <Box>
-            {filteredTopics.map(topic => (
-              <TopicItem key={topic.id} topic={topic} isContent={false} />
-            ))}
+            <Box className={classes.topicsList}>
+              {topics.map(topic => (
+                <TopicItem
+                  key={topic.id}
+                  topic={topic}
+                  isContent={false}
+                  commentsCount={commentsCount[topic.id]}
+                />
+              ))}
+            </Box>
+
+            {pagination && pagination.pageCount > 1 && (
+              <ForumPagination
+                pagination={pagination}
+                currentPage={currentPage}
+                pageSize={pageSize}
+                onPageChange={handlePageChange}
+              />
+            )}
           </Box>
         )}
       </Container>
