@@ -18,21 +18,27 @@ import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
-import landing from '../assets/landing-first-screen.webp'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
+import { ThemeToggleButton } from '../components/ThemeToggle/ThemeToggleButton'
+import { ThemeMode, useThemeSwitcher } from '../theme/ThemeContext'
+import { themeAssets } from '../theme/themeAssets'
 
 const useStyles = makeStyles(theme => ({
+  title: {
+    color: theme.palette.text.primary,
+  },
   wrapper: {
-    backgroundColor: theme.palette.background.default,
     paddingBottom: theme.spacing(5),
   },
   card: {
     height: '100%',
+    backgroundColor: theme.palette.background.paper,
   },
   cardContent: {
     padding: theme.spacing(3),
   },
   featureTitle: {
+    color: theme.palette.text.primary,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -43,16 +49,18 @@ const useStyles = makeStyles(theme => ({
     fontSize: '18px',
   },
   readyBlockTitle: {
+    color: theme.palette.text.primary,
     marginBottom: '2rem',
     marginTop: '4rem',
     fontWeight: 'bold',
     textAlign: 'center',
   },
-  firstScreen: {
+  firstScreen: (props: { mode: ThemeMode }) => ({
     minHeight: 500,
-    backgroundImage: `url(${landing})`,
+    backgroundImage: `url(${themeAssets[props.mode].landing})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundColor: theme.palette.background.default,
     display: 'flex',
     alignItems: 'flex-end',
     justifyContent: 'center',
@@ -60,7 +68,7 @@ const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('md')]: {
       minHeight: 660,
     },
-  },
+  }),
   contentContainer: {
     paddingBottom: '4rem',
     display: 'flex',
@@ -68,9 +76,12 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     maxWidth: '435px !important',
   },
-  featuresSection: {
-    backgroundColor: theme.palette.background.default,
-  },
+  featuresSection: (props: { mode: ThemeMode }) => ({
+    backgroundColor:
+      props.mode === 'halloween'
+        ? 'transparent'
+        : theme.palette.background.default,
+  }),
   iconWrapper: {
     display: 'inline-flex',
     padding: theme.spacing(1),
@@ -114,7 +125,8 @@ export const MainPage = () => {
   usePage({ initPage: initMainPage })
   const { isLoggedIn, clearUser } = useAuth()
   const navigate = useNavigate()
-  const classes = useStyles()
+  const { mode } = useThemeSwitcher()
+  const classes = useStyles({ mode })
   const globalClasses = useGlobalStyles()
 
   useEffect(() => {
@@ -135,6 +147,7 @@ export const MainPage = () => {
       </Helmet>
 
       <Box className={classes.firstScreen}>
+        <ThemeToggleButton />
         <FullscreenToggle />
         <Container maxWidth="lg" className={classes.contentContainer}>
           <Typography variant="h1" gutterBottom>
@@ -156,7 +169,12 @@ export const MainPage = () => {
 
       <Container maxWidth="lg" className={classes.featuresSection}>
         <Box mt={8}>
-          <Typography variant="h2" component="h2" align="center" gutterBottom>
+          <Typography
+            variant="h2"
+            component="h2"
+            align="center"
+            gutterBottom
+            className={classes.title}>
             Правила Выживания
           </Typography>
         </Box>

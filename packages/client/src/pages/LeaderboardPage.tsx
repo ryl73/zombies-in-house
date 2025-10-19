@@ -25,11 +25,13 @@ import {
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {
     paddingTop: '2rem',
+  },
+  description: {
+    color: theme.palette.text.primary,
   },
   tableContainer: {
     marginTop: theme.spacing(4),
@@ -47,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     },
   },
   tableCell: {
-    color: theme.palette.text.primary,
+    color: theme.palette.text.secondary,
     borderBottom: `1px solid ${theme.palette.primary.dark}`,
   },
   firstPlace: {
@@ -165,6 +167,13 @@ export const LeaderboardPage = () => {
     }
   }
 
+  const getPlaceClass = (index: number): keyof ReturnType<typeof useStyles> => {
+    if (index === 0) return 'firstPlace'
+    if (index === 1) return 'secondPlace'
+    if (index === 2) return 'thirdPlace'
+    return 'regularPlace'
+  }
+
   useEffect(() => {
     getAllLeaderboard({ limit: 10, cursor: 0 })
       .then(data => {
@@ -208,7 +217,7 @@ export const LeaderboardPage = () => {
         <Typography
           variant="body1"
           align="center"
-          color="textSecondary"
+          className={classes.description}
           paragraph>
           Рейтинг игроков по результатам прохождения Зомби в доме
         </Typography>
@@ -265,15 +274,7 @@ export const LeaderboardPage = () => {
               {sortedData.map((row, index) => (
                 <TableRow
                   key={row.data.login}
-                  className={
-                    index === 0
-                      ? classes.firstPlace
-                      : index === 1
-                      ? classes.secondPlace
-                      : index === 2
-                      ? classes.thirdPlace
-                      : classes.regularPlace
-                  }>
+                  className={classes[getPlaceClass(index)]}>
                   <TableCell
                     className={`${classes.tableCell} ${classes.rankCell}`}
                     component="th"

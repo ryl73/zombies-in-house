@@ -26,6 +26,9 @@ const useStyles = makeStyles(theme => ({
     borderRadius: theme.spacing(0.5),
     zIndex: 9999,
   },
+  iconButton: {
+    color: 'var(--text-white)',
+  },
 }))
 
 export const FullscreenToggle: React.FC<FullscreenToggleProps> = ({
@@ -50,7 +53,10 @@ export const FullscreenToggle: React.FC<FullscreenToggleProps> = ({
             ? 'Выйти из полноэкранного режима'
             : 'Полноэкранный режим'
         }>
-        <IconButton onClick={handleClick} color="inherit" size="medium">
+        <IconButton
+          onClick={handleClick}
+          size="medium"
+          className={classes.iconButton}>
           {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
         </IconButton>
       </Tooltip>

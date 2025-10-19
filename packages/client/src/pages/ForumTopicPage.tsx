@@ -22,7 +22,6 @@ import { mockComments, mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {
@@ -56,6 +55,9 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     alignItems: 'center',
     marginBottom: theme.spacing(2),
+  },
+  title: {
+    color: theme.palette.text.primary,
   },
   avatar: {
     width: theme.spacing(3),
@@ -210,7 +212,7 @@ export const ForumTopicPage = () => {
 
         <Paper className={classes.paper} elevation={3}>
           <Box className={classes.header}>
-            <Typography variant="h4" component="h1">
+            <Typography variant="h4" component="h1" className={classes.title}>
               {topic.title}
             </Typography>
           </Box>

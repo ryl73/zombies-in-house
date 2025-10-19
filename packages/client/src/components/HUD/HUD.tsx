@@ -7,10 +7,11 @@ import {
 } from '../../slices/gameSlice'
 import { Box, Button, makeStyles } from '@material-ui/core'
 import { CellCard } from '../../styles/styledComponents/CellCard'
-import hud from '../../assets/hud.webp'
+import { ThemeAssetsItem } from '../../theme/themeAssets'
+import { themeManager } from '../../theme/ThemeManager'
 
 const useStyles = makeStyles(theme => ({
-  hudWrapper: (props: { isOpen: boolean }) => ({
+  hudWrapper: (props: { isOpen: boolean; assets: ThemeAssetsItem }) => ({
     position: 'fixed',
     left: '50%',
     transform: 'translateX(-50%)',
@@ -22,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     gap: '8px',
     zIndex: 999,
-    background: `url(${hud}) center 50% no-repeat`,
+    background: `url(${props.assets.hud}) center 50% no-repeat`,
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
     display: props.isOpen ? 'none' : 'flex',
@@ -37,6 +38,9 @@ const useStyles = makeStyles(theme => ({
   playerCard: {
     width: '70px',
     height: '70px',
+  },
+  playerName: {
+    color: 'var(--text-white)',
   },
   items: {
     display: 'flex',
@@ -66,10 +70,8 @@ const useStyles = makeStyles(theme => ({
     },
   },
   spinButton: {
-    backgroundColor: 'var(--color-button-primary)',
     border: 'none',
     padding: '16px 12px',
-    color: 'var(--color-primary)',
     margin: 0,
     borderRadius: '20px',
     cursor: 'pointer',
@@ -85,7 +87,8 @@ export const Hud = () => {
   const dispatch = useAppDispatch()
   const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
     useAppSelector(state => state.game)
-  const classes = useStyles({ isOpen: isPinwheelOpen })
+  const assets = themeManager.getAssets()
+  const classes = useStyles({ isOpen: isPinwheelOpen, assets })
 
   const player = players[currentPlayerIndex]
 
@@ -107,7 +110,7 @@ export const Hud = () => {
             alt={player.name}
           />
         </CellCard>
-        {player.name}
+        <span className={classes.playerName}>{player.name}</span>
         {player.lifeCount > 0 && (
           <Box>
             {Array.from({ length: player.lifeCount }, (_, i) => (
@@ -143,6 +146,8 @@ export const Hud = () => {
         ))}
         {canFight === 'grenade' && (
           <Button
+            variant="contained"
+            color="primary"
             className={classes.spinButton}
             onClick={() => dispatch(manualSpinPinwheel())}>
             Spin pinwheel

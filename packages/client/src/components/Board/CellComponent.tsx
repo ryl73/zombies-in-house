@@ -4,6 +4,7 @@ import { Cell } from '../../game/models/Cell'
 import { useAppSelector } from '../../hooks/useApp'
 import { Box, makeStyles } from '@material-ui/core'
 import { CellCard } from '../../styles/styledComponents/CellCard'
+import { useThemeSwitcher } from '../../theme/ThemeContext'
 
 type Props = {
   cell: Cell
@@ -41,6 +42,7 @@ const useStyles = makeStyles(() => ({
 }))
 
 export const CellComponent: FC<Props> = ({ cell, click }) => {
+  const { mode } = useThemeSwitcher()
   const classes = useStyles()
   const { zombies, players, items } = useAppSelector(state => state.game)
 
@@ -85,7 +87,7 @@ export const CellComponent: FC<Props> = ({ cell, click }) => {
 
           return (
             <CardWrapper $isOpen={isOpen} key={object.id}>
-              <CellCard $isPlayer={isPlayer}>
+              <CellCard $isPlayer={isPlayer} $mode={mode}>
                 {isVisible && (
                   <img
                     className={classes.cardImage}

@@ -46,6 +46,7 @@ const useStyles = makeStyles((theme: Theme) =>
       marginRight: theme.spacing(2),
       position: 'absolute',
       left: theme.spacing(2),
+      color: theme.palette.text.primary,
       transition: 'all .2s ease',
       [theme.breakpoints.up('md')]: {
         display: 'none',
@@ -53,25 +54,17 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     drawer: {
       '& .MuiDrawer-paper': {
-        backgroundColor: '#1D333B',
-        color: '#F7F4F3',
         width: 250,
       },
     },
     drawerItem: {
       '&:hover': {
+        color: 'var(--text-white)',
         backgroundColor: '#355155',
       },
     },
     button: {
       margin: theme.spacing(0, 0.5),
-      transition: 'all .2s ease',
-      '&:hover': {
-        backgroundColor: '#355155 !important',
-        '& $link': {
-          color: '#CBAC51 !important',
-        },
-      },
       [theme.breakpoints.down('sm')]: {
         display: 'none',
       },
@@ -114,7 +107,6 @@ export const Header = () => {
           <IconButton
             edge="start"
             className={classes.menuButton}
-            color="inherit"
             aria-label="menu"
             onClick={toggleDrawer(true)}>
             <MenuIcon />

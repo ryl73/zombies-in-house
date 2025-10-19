@@ -20,7 +20,6 @@ import { mockTopics } from '../utils/mockData'
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
     fontSize: '20px',
   },

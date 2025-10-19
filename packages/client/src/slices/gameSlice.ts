@@ -47,6 +47,8 @@ const ZombieMap: Record<ZombieType, { count: number }> = {
   boss: { count: 1 },
 }
 
+type StageType = 'move' | 'fight'
+
 export type CanFightType =
   | 'coldWeapon'
   | 'gunWeapon'
@@ -84,6 +86,7 @@ export type GameState = {
   type: GameType
   roomId: string | null
   users: Partial<User>[]
+  stage: StageType
 }
 
 export type GameStatistics = {
@@ -124,9 +127,10 @@ const initialState: GameState = {
   type: 'local',
   roomId: null,
   users: [],
+  stage: 'move',
 }
 
-const getCurrentPlayer = (game: GameState) =>
+export const getCurrentPlayer = (game: GameState) =>
   game.players[game.currentPlayerIndex]
 
 const getCellById = (game: GameState, id: string) =>
@@ -164,6 +168,7 @@ export const startGame = createAsyncThunk(
 export const moveStage = createAsyncThunk(
   'game/moveStage',
   async (_, { getState, dispatch }) => {
+    dispatch(gameSlice.actions.setStage('move'))
     await dispatch(spinPinwheel())
     const { game } = getState() as { game: GameState }
     const currentPlayer = getCurrentPlayer(game)
@@ -278,6 +283,7 @@ export const fightStage = createAsyncThunk(
   'game/fightStage',
   async (_, { getState, dispatch }) => {
     dispatch(gameSlice.actions.resetCanMoveCells())
+    dispatch(gameSlice.actions.setStage('fight'))
     await dispatch(spinPinwheel())
 
     const { game } = getState() as { game: GameState }
@@ -720,6 +726,7 @@ export const gameSlice = createSlice({
       state.pinwheelResult = null
       state.isPinwheelOpen = false
       state.statistics = initialStatisticsState
+      state.stage = 'move'
     },
 
     createCharacters(state) {
@@ -1018,6 +1025,10 @@ export const gameSlice = createSlice({
 
     setLocalNumberOfPlayers(state, action: PayloadAction<number>) {
       state.localNumberOfPlayers = action.payload
+    },
+
+    setStage(state, action: PayloadAction<'move' | 'fight'>) {
+      state.stage = action.payload
     },
   },
 })
