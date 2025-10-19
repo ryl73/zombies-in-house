@@ -4,10 +4,9 @@ import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/useApp'
 import { getCurrentPlayer, resolvePinwheel } from '../../slices/gameSlice'
 import { Box, Container, makeStyles } from '@material-ui/core'
-import spinwheel from '../../assets/spinwheel.webp'
-import spinwheelHalloween from '../../assets/halloween/spinwheel-halloween.webp'
 import spinArrow from '../../assets/spinner-arrow.webp'
 import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
+import { themeAssets } from '../../theme/themeAssets'
 
 const useStyles = makeStyles(theme => ({
   pinwheelWrapper: {
@@ -98,9 +97,7 @@ export const Pinwheel = () => {
         }`}</Box>
         <Box className={classes.pinwheelContainer}>
           <img
-            src={
-              mode === 'halloween' ? `${spinwheelHalloween}` : `${spinwheel}`
-            }
+            src={themeAssets[mode].spinwheel}
             className={classes.pinwheelImg}
             alt="spinwheel"
           />

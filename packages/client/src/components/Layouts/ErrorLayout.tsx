@@ -4,10 +4,8 @@ import { ArrowBack } from '@material-ui/icons'
 import { Header } from '../Header/Header'
 import { makeStyles } from '@material-ui/core/styles'
 import { Helmet } from 'react-helmet'
-import notFoundImage from '../../assets/notfound.webp'
-import notFoundImageLight from '../../assets/notfound-light.webp'
-import notFoundImageHalloween from '../../assets/halloween/notfound-halloween.webp'
-import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
+import { useThemeSwitcher } from '../../theme/ThemeContext'
+import { themeAssets } from '../../theme/themeAssets'
 
 const useStyles = makeStyles(theme => ({
   errorSection: {
@@ -31,12 +29,6 @@ const useStyles = makeStyles(theme => ({
     transform: 'translate(-50%)',
   },
 }))
-
-function getNotFoundImage(mode: ThemeMode) {
-  if (mode === 'halloween') return notFoundImageHalloween
-  if (mode === 'light') return notFoundImageLight
-  return notFoundImage
-}
 
 interface ErrorLayoutProps {
   code: number
@@ -70,7 +62,7 @@ export const ErrorLayout = ({
       <Box className={classes.errorSection}>
         <Header />
         <img
-          src={getNotFoundImage(mode)}
+          src={themeAssets[mode].notFound}
           alt={title}
           className={classes.backgroundImg}
         />

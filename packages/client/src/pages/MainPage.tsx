@@ -18,11 +18,10 @@ import { logout } from '../api/LoginAPI'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { FullscreenToggle } from '../components/FullscreenToggle/FullscreenToggle'
-import landing from '../assets/landing-first-screen.webp'
-import landingHalloween from '../assets/halloween/landing-first-screen-halloween.webp'
 import { useGlobalStyles } from '../styles/mui/GlobalStyles'
 import { ThemeToggleButton } from '../components/ThemeToggle/ThemeToggleButton'
 import { ThemeMode, useThemeSwitcher } from '../theme/ThemeContext'
+import { themeAssets } from '../theme/themeAssets'
 
 const useStyles = makeStyles(theme => ({
   title: {
@@ -58,10 +57,7 @@ const useStyles = makeStyles(theme => ({
   },
   firstScreen: (props: { mode: ThemeMode }) => ({
     minHeight: 500,
-    backgroundImage:
-      props.mode === 'halloween'
-        ? `url(${landingHalloween})`
-        : `url(${landing})`,
+    backgroundImage: `url(${themeAssets[props.mode].landing})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundColor: theme.palette.background.default,
