@@ -53,7 +53,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({
   const classes = useStyles()
 
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} data-testid="topic-item">
       <Link
         to={`/forum/topic/${topic.id}`}
         className={classes.link}

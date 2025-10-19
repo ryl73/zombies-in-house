@@ -103,6 +103,7 @@ export const ForumPagination: React.FC<ForumPaginationProps> = ({
 
         {getPageNumbers().map((page, index) => (
           <Button
+            data-testid="pagination"
             key={index}
             className={classes.pageButton}
             variant={page === currentPage ? 'contained' : 'outlined'}
