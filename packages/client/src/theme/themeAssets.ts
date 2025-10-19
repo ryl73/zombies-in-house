@@ -7,8 +7,15 @@ import spinwheel from '../assets/spinwheel.webp'
 import spinwheelHalloween from '../assets/halloween/spinwheel-halloween.webp'
 import landing from '../assets/landing-first-screen.webp'
 import landingHalloween from '../assets/halloween/landing-first-screen-halloween.webp'
+import { ThemeMode } from './ThemeContext'
 
-export const themeAssets = {
+export type ThemeAssetsItem = {
+  [key: string]: string
+}
+
+type ThemeAssetsMap = Record<ThemeMode, ThemeAssetsItem>
+
+export const themeAssets: ThemeAssetsMap = {
   light: {
     hud,
     notFound: notFoundImageLight,

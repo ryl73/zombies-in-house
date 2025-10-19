@@ -6,7 +6,7 @@ import { getCurrentPlayer, resolvePinwheel } from '../../slices/gameSlice'
 import { Box, Container, makeStyles } from '@material-ui/core'
 import spinArrow from '../../assets/spinner-arrow.webp'
 import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
-import { themeAssets } from '../../theme/themeAssets'
+import { themeManager } from '../../theme/ThemeManager'
 
 const useStyles = makeStyles(theme => ({
   pinwheelWrapper: {
@@ -43,6 +43,7 @@ export const Pinwheel = () => {
   const [isSpinning, setIsSpinning] = useState(false)
   const controls = useAnimation()
   const dispatch = useAppDispatch()
+  const assets = themeManager.getAssets()
 
   const { pinwheelResult, isPinwheelOpen, stage } = useAppSelector(
     state => state.game
@@ -97,7 +98,7 @@ export const Pinwheel = () => {
         }`}</Box>
         <Box className={classes.pinwheelContainer}>
           <img
-            src={themeAssets[mode].spinwheel}
+            src={assets.spinwheel}
             className={classes.pinwheelImg}
             alt="spinwheel"
           />

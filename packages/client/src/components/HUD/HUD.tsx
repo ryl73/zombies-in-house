@@ -7,11 +7,11 @@ import {
 } from '../../slices/gameSlice'
 import { Box, Button, makeStyles } from '@material-ui/core'
 import { CellCard } from '../../styles/styledComponents/CellCard'
-import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
-import { themeAssets } from '../../theme/themeAssets'
+import { ThemeAssetsItem } from '../../theme/themeAssets'
+import { themeManager } from '../../theme/ThemeManager'
 
 const useStyles = makeStyles(theme => ({
-  hudWrapper: (props: { isOpen: boolean; mode: ThemeMode }) => ({
+  hudWrapper: (props: { isOpen: boolean; assets: ThemeAssetsItem }) => ({
     position: 'fixed',
     left: '50%',
     transform: 'translateX(-50%)',
@@ -23,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     gap: '8px',
     zIndex: 999,
-    background: `url(${themeAssets[props.mode].hud}) center 50% no-repeat`,
+    background: `url(${props.assets.hud}) center 50% no-repeat`,
     borderTopLeftRadius: '10px',
     borderTopRightRadius: '10px',
     display: props.isOpen ? 'none' : 'flex',
@@ -87,8 +87,8 @@ export const Hud = () => {
   const dispatch = useAppDispatch()
   const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
     useAppSelector(state => state.game)
-  const { mode } = useThemeSwitcher()
-  const classes = useStyles({ isOpen: isPinwheelOpen, mode })
+  const assets = themeManager.getAssets()
+  const classes = useStyles({ isOpen: isPinwheelOpen, assets })
 
   const player = players[currentPlayerIndex]
 
