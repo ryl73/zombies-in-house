@@ -9,8 +9,6 @@ import { configureStore } from '@reduxjs/toolkit'
 import { mockTopics } from '../utils/mockData'
 import { ThemeProviderCustom } from '../theme/ThemeContext'
 
-jest.mock('../assets/halloween/bg-halloween.webp', () => 'bg-halloween.webp')
-
 let counter = 0
 jest.mock('uuid', () => ({
   v4: () => `test-uuid-${Date.now()}-${counter++}`,
