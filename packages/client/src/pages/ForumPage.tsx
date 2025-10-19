@@ -19,7 +19,6 @@ import { forumAPI } from '../api/forumAPI'
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {

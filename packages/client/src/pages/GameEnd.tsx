@@ -14,7 +14,7 @@ export const GameEnd = () => {
   const globalClasses = useGlobalStyles()
 
   return (
-    <Box className={classes.wrapper}>
+    <Box>
       <Helmet>
         <meta charSet="utf-8" />
         <title>Конец игры</title>

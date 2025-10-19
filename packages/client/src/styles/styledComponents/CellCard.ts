@@ -1,4 +1,5 @@
 import styled, { css, keyframes } from 'styled-components'
+import { ThemeMode } from '../../theme/ThemeContext'
 
 const ripple = keyframes`
   from { opacity: 0; }
@@ -8,6 +9,7 @@ const ripple = keyframes`
 export const CellCard = styled.div<{
   $isPlayer?: boolean
   $animation?: boolean
+  $mode?: ThemeMode
 }>`
   display: flex;
   align-items: center;
@@ -16,6 +18,10 @@ export const CellCard = styled.div<{
   width: 98px;
   height: 98px;
   border-radius: 20px;
+  background: ${props =>
+    props.$mode === 'halloween'
+      ? 'url(src/assets/halloween/card-halloween.webp) no-repeat center / cover'
+      : 'url(src/assets/card.webp) no-repeat center / cover'};
   ${props =>
     props.$animation &&
     css`

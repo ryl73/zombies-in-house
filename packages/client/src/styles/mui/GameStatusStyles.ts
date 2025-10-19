@@ -2,9 +2,6 @@ import { makeStyles } from '@material-ui/core'
 import landing from '../../assets/landing-first-screen.webp'
 
 export const useGameStatusStyles = makeStyles(theme => ({
-  wrapper: {
-    backgroundColor: theme.palette.background.default,
-  },
   header: {
     fontSize: 72,
     [theme.breakpoints.up('sm')]: {
