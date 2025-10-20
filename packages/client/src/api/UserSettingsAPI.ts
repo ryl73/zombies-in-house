@@ -2,7 +2,7 @@ import { ThemeMode } from '../theme/ThemeContext'
 import { api } from './API'
 
 export const getUserTheme = async (): Promise<ThemeMode> => {
-  const response = await api.get<{ theme: ThemeMode }>('/user/theme')
+  const response = await api.get('/user/theme')
   return response.data.theme
 }
 

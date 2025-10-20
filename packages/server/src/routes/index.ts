@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { router as roomRouter } from './roomRouter'
 import { router as forumRouter } from './forum'
-import { router as userRouter } from './user/userSettingsRouter'
+import { router as userRouter } from './user'
 
 export const router = Router()
 

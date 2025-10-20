@@ -14,7 +14,7 @@ export default class Theme extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  override id!: string
+  override id!: number
 
   @Column({
     type: DataType.ENUM('light', 'dark', 'halloween'),

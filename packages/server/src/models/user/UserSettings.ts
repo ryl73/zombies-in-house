@@ -10,8 +10,8 @@ import type { ThemeType } from '../theme/Theme'
 @Table({ tableName: 'UserSettings', timestamps: false })
 export default class UserSettings extends Model {
   @PrimaryKey
-  @Column(DataType.STRING)
-  userId!: string
+  @Column(DataType.INTEGER)
+  userId!: number
 
   @Column({
     type: DataType.ENUM('light', 'dark', 'halloween'),
