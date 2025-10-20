@@ -30,12 +30,17 @@ export function createPlayer({
   type,
   userId = null,
 }: PlayerProps): Player {
+  const mode = localStorage.getItem('theme') || 'dark'
+
   const player = {
     cellId,
     lifeCount,
     name,
     userId,
-    image: `/images/game/cards/characters/${type}.png`,
+    image:
+      mode === 'halloween'
+        ? `src/assets/halloween/characters/${type}.webp`
+        : `/images/game/cards/characters/${type}.png`,
     type,
     items: [],
     id: uuidv4(),

@@ -2,15 +2,14 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
-import { ThemeProvider } from '@material-ui/core/styles'
 import { store } from './store'
 import { AppErrorBoundary } from './components/ErrorBoundary/AppErrorBoundary'
 import './index.css'
-import { theme } from './theme/theme'
 import { NotificationProvider } from './hooks/useNotification'
 import App from './App'
 import { startServiceWorker } from './serviceWorkers'
 import { CssBaseline } from '@material-ui/core'
+import { ThemeProviderCustom } from './theme/ThemeContext'
 
 if (process.env.NODE_ENV === 'development' && 'serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(registrations => {
@@ -32,7 +31,7 @@ function Main() {
 
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
+      <ThemeProviderCustom>
         <CssBaseline />
         <AppErrorBoundary>
           <NotificationProvider>
@@ -41,7 +40,7 @@ function Main() {
             </BrowserRouter>
           </NotificationProvider>
         </AppErrorBoundary>
-      </ThemeProvider>
+      </ThemeProviderCustom>
     </Provider>
   )
 }

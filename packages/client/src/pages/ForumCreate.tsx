@@ -17,15 +17,18 @@ import { makeStyles } from '@material-ui/core/styles'
 import { ArrowBack } from '@material-ui/icons'
 import * as Yup from 'yup'
 import { validation } from '../utils/validation'
-
+import { forumAPI } from '../api/forumAPI'
+import { useNavigate } from 'react-router-dom'
 const useStyles = makeStyles(theme => ({
   root: {
-    backgroundColor: theme.palette.background.default,
     minHeight: '100vh',
   },
   container: {
     paddingTop: '2rem',
     paddingBottom: '2rem',
+  },
+  title: {
+    color: theme.palette.text.primary,
   },
   divider: {
     marginBottom: theme.spacing(3),
@@ -73,6 +76,7 @@ const TopicCreateSchema = Yup.object().shape({
 export const ForumCreatePage = () => {
   usePage({ initPage: initForumCreatePage })
   const classes = useStyles()
+  const navigate = useNavigate()
 
   const [formData, setFormData] = useState<FormData>({
     title: '',
@@ -117,13 +121,22 @@ export const ForumCreatePage = () => {
         content: '',
       })
 
-      // Делаю имитацию загрузки данных
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Создание топика:', formData)
-      setFormData({
-        title: '',
-        content: '',
+      const response = await forumAPI.createTopic({
+        title: formData.title,
+        description: formData.content,
       })
+      if (response.success) {
+        navigate(`/forum/topic/${response.data?.id}`)
+        setFormData({
+          title: '',
+          content: '',
+        })
+      } else {
+        setErrors({
+          title: response.message || 'Ошибка создания топика',
+          content: response.message || 'Ошибка создания топика',
+        })
+      }
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const validationErrors: FormErrors = {
@@ -169,7 +182,11 @@ export const ForumCreatePage = () => {
         </Button>
 
         <Paper className={classes.paper} elevation={3}>
-          <Typography variant="h3" component="h1" gutterBottom>
+          <Typography
+            variant="h3"
+            component="h1"
+            gutterBottom
+            className={classes.title}>
             Создание нового топика
           </Typography>
 

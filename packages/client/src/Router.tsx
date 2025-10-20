@@ -13,6 +13,7 @@ import { NotFoundPage } from './pages/NotFound'
 import { ProtectedRoute } from './components/Routes/ProtectedRoute'
 import { OnlyPublicRoute } from './components/Routes/OnlyPublicRoute'
 import { GameEnd } from './pages/GameEnd'
+import { OAuthPage } from './pages/OAuthPage'
 
 function Router() {
   return (
@@ -102,6 +103,14 @@ function Router() {
           <ProtectedRoute>
             <GameEnd />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/oauth"
+        element={
+          <OnlyPublicRoute>
+            <OAuthPage />
+          </OnlyPublicRoute>
         }
       />
 

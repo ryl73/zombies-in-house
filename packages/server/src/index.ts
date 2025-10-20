@@ -3,12 +3,13 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import fs from 'fs/promises'
-import { dbConnect, sequelize } from './db'
+import { dbConnect } from './db'
 import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
 import { router } from './routes'
 import http from 'http'
 import { setupWebSocket } from './ws'
+import { errorHandlingMiddleware } from './middleware/ErrorHandlingMiddleware'
 
 dotenv.config()
 
@@ -29,9 +30,9 @@ async function startServer() {
 
   setupWebSocket(server)
 
-  if (isDev) {
-    await sequelize.sync()
+  app.use(errorHandlingMiddleware)
 
+  if (isDev) {
     const vite = await import('vite')
     const viteServer = await vite.createServer({
       root: path.resolve(__dirname, '../../client'),

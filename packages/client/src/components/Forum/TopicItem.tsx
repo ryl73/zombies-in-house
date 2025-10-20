@@ -4,7 +4,8 @@ import { Card, CardContent, Typography, Box, Avatar } from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 
 import { Comment as CommentIcon } from '@material-ui/icons'
-import { Topic } from '../../types/types'
+import { Topic } from '../../types/forum'
+
 const useStyles = makeStyles(theme => ({
   card: {
     marginBottom: theme.spacing(2),
@@ -22,6 +23,9 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.primary.light,
     marginRight: theme.spacing(1),
   },
+  title: {
+    color: theme.palette.text.secondary,
+  },
   contentPreview: {
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -35,37 +39,42 @@ const useStyles = makeStyles(theme => ({
   commentIcon: {
     marginRight: theme.spacing(0.5),
     marginLeft: theme.spacing(1),
+    color: theme.palette.text.secondary,
   },
 }))
 
 interface TopicItemProps {
   topic: Topic
   isContent?: boolean
+  commentsCount?: number
 }
 
 export const TopicItem: React.FC<TopicItemProps> = ({
   topic,
   isContent = true,
+  commentsCount,
 }) => {
   const classes = useStyles()
 
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} data-testid="topic-item">
       <Link
         to={`/forum/topic/${topic.id}`}
         className={classes.link}
         data-testid="topic-link">
         <CardContent>
           <Box display="flex" flexDirection="row" alignItems="center" mb={1}>
-            <Avatar className={classes.avatar}>
-              {topic.author.charAt(0).toUpperCase()}
-            </Avatar>
+            <Avatar
+              className={classes.avatar}
+              src={`https://ya-praktikum.tech/api/v2/resources${topic.authorAvatar}`}></Avatar>
             <Typography variant="caption" color="textSecondary">
-              {topic.author}
+              {topic.authorLogin}
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" mb={1}>
-            <Typography variant="h6">{topic.title}</Typography>
+            <Typography variant="h6" className={classes.title}>
+              {topic.title}
+            </Typography>
           </Box>
           {isContent !== false && (
             <Typography
@@ -73,16 +82,16 @@ export const TopicItem: React.FC<TopicItemProps> = ({
               color="textSecondary"
               paragraph
               className={classes.contentPreview}>
-              {topic.content}
+              {topic.description}
             </Typography>
           )}
           <Box display="flex" justifyContent="flex-start" alignItems="center">
             <Typography variant="caption" color="textSecondary">
-              {topic.createdAt.toLocaleDateString()}
+              {new Date(topic.createdAt).toLocaleDateString()}
             </Typography>
             <CommentIcon fontSize="small" className={classes.commentIcon} />
             <Typography variant="caption" color="textSecondary">
-              {topic.commentsCount}
+              {commentsCount !== undefined ? commentsCount : '...'}
             </Typography>
           </Box>
         </CardContent>

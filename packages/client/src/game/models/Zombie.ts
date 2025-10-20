@@ -18,10 +18,15 @@ export type Zombie = {
 }
 
 export function createZombie({ cellId, type, name }: ZombieProps): Zombie {
+  const mode = localStorage.getItem('theme') || 'dark'
+
   return {
     cellId,
     type,
-    image: `/images/game/cards/zombies/${type}.png`,
+    image:
+      mode === 'halloween'
+        ? `src/assets/halloween/zombies/${type}.webp`
+        : `/images/game/cards/zombies/${type}.png`,
     name,
     id: uuidv4(),
     opened: false,

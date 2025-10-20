@@ -64,11 +64,13 @@
 
 
 `docker compose up` - запустит три сервиса
-1. nginx, раздающий клиентскую статику (client)
+1. сервис, раздающий клиентскую статику (client)
 2. node, ваш сервер (server)
 3. postgres, вашу базу данных (postgres)
 
 Если вам понадобится только один сервис, просто уточните какой в команде
 `docker compose up {sevice_name}`, например `docker compose up server`
+
+Важно: Убедитесь, что вы используете Docker Compose CLI (новый синтаксис docker compose, а не docker-compose). Команда docker compose version должна показать версию 2.x.x или выше. 
 
 [Документация](docs/README.md)
