@@ -1,4 +1,4 @@
-import { fetchUser, selectUserLoading } from './slices/userSlice'
+import { fetchUser, selectUser, selectUserLoading } from './slices/userSlice'
 import React, { useEffect } from 'react'
 import { Helmet } from 'react-helmet'
 import Router from './Router'
@@ -6,6 +6,8 @@ import { useAppDispatch, useAppSelector } from './hooks/useApp'
 import './App.css'
 import { Box, makeStyles, Typography } from '@material-ui/core'
 import { useGlobalStyles } from './styles/mui/GlobalStyles'
+import { getUserTheme, setUserTheme } from './api/UserSettingsAPI'
+import { setTheme } from './slices/themeSlice'
 
 const useStyles = makeStyles(theme => ({
   pageContainer: {
@@ -21,10 +23,33 @@ const App = () => {
   const globalClasses = useGlobalStyles()
   const dispatch = useAppDispatch()
   const isLoading = useAppSelector(selectUserLoading)
+  const user = useAppSelector(selectUser)
 
   useEffect(() => {
     dispatch(fetchUser())
   }, [dispatch])
+
+  useEffect(() => {
+    if (!user) return
+
+    const initUserSettings = async () => {
+      try {
+        let theme = await getUserTheme(user.id)
+
+        if (!theme) {
+          // theme = 'dark'
+          theme = 'halloween'
+          await setUserTheme(user.id, theme)
+        }
+
+        dispatch(setTheme(theme))
+      } catch (err) {
+        console.error('Ошибка инициализации пользователя:', err)
+      }
+    }
+
+    initUserSettings()
+  }, [user, dispatch])
 
   if (isLoading) {
     return (

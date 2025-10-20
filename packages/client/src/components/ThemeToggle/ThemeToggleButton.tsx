@@ -1,5 +1,5 @@
 import { Box, IconButton, makeStyles } from '@material-ui/core'
-import { useThemeSwitcher } from '../../theme/ThemeContext'
+import { ThemeMode, useThemeSwitcher } from '../../theme/ThemeContext'
 
 const useStyles = makeStyles(theme => ({
   wrapper: {
@@ -13,8 +13,17 @@ const useStyles = makeStyles(theme => ({
 }))
 
 export const ThemeToggleButton = () => {
-  const { mode, toggleTheme } = useThemeSwitcher()
+  const { mode, setMode } = useThemeSwitcher()
   const classes = useStyles()
+
+  const toggleTheme = () => {
+    let nextMode: ThemeMode
+    if (mode === 'light') {
+      //nextMode = 'dark'
+      nextMode = 'halloween'
+    } else nextMode = 'light'
+    setMode(nextMode)
+  }
 
   return (
     <Box className={classes.wrapper}>

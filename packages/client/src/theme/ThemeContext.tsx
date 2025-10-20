@@ -2,56 +2,52 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ThemeProvider } from '@material-ui/core/styles'
 import { darkTheme, lightTheme, halloweenTheme } from './theme'
 import { themeManager } from './ThemeManager'
+import { useAppDispatch, useAppSelector } from '../hooks/useApp'
+import { selectTheme, updateUserTheme } from '../slices/themeSlice'
+import { selectUser } from '../slices/userSlice'
 
 export type ThemeMode = 'light' | 'dark' | 'halloween'
 
 const ThemeContext = createContext<{
   mode: ThemeMode
-  toggleTheme: () => void
+  setMode: (mode: ThemeMode) => void
 }>({
   // mode: 'dark',
   mode: 'halloween',
-  toggleTheme: () => {
+  setMode: (mode: ThemeMode) => {
     throw new Error('useThemeSwitcher must be used within ThemeProviderCustom')
   },
 })
 
 export const useThemeSwitcher = () => useContext(ThemeContext)
 
-// const providerInitialMode = 'dark'
-const providerInitialMode = 'halloween'
-
 export const ThemeProviderCustom: React.FC<{
   children: React.ReactNode
-  initialMode?: ThemeMode
-}> = ({ children, initialMode = providerInitialMode }) => {
-  const [mode, setMode] = useState<ThemeMode>(initialMode)
+}> = ({ children }) => {
+  const dispatch = useAppDispatch()
+  const theme = useAppSelector(selectTheme)
+  const user = useAppSelector(selectUser)
 
   useEffect(() => {
-    const saved = localStorage.getItem('theme') as ThemeMode | null
-    if (saved) {
-      setMode(saved)
-      themeManager.setMode(saved)
+    if (theme) {
+      localStorage.setItem('theme', theme)
+      themeManager.setMode(theme)
     }
-  }, [])
+  }, [theme])
 
-  useEffect(() => {
-    localStorage.setItem('theme', mode)
+  const setMode = (mode: ThemeMode) => {
     themeManager.setMode(mode)
-  }, [mode])
-
-  const toggleTheme = () => {
-    // const nextMode = mode === 'dark' ? 'light' : 'dark'
-    const nextMode = mode === 'halloween' ? 'light' : 'halloween'
-    setMode(nextMode)
-    themeManager.setMode(nextMode)
+    localStorage.setItem('theme', mode)
+    if (user?.id) {
+      dispatch(updateUserTheme({ userId: user.id, theme: mode }))
+    }
   }
 
   // const muiTheme = mode === 'dark' ? darkTheme : lightTheme
-  const muiTheme = mode === 'halloween' ? halloweenTheme : lightTheme
+  const muiTheme = theme === 'halloween' ? halloweenTheme : lightTheme
 
   return (
-    <ThemeContext.Provider value={{ mode, toggleTheme }}>
+    <ThemeContext.Provider value={{ mode: theme, setMode }}>
       <ThemeProvider theme={muiTheme}>{children}</ThemeProvider>
     </ThemeContext.Provider>
   )
