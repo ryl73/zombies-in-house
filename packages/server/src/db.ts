@@ -47,7 +47,7 @@ export const sequelize = new Sequelize(sequelizeOptions)
 export const dbConnect = async (): Promise<void> => {
   try {
     await sequelize.authenticate() // Проверка аутентификации в БД
-    await sequelize.sync({ force: true }) // Синхронизация базы данных
+    await sequelize.sync() // Синхронизация базы данных
     await seedThemes()
     console.log('  ➜ 🎸 Connected to the database')
   } catch (e) {
