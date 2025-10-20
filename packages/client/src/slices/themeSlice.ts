@@ -18,12 +18,9 @@ const initialState: ThemeState = {
 
 export const updateUserTheme = createAsyncThunk(
   'theme/updateUserTheme',
-  async (
-    { userId, theme }: { userId: number; theme: ThemeMode },
-    { rejectWithValue }
-  ) => {
+  async (theme: ThemeMode, { rejectWithValue }) => {
     try {
-      await setUserTheme(userId, theme)
+      await setUserTheme(theme)
       return theme
     } catch (error: any) {
       return rejectWithValue(error.message || 'Failed to set theme')

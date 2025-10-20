@@ -39,7 +39,7 @@ export const ThemeProviderCustom: React.FC<{
     themeManager.setMode(mode)
     localStorage.setItem('theme', mode)
     if (user?.id) {
-      dispatch(updateUserTheme({ userId: user.id, theme: mode }))
+      dispatch(updateUserTheme(mode))
     }
   }
 

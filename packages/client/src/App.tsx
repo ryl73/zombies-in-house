@@ -34,12 +34,12 @@ const App = () => {
 
     const initUserSettings = async () => {
       try {
-        let theme = await getUserTheme(user.id)
+        let theme = await getUserTheme()
 
         if (!theme) {
           // theme = 'dark'
           theme = 'halloween'
-          await setUserTheme(user.id, theme)
+          await setUserTheme(theme)
         }
 
         dispatch(setTheme(theme))
