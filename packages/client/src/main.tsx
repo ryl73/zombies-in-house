@@ -30,18 +30,18 @@ function Main() {
   }, [])
 
   return (
-    <Provider store={store}>
-      <ThemeProviderCustom>
-        <CssBaseline />
-        <AppErrorBoundary>
+    <AppErrorBoundary>
+      <Provider store={store}>
+        <ThemeProviderCustom>
+          <CssBaseline />
           <NotificationProvider>
             <BrowserRouter>
               <App />
             </BrowserRouter>
           </NotificationProvider>
-        </AppErrorBoundary>
-      </ThemeProviderCustom>
-    </Provider>
+        </ThemeProviderCustom>
+      </Provider>
+    </AppErrorBoundary>
   )
 }
 
