@@ -3,7 +3,7 @@ import Zombie from '../../models/game/Zombie'
 export default class ZombieController {
   static async createAll(roomId: string, zombies: Zombie[]) {
     for (const zombie of zombies) {
-      await Zombie.create({ ...zombie, roomId })
+      await Zombie.upsert({ ...zombie, roomId })
     }
   }
 

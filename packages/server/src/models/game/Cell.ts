@@ -16,7 +16,7 @@ import Room from './Room'
 
 export type CellType = 'car' | 'plankPlace' | 'start'
 
-@Table({ tableName: 'Cells' })
+@Table({ tableName: 'Cells', timestamps: false })
 export default class Cell extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -33,9 +33,6 @@ export default class Cell extends Model {
   @Column(DataType.INTEGER)
   y!: number
 
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  isTraversable!: boolean
-
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   isEmpty!: boolean
 
@@ -44,15 +41,6 @@ export default class Cell extends Model {
 
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   hasBarricade!: boolean
-
-  @Column(DataType.JSONB)
-  availableBarricadeDirections!: string
-
-  @Column(DataType.JSONB)
-  installedBarricadeDirections!: string
-
-  @Column(DataType.JSONB)
-  walls!: string
 
   @BelongsTo(() => Room)
   room!: Room

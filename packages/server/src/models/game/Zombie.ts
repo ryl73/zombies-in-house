@@ -15,7 +15,7 @@ export type ZombieType = 'ordinary' | 'dog' | 'spider' | 'boss'
 
 @Table({
   tableName: 'Zombies',
-  timestamps: false, // enable if you have createdAt / updatedAt
+  timestamps: false,
 })
 export default class Zombie extends Model {
   @PrimaryKey
@@ -33,6 +33,9 @@ export default class Zombie extends Model {
   @ForeignKey(() => Cell)
   @Column(DataType.UUID)
   cellId!: string | null
+
+  @Column(DataType.STRING)
+  image!: string
 
   @Column(DataType.STRING)
   name!: string

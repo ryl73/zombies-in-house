@@ -26,7 +26,8 @@ const useStyles = makeStyles(() => ({
 
 export const LobbyDialog: FC<Props> = ({ isDialog, startGame }) => {
   const classes = useStyles()
-  const { users } = useAppSelector(state => state.game)
+  const { users, room } = useAppSelector(state => state.game)
+  const { data } = useAppSelector(state => state.user)
 
   return (
     <Dialog open={isDialog} maxWidth="md">
@@ -53,13 +54,15 @@ export const LobbyDialog: FC<Props> = ({ isDialog, startGame }) => {
             </Box>
           ))}
         </Box>
-        <Button
-          variant="contained"
-          color="primary"
-          size="large"
-          onClick={startGame}>
-          Начать игру
-        </Button>
+        {room?.hostId === data?.id && (
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={startGame}>
+            Начать игру
+          </Button>
+        )}
       </DialogContent>
       <DialogActions />
     </Dialog>

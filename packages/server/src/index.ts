@@ -8,7 +8,7 @@ import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
 import { router } from './routes'
 import http from 'http'
-import { setupWebSocket } from './ws'
+import Wss from './ws'
 import { errorHandlingMiddleware } from './middleware/ErrorHandlingMiddleware'
 
 dotenv.config()
@@ -28,7 +28,7 @@ async function startServer() {
 
   app.use('/api', router)
 
-  setupWebSocket(server)
+  Wss.init(server)
 
   app.use(errorHandlingMiddleware)
 

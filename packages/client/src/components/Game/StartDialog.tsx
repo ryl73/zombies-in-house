@@ -89,7 +89,7 @@ export const StartDialog: FC<Props> = ({ isDialog, startGame }) => {
                   color="primary"
                   size="large"
                   disabled={!roomIdInput}
-                  onClick={() => startGame('local', roomIdInput)}>
+                  onClick={() => startGame('online', roomIdInput)}>
                   Подключиться к комнате
                 </Button>
               </Box>

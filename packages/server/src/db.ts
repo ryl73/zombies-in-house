@@ -24,6 +24,7 @@ const sequelizeOptions: SequelizeOptions = {
   password: POSTGRES_PASSWORD,
   database: POSTGRES_DB,
   dialect: 'postgres',
+  logging: false,
   models: [Room, Cell, Item, Player, Zombie, Topic, Comment, Reply, Reaction],
 }
 
@@ -32,7 +33,7 @@ export const sequelize = new Sequelize(sequelizeOptions)
 export const dbConnect = async (): Promise<void> => {
   try {
     await sequelize.authenticate() // Проверка аутентификации в БД
-    await sequelize.sync() // Синхронизация базы данных
+    await sequelize.sync({ force: true }) // Синхронизация базы данных
     console.log('  ➜ 🎸 Connected to the database')
   } catch (e) {
     console.error('Unable to connect to the database:', e)

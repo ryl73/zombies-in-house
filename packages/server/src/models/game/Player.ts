@@ -17,6 +17,7 @@ export type PlayerType = 'sasha' | 'nastya' | 'max' | 'nadya' | 'boris'
 
 @Table({
   tableName: 'Players',
+  timestamps: false,
 })
 export default class Player extends Model {
   @PrimaryKey
@@ -47,6 +48,12 @@ export default class Player extends Model {
   @Default(3)
   @Column(DataType.INTEGER)
   lifeCount!: number
+
+  @Column(DataType.INTEGER)
+  index!: number
+
+  @Column(DataType.STRING)
+  image!: string
 
   @Column(DataType.ENUM('sasha', 'nastya', 'max', 'nadya', 'boris'))
   type!: PlayerType

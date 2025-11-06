@@ -3,7 +3,7 @@ import Cell from '../../models/game/Cell'
 export default class CellController {
   static async createAll(roomId: string, cells: Cell[][]) {
     for (const cell of cells.flat()) {
-      await Cell.create({ ...cell, roomId })
+      await Cell.upsert({ ...cell, roomId })
     }
   }
 
@@ -11,16 +11,6 @@ export default class CellController {
     const roomCells = await Cell.findAll({
       where: { roomId },
       attributes: { exclude: ['roomId'] },
-    })
-
-    roomCells.forEach(cell => {
-      cell.availableBarricadeDirections = JSON.parse(
-        cell.availableBarricadeDirections
-      )
-      cell.installedBarricadeDirections = JSON.parse(
-        cell.installedBarricadeDirections
-      )
-      cell.walls = JSON.parse(cell.walls)
     })
 
     const result = []

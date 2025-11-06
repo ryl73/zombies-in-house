@@ -38,21 +38,21 @@ class WebSocketService {
   roomId = ''
   private _interval: NodeJS.Timeout | null = null
   public onConnect?: () => void
-  public onMessage?: (data: unknown) => void
+  public onMessage?: (data: any) => void
 
   constructor(url: string) {
     this.url = url
   }
 
-  public connect(roomId: string, user: UserInfo): void {
+  public connect(roomId: string): void {
     this.socket = new WebSocket(this.url)
     this.roomId = roomId
 
     this.socket.addEventListener(WSEvents.OPEN, () => {
-      this.socket?.send(
-        JSON.stringify({ type: 'join', room: this.roomId, user })
-      )
-      this.onConnect?.()
+      setTimeout(() => {
+        this.socket?.send(JSON.stringify({ type: 'join', room: this.roomId }))
+        this.onConnect?.()
+      }, 100)
     })
 
     this.socket.addEventListener(WSEvents.MESSAGE, (event: MessageEvent) => {
