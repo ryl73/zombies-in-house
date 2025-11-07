@@ -8,6 +8,9 @@ import Topic from './models/forum/Topic'
 import Comment from './models/forum/Comment'
 import Reply from './models/forum/Reply'
 import Reaction from './models/forum/Reaction'
+import Theme from './models/theme/Theme'
+import UserSettings from './models/user/UserSettings'
+import { seedThemes } from './seeders/seedThemes'
 
 const {
   POSTGRES_USER,
@@ -24,8 +27,19 @@ const sequelizeOptions: SequelizeOptions = {
   password: POSTGRES_PASSWORD,
   database: POSTGRES_DB,
   dialect: 'postgres',
-  logging: false,
-  models: [Room, Cell, Item, Player, Zombie, Topic, Comment, Reply, Reaction],
+  models: [
+    Room,
+    Cell,
+    Item,
+    Player,
+    Zombie,
+    Topic,
+    Comment,
+    Reply,
+    Reaction,
+    Theme,
+    UserSettings,
+  ],
 }
 
 export const sequelize = new Sequelize(sequelizeOptions)
@@ -33,7 +47,8 @@ export const sequelize = new Sequelize(sequelizeOptions)
 export const dbConnect = async (): Promise<void> => {
   try {
     await sequelize.authenticate() // Проверка аутентификации в БД
-    await sequelize.sync({ force: true }) // Синхронизация базы данных
+    await sequelize.sync() // Синхронизация базы данных
+    await seedThemes()
     console.log('  ➜ 🎸 Connected to the database')
   } catch (e) {
     console.error('Unable to connect to the database:', e)

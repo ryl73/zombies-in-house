@@ -14,6 +14,7 @@ import { ProtectedRoute } from './components/Routes/ProtectedRoute'
 import { OnlyPublicRoute } from './components/Routes/OnlyPublicRoute'
 import { GameEnd } from './pages/GameEnd'
 import { OAuthPage } from './pages/OAuthPage'
+import { ServerErrorPage } from './pages/ServerErrorPage'
 
 function Router() {
   return (
@@ -80,6 +81,7 @@ function Router() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/forum/create"
         element={
@@ -88,6 +90,7 @@ function Router() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/forum/topic/:id"
         element={
@@ -105,6 +108,7 @@ function Router() {
           </ProtectedRoute>
         }
       />
+
       <Route
         path="/oauth"
         element={
@@ -113,6 +117,8 @@ function Router() {
           </OnlyPublicRoute>
         }
       />
+
+      <Route path="/500" element={<ServerErrorPage />} />
 
       <Route path="*" element={<NotFoundPage />} />
     </Routes>

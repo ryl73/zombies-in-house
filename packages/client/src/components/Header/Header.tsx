@@ -98,6 +98,7 @@ export const Header = () => {
     { text: 'Лидерборд', to: '/leaderboard' },
     { text: 'Форум', to: '/forum' },
     { text: '404', to: '/404' },
+    { text: '500', to: '/500' },
   ]
 
   return (
