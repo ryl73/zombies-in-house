@@ -3,7 +3,7 @@ name: Push to GitHub Container Registry
 on:
   push:
     branches:
-      - main
+      - fix/100-yandex-cloud
 
 jobs:
   build-and-push:
