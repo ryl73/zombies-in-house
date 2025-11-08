@@ -10,6 +10,7 @@ import { router } from './routes'
 import http from 'http'
 import { setupWebSocket } from './ws'
 import { errorHandlingMiddleware } from './middleware/ErrorHandlingMiddleware'
+import helmet from 'helmet'
 
 dotenv.config()
 
@@ -25,6 +26,25 @@ async function startServer() {
   app.use(cookieParser())
   app.use(cors())
   app.use(express.json())
+
+  app.use(
+    helmet.contentSecurityPolicy({
+      useDefaults: false,
+      reportOnly: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        imgSrc: ["'self'", 'data:'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        connectSrc: ["'self'", 'http://localhost:3001'],
+        frameSrc: ["'none'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+      },
+    })
+  )
 
   app.use('/api', router)
 

@@ -5,7 +5,6 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development nodemon src/index.ts",
     "build": "tsc --p ./tsconfig.prod.json --outDir dist/server",
-    "preview": "node ./dist/index.js",
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "jest ."
@@ -17,6 +16,7 @@
     "dotenv": "^16.0.2",
     "eslint-config-prettier": "^8.5.0",
     "express": "^4.18.1",
+    "helmet": "^8.1.0",
     "pg": "^8.8.0",
     "prettier": "^2.7.1",
     "reflect-metadata": "^0.2.2",
