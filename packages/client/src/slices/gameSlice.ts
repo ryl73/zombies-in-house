@@ -136,7 +136,10 @@ const initialState: GameState = {
 }
 
 export const getCurrentPlayer = (game: GameState) =>
-  game.players[game.currentPlayerIndex]
+  game.type === 'online'
+    ? game.players.find(p => p.index === game.currentPlayerIndex) ||
+      game.players[0]
+    : game.players[game.currentPlayerIndex]
 
 const getCellById = (game: GameState, id: string) =>
   game.board.cells.flat().find(cell => cell.id === id)
@@ -402,6 +405,9 @@ export const endTurn = createAsyncThunk(
     } else {
       if (game.zombies.every(z => !z.opened)) {
         await dispatch(endTurn()) // skip to next if all zombies closed
+      }
+      if (game.room) {
+        await updateRoomRequest(game.room.id)
       }
     }
   }
@@ -1058,19 +1064,13 @@ export const gameSlice = createSlice({
         id: newState.id,
         hostId: newState.hostId,
       }
-      const newItems: Item[] = []
-      state.items.forEach((item, index) => {
-        newItems.push({
-          ...item,
-          ...newState.items[index],
-        })
-      })
-      state.items = newItems
+      state.items = newState.items
       state.players = newState.players
       state.zombies = newState.zombies
       state.board = newState.board
       state.turn = newState.turn
       state.currentPlayerIndex = newState.currentPlayerIndex
+      state.status = newState.status
     },
   },
 })

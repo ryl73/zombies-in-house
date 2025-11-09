@@ -8,7 +8,7 @@ import { BarricadeDirectionSelector } from '../components/Game/BarricadeDirectio
 import { WinDialog } from '../components/Game/WinDialog'
 import { StartDialog } from '../components/Game/StartDialog'
 import { createPortal } from 'react-dom'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Pinwheel } from '../components/Pinwheel/Pinwheel'
 import { Box, makeStyles } from '@material-ui/core'
 import { LobbyDialog } from '../components/Game/LobbyDialog'
@@ -33,6 +33,8 @@ const useStyles = makeStyles(theme => ({
 export const GamePage = () => {
   const classes = useStyles()
   const navigate = useNavigate()
+  const { roomId } = useParams()
+
   const dispatch = useAppDispatch()
   const { players, currentPlayerIndex, status, isLobbyDialogOpen } =
     useAppSelector(state => state.game)
@@ -47,10 +49,14 @@ export const GamePage = () => {
     dispatch(gameSlice.actions.setGameType(gameType))
     if (gameType === 'online') {
       if (!userRoomId) {
-        await createRoomRequest()
+        const roomReqId = await createRoomRequest()
+        if (!roomReqId) return
+
+        navigate(`/game/${roomReqId}`)
         dispatch(gameSlice.actions.setIsLobbyDialogOpen(true))
         return
       }
+      navigate(`/game/${userRoomId}`)
       dispatch(gameSlice.actions.setIsLobbyDialogOpen(true))
       await connectToRoomRequest(userRoomId)
       return
@@ -67,6 +73,14 @@ export const GamePage = () => {
 
   useEffect(() => {
     setPortalRoot(document.body)
+  }, [])
+
+  useEffect(() => {
+    if (roomId) {
+      setIsStartDialog(false)
+      dispatch(gameSlice.actions.setIsLobbyDialogOpen(true))
+      connectToRoomRequest(roomId)
+    }
   }, [])
 
   useEffect(() => {

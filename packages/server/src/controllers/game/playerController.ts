@@ -8,6 +8,7 @@ export default class PlayerController {
       for (const item of player.items) {
         const playerItem = await Item.findByPk(item.id)
         if (!playerItem) {
+          await Item.upsert({ ...item, roomId })
           return
         }
         await playerItem.update({ ownerId: player.id })

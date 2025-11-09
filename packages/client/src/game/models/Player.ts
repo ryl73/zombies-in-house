@@ -42,7 +42,7 @@ export function createPlayer({
     userId,
     image:
       mode === 'halloween'
-        ? `src/assets/halloween/characters/${type}.webp`
+        ? `/images/game/cards/halloween/characters/${type}.webp`
         : `/images/game/cards/characters/${type}.png`,
     type,
     index,

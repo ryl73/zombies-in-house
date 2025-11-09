@@ -33,14 +33,26 @@ export default class Cell extends Model {
   @Column(DataType.INTEGER)
   y!: number
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isTraversable!: boolean
+
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   isEmpty!: boolean
 
-  @Column(DataType.ENUM('car', 'plankPlace', 'start'))
-  type?: CellType
-
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   hasBarricade!: boolean
+
+  @Column({ type: DataType.JSONB })
+  availableBarricadeDirections!: string
+
+  @Column({ type: DataType.JSONB })
+  installedBarricadeDirections!: string
+
+  @Column({ type: DataType.JSONB })
+  walls!: string
+
+  @Column(DataType.ENUM('car', 'plankPlace', 'start'))
+  type?: CellType
 
   @BelongsTo(() => Room)
   room!: Room

@@ -37,9 +37,30 @@ export default class Room extends Model {
   @Column(DataType.INTEGER)
   currentPlayerIndex!: number
 
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  canFight!: boolean
+
   @Default('idle')
   @Column(DataType.ENUM('idle', 'playing', 'won', 'lost'))
   status!: GameStatus
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isZombieMove!: boolean
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isAwaitingBarricadeDirection!: boolean
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  canSkipTurn!: boolean
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isWinDialogOpen!: boolean
+
+  @Column({ type: DataType.STRING })
+  winningPlayerId!: string
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isPinwheelOpen!: boolean
 
   @HasMany(() => Player)
   players!: Player[]

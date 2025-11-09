@@ -25,7 +25,7 @@ export function createZombie({ cellId, type, name }: ZombieProps): Zombie {
     type,
     image:
       mode === 'halloween'
-        ? `src/assets/halloween/zombies/${type}.webp`
+        ? `/images/game/cards/halloween/zombies/${type}.webp`
         : `/images/game/cards/zombies/${type}.png`,
     name,
     id: uuidv4(),

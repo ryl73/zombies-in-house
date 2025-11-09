@@ -10,6 +10,7 @@ import { router } from './routes'
 import http from 'http'
 import Wss from './ws'
 import { errorHandlingMiddleware } from './middleware/ErrorHandlingMiddleware'
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 
 dotenv.config()
 
@@ -25,8 +26,23 @@ async function startServer() {
   app.use(cookieParser())
   app.use(cors())
   app.use(express.json())
-
-  app.use('/api', router)
+  app.use(
+    '/api/v2',
+    createProxyMiddleware({
+      changeOrigin: true,
+      cookieDomainRewrite: {
+        '*': '',
+      },
+      timeout: 5000,
+      proxyTimeout: 5000,
+      on: {
+        proxyReq: fixRequestBody,
+      },
+      logger: console,
+      target: 'https://ya-praktikum.tech/api/v2',
+    })
+  )
+  app.use('/server/api', router)
 
   Wss.init(server)
 

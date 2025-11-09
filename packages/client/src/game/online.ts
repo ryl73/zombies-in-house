@@ -1,40 +1,21 @@
 import { createRoom, getRoomById, updateRoomById } from '../api/GameAPI'
 import { store } from '../store'
 import Ws, { UserInfo } from '../api/ws'
-import { createState, gameSlice, moveStage } from '../slices/gameSlice'
+import { gameSlice, moveStage } from '../slices/gameSlice'
 
-export const createRoomRequest = async (): Promise<void> => {
+export const createRoomRequest = async (): Promise<string | null> => {
   const userData = store.getState().user.data
-  if (!userData) return
+  if (!userData) return null
 
   try {
     const { id } = await createRoom()
     store.dispatch(gameSlice.actions.setRoom({ id, hostId: userData.id }))
-    Ws.connect(id)
-    Ws.onMessage = async data => {
-      if (data.type === 'room-users') {
-        store.dispatch(
-          gameSlice.actions.setUsers((data as { users: UserInfo[] }).users)
-        )
-      }
-      if (data.type === 'updated') {
-        const state = await getRoomById(id)
-        store.dispatch(gameSlice.actions.setState(state))
-        const gameData = store.getState().game
-        const userData = store.getState().user.data
-        if (!userData) return
-
-        if (
-          gameData.currentPlayerIndex ===
-          gameData.players.findIndex(player => player.userId === userData.id)
-        ) {
-          await store.dispatch(moveStage())
-        }
-      }
-    }
+    wsConnect('create', id)
+    return id
   } catch (e) {
     console.error(e)
   }
+  return null
 }
 
 export const connectToRoomRequest = async (roomId: string): Promise<void> => {
@@ -43,38 +24,44 @@ export const connectToRoomRequest = async (roomId: string): Promise<void> => {
     store.dispatch(
       gameSlice.actions.setRoom({ id: roomId, hostId: state.hostId })
     )
-    Ws.connect(roomId)
-    Ws.onMessage = async data => {
-      if (data.type === 'room-users') {
-        store.dispatch(
-          gameSlice.actions.setUsers((data as { users: UserInfo[] }).users)
-        )
-      }
-      if (data.type === 'updated') {
-        const state = await getRoomById(roomId)
-        store.dispatch(gameSlice.actions.setIsLobbyDialogOpen(false))
-        if (store.getState().game.players.length === 0) {
-          store.dispatch(createState())
-        }
-        store.dispatch(gameSlice.actions.setState(state))
-        const gameData = store.getState().game
-        const userData = store.getState().user.data
-        if (!userData) return
-
-        if (
-          gameData.currentPlayerIndex ===
-          gameData.players.find(player => player.userId === userData.id)?.index
-        ) {
-          await store.dispatch(moveStage())
-        }
-      }
-    }
+    wsConnect('connect', roomId)
     if (state.status === 'playing') {
       store.dispatch(gameSlice.actions.setIsLobbyDialogOpen(false))
       store.dispatch(gameSlice.actions.setState(state))
     }
   } catch (e) {
     console.error(e)
+  }
+}
+
+const wsConnect = (type: 'connect' | 'create', roomId: string) => {
+  Ws.connect(roomId)
+  Ws.onMessage = async data => {
+    if (data.type === 'room-users') {
+      store.dispatch(
+        gameSlice.actions.setUsers((data as { users: UserInfo[] }).users)
+      )
+    }
+    if (data.type === 'updated') {
+      const state = await getRoomById(roomId)
+      if (type === 'connect') {
+        store.dispatch(gameSlice.actions.setIsLobbyDialogOpen(false))
+      }
+      store.dispatch(gameSlice.actions.setState(state))
+      const gameData = store.getState().game
+      const userData = store.getState().user.data
+      if (!userData) return
+
+      const currentPlayer = gameData.players.find(
+        player => player.userId === userData.id
+      )
+      if (
+        gameData.currentPlayerIndex === currentPlayer?.index &&
+        !currentPlayer.isZombie
+      ) {
+        await store.dispatch(moveStage())
+      }
+    }
   }
 }
 

@@ -54,7 +54,7 @@ export const LobbyDialog: FC<Props> = ({ isDialog, startGame }) => {
             </Box>
           ))}
         </Box>
-        {room?.hostId === data?.id && (
+        {room?.hostId === data?.id && users.length >= 2 && (
           <Button
             variant="contained"
             color="primary"
