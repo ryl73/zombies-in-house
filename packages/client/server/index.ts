@@ -9,6 +9,7 @@ import fs from 'fs/promises'
 import { createServer as createViteServer, ViteDevServer } from 'vite'
 import serialize from 'serialize-javascript'
 import cookieParser from 'cookie-parser'
+import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
 
 const port = process.env.PORT || 80
 const clientPath = path.join(__dirname, '..')
@@ -32,6 +33,23 @@ async function createServer() {
       express.static(path.join(clientPath, 'dist/client'), { index: false })
     )
   }
+
+  app.use(
+    '/api/v2',
+    createProxyMiddleware({
+      changeOrigin: true,
+      cookieDomainRewrite: {
+        '*': '',
+      },
+      timeout: 5000,
+      proxyTimeout: 5000,
+      on: {
+        proxyReq: fixRequestBody,
+      },
+      logger: console,
+      target: 'https://ya-praktikum.tech/api/v2',
+    })
+  )
 
   app.get('*', async (req, res, next) => {
     const url = req.originalUrl
