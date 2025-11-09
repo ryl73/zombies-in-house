@@ -11,6 +11,7 @@ import http from 'http'
 import Wss from './ws'
 import { errorHandlingMiddleware } from './middleware/ErrorHandlingMiddleware'
 import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware'
+import helmet from 'helmet'
 
 dotenv.config()
 
@@ -42,6 +43,33 @@ async function startServer() {
       target: 'https://ya-praktikum.tech/api/v2',
     })
   )
+  app.use(
+    helmet.contentSecurityPolicy({
+      useDefaults: false,
+      reportOnly: true,
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", ...(isDev ? ["'unsafe-inline'"] : [])],
+        styleSrc: [
+          "'self'",
+          'https://fonts.googleapis.com',
+          ...(isDev ? ["'unsafe-inline'"] : []),
+        ],
+        imgSrc: ["'self'", 'https://ya-praktikum.tech'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        connectSrc: [
+          "'self'",
+          ...(isDev ? ['http://localhost:3001', 'ws://localhost:24678/'] : []),
+          'https://ya-praktikum.tech',
+        ],
+        frameSrc: ["'none'"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+      },
+    })
+  )
+
   app.use('/server/api', router)
 
   Wss.init(server)
