@@ -5,7 +5,7 @@ import { logout } from './LoginAPI'
 const USER_IN_SYSTEM = 'User already in system'
 
 export const apiYandex = axios.create({
-  baseURL: 'https://ya-praktikum.tech/api/v2', // базовый URL
+  baseURL: '/api/v2', // базовый URL
   withCredentials: true,
 })
 

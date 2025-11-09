@@ -24,6 +24,7 @@ export type ItemType =
 
 @Table({
   tableName: 'Items',
+  timestamps: false,
 })
 export default class Item extends Model {
   @PrimaryKey
@@ -47,6 +48,9 @@ export default class Item extends Model {
 
   @Column(DataType.STRING)
   name!: string
+
+  @Column(DataType.STRING)
+  image!: string
 
   @Column(
     DataType.ENUM(

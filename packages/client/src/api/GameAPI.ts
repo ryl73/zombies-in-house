@@ -5,18 +5,17 @@ export type SimpleResponse = {
   response?: string
 }
 
-export type CreateRoomRequest = {
-  hostId: number
-}
-
 export type CreateRoomResponse = {
   id: string
 } & SimpleResponse
 
-export const createRoom = async (
-  data: CreateRoomRequest
-): Promise<CreateRoomResponse> => {
-  const response = await api.post<CreateRoomResponse>('/room', data)
+export type GetRoomResponse = GameState & {
+  id: string
+  hostId: number
+} & SimpleResponse
+
+export const createRoom = async (): Promise<CreateRoomResponse> => {
+  const response = await api.post<CreateRoomResponse>('/room')
   return response.data
 }
 
@@ -25,5 +24,10 @@ export const updateRoomById = async (
   data: GameState
 ): Promise<CreateRoomResponse> => {
   const response = await api.post<CreateRoomResponse>(`/room/${id}`, data)
+  return response.data
+}
+
+export const getRoomById = async (id: string): Promise<GetRoomResponse> => {
+  const response = await api.get<GetRoomResponse>(`/room/${id}`)
   return response.data
 }

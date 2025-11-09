@@ -65,6 +65,15 @@ function Router() {
       />
 
       <Route
+        path="/game/:roomId"
+        element={
+          <ProtectedRoute>
+            <GamePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/leaderboard"
         element={
           <ProtectedRoute>

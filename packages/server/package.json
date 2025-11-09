@@ -38,6 +38,7 @@
     "babel-jest": "^29.0.1",
     "eslint": "^8.23.0",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "http-proxy-middleware": "^3.0.5",
     "jest": "^28",
     "nodemon": "^2.0.19",
     "prettier": "^2.7.1",

@@ -4,10 +4,11 @@ import Item from '../../models/game/Item'
 export default class PlayerController {
   static async createAll(roomId: string, players: Player[]) {
     for (const player of players) {
-      await Player.create({ ...player, roomId })
+      await Player.upsert({ ...player, roomId })
       for (const item of player.items) {
         const playerItem = await Item.findByPk(item.id)
         if (!playerItem) {
+          await Item.upsert({ ...item, roomId })
           return
         }
         await playerItem.update({ ownerId: player.id })

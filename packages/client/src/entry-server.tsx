@@ -77,7 +77,7 @@ export const render = async (req: ExpressRequest) => {
         styledComponentsSheet.collectStyles(
           // Собираем стили styled-components
           <Provider store={store}>
-            <ThemeProviderCustom initialMode="dark">
+            <ThemeProviderCustom>
               <CssBaseline />
               <NotificationProvider>
                 <StaticRouterProvider router={router} context={context} />

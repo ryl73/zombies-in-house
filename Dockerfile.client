@@ -3,11 +3,11 @@ ARG CLIENT_PORT=3001
 ARG EXTERNAL_SERVER_URL
 ARG INTERNAL_SERVER_URL
 
-FROM node:$NODE_VERSION-buster as base
+FROM node:$NODE_VERSION-buster AS base
 
 WORKDIR /app
 
-FROM base as builder
+FROM base AS builder
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile
@@ -18,7 +18,7 @@ COPY . .
 RUN yarn lerna bootstrap
 RUN rm -rf /app/packages/client/dist/ && yarn build --scope=client
 
-FROM node:$NODE_VERSION-buster-slim as production
+FROM node:$NODE_VERSION-buster-slim AS production
 WORKDIR /app
 
 COPY --from=builder /app/packages/client/dist/ /app/dist/

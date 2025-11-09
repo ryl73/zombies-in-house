@@ -31,6 +31,11 @@ console.log = jest.fn()
 
 // ====== TEST UTILS ======
 
+let counter = 0
+jest.mock('uuid', () => ({
+  v4: () => `test-uuid-${Date.now()}-${counter++}`,
+}))
+
 export const renderWithProviders = (
   ui: ReactNode,
   withRoutes = false,

@@ -85,12 +85,17 @@ const useStyles = makeStyles(theme => ({
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
-  const { players, currentPlayerIndex, canFight, isPinwheelOpen } =
+  const { type, players, currentPlayerIndex, canFight, isPinwheelOpen } =
     useAppSelector(state => state.game)
+  const { data } = useAppSelector(state => state.user)
   const assets = themeManager.getAssets()
   const classes = useStyles({ isOpen: isPinwheelOpen, assets })
 
-  const player = players[currentPlayerIndex]
+  const player =
+    type === 'online'
+      ? players.find(player => player.userId === data?.id) ||
+        players[currentPlayerIndex]
+      : players[currentPlayerIndex]
 
   const game = useAppSelector(state => state.game)
 
