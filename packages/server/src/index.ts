@@ -33,11 +33,19 @@ async function startServer() {
       reportOnly: true,
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
-        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
-        imgSrc: ["'self'", 'data:'],
+        scriptSrc: ["'self'", ...(isDev ? ["'unsafe-inline'"] : [])],
+        styleSrc: [
+          "'self'",
+          'https://fonts.googleapis.com',
+          ...(isDev ? ["'unsafe-inline'"] : []),
+        ],
+        imgSrc: ["'self'", 'https://ya-praktikum.tech'],
         fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-        connectSrc: ["'self'", 'http://localhost:3001'],
+        connectSrc: [
+          "'self'",
+          ...(isDev ? ['http://localhost:3001', 'ws://localhost:24678/'] : []),
+          'https://ya-praktikum.tech',
+        ],
         frameSrc: ["'none'"],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
