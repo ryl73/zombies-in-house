@@ -65,6 +65,11 @@ export const routes: Route[] = [
     fetchData: initGamePage,
   },
   {
+    path: '/game/:roomId',
+    Component: GamePage,
+    fetchData: initGamePage,
+  },
+  {
     path: '/game-start',
     Component: GameStart,
     fetchData: initGameStart,

@@ -13,6 +13,7 @@ export type Player = {
   id: string
   isZombie: boolean
   userId: number | null
+  index?: number
 }
 
 export type PlayerProps = {
@@ -21,6 +22,7 @@ export type PlayerProps = {
   name: string
   userId?: number | null
   type: PlayerType
+  index?: number
 }
 
 export function createPlayer({
@@ -28,6 +30,7 @@ export function createPlayer({
   lifeCount,
   name,
   type,
+  index,
   userId = null,
 }: PlayerProps): Player {
   const mode = localStorage.getItem('theme') || 'dark'
@@ -39,9 +42,10 @@ export function createPlayer({
     userId,
     image:
       mode === 'halloween'
-        ? `src/assets/halloween/characters/${type}.webp`
+        ? `/images/game/cards/halloween/characters/${type}.webp`
         : `/images/game/cards/characters/${type}.png`,
     type,
+    index,
     items: [],
     id: uuidv4(),
     isZombie: false,

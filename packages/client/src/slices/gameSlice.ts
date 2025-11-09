@@ -16,6 +16,7 @@ import { sendStats } from '../game/stats'
 import { updateRoomRequest } from '../game/online'
 import { User } from './userSlice'
 import { UserInfo } from '../api/ws'
+import { GetRoomResponse } from '../api/GameAPI'
 
 const CharacterMap: Record<number, Omit<PlayerProps, 'cellId'>> = {
   1: { lifeCount: 3, name: 'Саша', type: 'sasha' },
@@ -84,7 +85,11 @@ export type GameState = {
   isPinwheelOpen: boolean
   statistics: GameStatistics
   type: GameType
-  roomId: string | null
+  room?: {
+    id: string
+    hostId: number
+  }
+  isLobbyDialogOpen: boolean
   users: Partial<User>[]
   stage: StageType
 }
@@ -125,13 +130,16 @@ const initialState: GameState = {
   isPinwheelOpen: false,
   statistics: initialStatisticsState,
   type: 'local',
-  roomId: null,
+  isLobbyDialogOpen: false,
   users: [],
   stage: 'move',
 }
 
 export const getCurrentPlayer = (game: GameState) =>
-  game.players[game.currentPlayerIndex]
+  game.type === 'online'
+    ? game.players.find(p => p.index === game.currentPlayerIndex) ||
+      game.players[0]
+    : game.players[game.currentPlayerIndex]
 
 const getCellById = (game: GameState, id: string) =>
   game.board.cells.flat().find(cell => cell.id === id)
@@ -150,16 +158,23 @@ const hasPlayerItem = (game: GameState, itemType: ItemType) =>
 
 // ----------- Async actions (thunks) ----------------
 
-export const startGame = createAsyncThunk(
-  'game/start',
-  async (_, { getState, dispatch }) => {
+export const createState = createAsyncThunk(
+  'game/createState',
+  async (_, { dispatch }) => {
     dispatch(gameSlice.actions.resetBoard())
     dispatch(gameSlice.actions.createCharacters())
     dispatch(gameSlice.actions.createItems())
     dispatch(gameSlice.actions.createZombies())
+  }
+)
+
+export const startGame = createAsyncThunk(
+  'game/start',
+  async (_, { getState, dispatch }) => {
+    dispatch(createState())
     const { game } = getState() as { game: GameState }
-    if (game.type === 'online' && game.roomId) {
-      await updateRoomRequest(game.roomId)
+    if (game.type === 'online' && game.room) {
+      await updateRoomRequest(game.room.id)
     }
     await dispatch(moveStage())
   }
@@ -382,10 +397,17 @@ export const endTurn = createAsyncThunk(
     dispatch(gameSlice.actions.resetCanMoveCells())
 
     if (!currentPlayer.isZombie) {
+      if (game.room) {
+        await updateRoomRequest(game.room.id)
+        return
+      }
       await dispatch(moveStage())
     } else {
       if (game.zombies.every(z => !z.opened)) {
         await dispatch(endTurn()) // skip to next if all zombies closed
+      }
+      if (game.room) {
+        await updateRoomRequest(game.room.id)
       }
     }
   }
@@ -749,6 +771,7 @@ export const gameSlice = createSlice({
           ...CharacterMap[result.value],
           cellId: startCell.id,
           userId: state.type === 'online' ? state.users[i].id : null,
+          index: i,
         })
         startCell.isEmpty = false
         state.players.push(player)
@@ -1019,8 +1042,8 @@ export const gameSlice = createSlice({
       state.users = action.payload
     },
 
-    setRoomId(state, action: PayloadAction<string>) {
-      state.roomId = action.payload
+    setRoom(state, action: PayloadAction<{ id: string; hostId: number }>) {
+      state.room = action.payload
     },
 
     setLocalNumberOfPlayers(state, action: PayloadAction<number>) {
@@ -1029,6 +1052,25 @@ export const gameSlice = createSlice({
 
     setStage(state, action: PayloadAction<'move' | 'fight'>) {
       state.stage = action.payload
+    },
+
+    setIsLobbyDialogOpen(state, action: PayloadAction<boolean>) {
+      state.isLobbyDialogOpen = action.payload
+    },
+
+    setState(state, action: PayloadAction<GetRoomResponse>) {
+      const newState = action.payload
+      state.room = {
+        id: newState.id,
+        hostId: newState.hostId,
+      }
+      state.items = newState.items
+      state.players = newState.players
+      state.zombies = newState.zombies
+      state.board = newState.board
+      state.turn = newState.turn
+      state.currentPlayerIndex = newState.currentPlayerIndex
+      state.status = newState.status
     },
   },
 })

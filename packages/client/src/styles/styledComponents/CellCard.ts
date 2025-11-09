@@ -20,7 +20,7 @@ export const CellCard = styled.div<{
   border-radius: 20px;
   background: ${props =>
     props.$mode === 'halloween'
-      ? 'url(src/assets/halloween/card-halloween.webp) no-repeat center / cover'
+      ? 'url(/images/game/cards/halloween/card-halloween.webp) no-repeat center / cover'
       : 'url(src/assets/card.webp) no-repeat center / cover'};
   ${props =>
     props.$animation &&

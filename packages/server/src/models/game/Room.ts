@@ -13,12 +13,6 @@ import Item from './Item'
 import Cell from './Cell'
 
 export type GameStatus = 'idle' | 'playing' | 'won' | 'lost'
-export type CanFightType =
-  | 'coldWeapon'
-  | 'gunWeapon'
-  | 'grenade'
-  | 'launcher'
-  | null
 
 @Table({
   tableName: 'Rooms',
@@ -43,31 +37,30 @@ export default class Room extends Model {
   @Column(DataType.INTEGER)
   currentPlayerIndex!: number
 
-  @Column(DataType.ENUM('coldWeapon', 'gunWeapon', 'grenade', 'launcher'))
-  canFight!: CanFightType
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  canFight!: boolean
 
   @Default('idle')
   @Column(DataType.ENUM('idle', 'playing', 'won', 'lost'))
   status!: GameStatus
 
-  @Default(false)
-  @Column(DataType.BOOLEAN)
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isZombieMove!: boolean
 
-  @Default(false)
-  @Column(DataType.BOOLEAN)
-  isProcessing!: boolean
-
-  @Column(DataType.JSONB)
-  barricadeSelection!: string
-
-  @Default(false)
-  @Column(DataType.BOOLEAN)
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
   isAwaitingBarricadeDirection!: boolean
 
-  @Default(false)
-  @Column(DataType.BOOLEAN)
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
   canSkipTurn!: boolean
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isWinDialogOpen!: boolean
+
+  @Column({ type: DataType.STRING })
+  winningPlayerId!: string
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: false })
+  isPinwheelOpen!: boolean
 
   @HasMany(() => Player)
   players!: Player[]

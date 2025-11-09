@@ -16,7 +16,7 @@ import Room from './Room'
 
 export type CellType = 'car' | 'plankPlace' | 'start'
 
-@Table({ tableName: 'Cells' })
+@Table({ tableName: 'Cells', timestamps: false })
 export default class Cell extends Model {
   @PrimaryKey
   @Default(DataType.UUIDV4)
@@ -39,20 +39,20 @@ export default class Cell extends Model {
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   isEmpty!: boolean
 
-  @Column(DataType.ENUM('car', 'plankPlace', 'start'))
-  type?: CellType
-
   @Column({ type: DataType.BOOLEAN, defaultValue: false })
   hasBarricade!: boolean
 
-  @Column(DataType.JSONB)
+  @Column({ type: DataType.JSONB })
   availableBarricadeDirections!: string
 
-  @Column(DataType.JSONB)
+  @Column({ type: DataType.JSONB })
   installedBarricadeDirections!: string
 
-  @Column(DataType.JSONB)
+  @Column({ type: DataType.JSONB })
   walls!: string
+
+  @Column(DataType.ENUM('car', 'plankPlace', 'start'))
+  type?: CellType
 
   @BelongsTo(() => Room)
   room!: Room

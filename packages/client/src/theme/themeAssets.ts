@@ -1,12 +1,12 @@
 import hud from '../assets/hud.webp'
-import hudHalloween from '../assets/halloween/hud-halloween.webp'
+import hudHalloween from '/images/game/cards/halloween/hud-halloween.webp'
 import notFoundImage from '../assets/notfound.webp'
 import notFoundImageLight from '../assets/notfound-light.webp'
-import notFoundImageHalloween from '../assets/halloween/notfound-halloween.webp'
+import notFoundImageHalloween from '/images/game/cards/halloween/notfound-halloween.webp'
 import spinwheel from '../assets/spinwheel.webp'
-import spinwheelHalloween from '../assets/halloween/spinwheel-halloween.webp'
+import spinwheelHalloween from '/images/game/cards/halloween/spinwheel-halloween.webp'
 import landing from '../assets/landing-first-screen.webp'
-import landingHalloween from '../assets/halloween/landing-first-screen-halloween.webp'
+import landingHalloween from '/images/game/cards/halloween/landing-first-screen-halloween.webp'
 import { ThemeMode } from './ThemeContext'
 
 export type ThemeAssetsItem = {

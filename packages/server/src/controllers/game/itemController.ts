@@ -3,7 +3,7 @@ import Item from '../../models/game/Item'
 export default class ItemController {
   static async createAll(roomId: string, items: Item[]) {
     for (const item of items) {
-      await Item.create({ ...item, roomId })
+      await Item.upsert({ ...item, roomId })
     }
   }
 
