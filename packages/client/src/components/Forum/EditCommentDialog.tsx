@@ -8,6 +8,7 @@ import {
   Button,
   CircularProgress,
 } from '@material-ui/core'
+import DOMPurify from 'dompurify'
 
 interface EditCommentDialogProps {
   open: boolean
@@ -38,7 +39,7 @@ export const EditCommentDialog: React.FC<EditCommentDialogProps> = ({
           multiline
           rows={4}
           variant="outlined"
-          value={message}
+          value={DOMPurify.sanitize(message)}
           onChange={e => onMessageChange(e.target.value)}
           disabled={isEditing}
         />
@@ -51,7 +52,7 @@ export const EditCommentDialog: React.FC<EditCommentDialogProps> = ({
           onClick={onSave}
           color="primary"
           variant="contained"
-          disabled={isEditing || !message.trim()}>
+          disabled={isEditing || !DOMPurify.sanitize(message).trim()}>
           {isEditing ? <CircularProgress size={24} /> : 'Сохранить'}
         </Button>
       </DialogActions>
