@@ -22,6 +22,7 @@ import {
   getAllLeaderboard,
   GetLeaderboardResponseData,
 } from '../api/LeaderboardAPI'
+import DOMPurify from 'dompurify'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -282,7 +283,9 @@ export const LeaderboardPage = () => {
                     {renderRankIcon(index)}
                   </TableCell>
                   <TableCell className={classes.tableCell}>
-                    <div className={classes.usernameCell}>{row.data.login}</div>
+                    <div className={classes.usernameCell}>
+                      {DOMPurify.sanitize(row.data.login)}
+                    </div>
                   </TableCell>
                   <TableCell className={classes.tableCell} align="right">
                     {row.data.totalPoints}

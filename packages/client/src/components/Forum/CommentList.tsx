@@ -18,6 +18,7 @@ import { forumAPI } from '../../api/forumAPI'
 import { CommentMenu } from './CommentMenu'
 import { EditCommentDialog } from './EditCommentDialog'
 import { MoreVert } from '@material-ui/icons'
+import DOMPurify from 'dompurify'
 
 const useStyles = makeStyles(theme => ({
   comment: {
@@ -188,11 +189,11 @@ const CommentItem: React.FC<CommentItemProps> = ({
           <Avatar
             className={classes.avatar}
             src={`https://ya-praktikum.tech/api/v2/resources${comment.authorAvatar}`}>
-            {comment.authorLogin?.charAt(0).toUpperCase()}
+            {DOMPurify.sanitize(comment.authorLogin?.charAt(0).toUpperCase())}
           </Avatar>
           <Box>
             <Typography variant="subtitle2" color="textPrimary">
-              {comment.authorLogin}
+              {DOMPurify.sanitize(comment.authorLogin)}
             </Typography>
             <Typography variant="caption" color="textSecondary">
               {new Date(comment.createdAt).toLocaleDateString()}
@@ -224,7 +225,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         variant="body1"
         color="textPrimary"
         className={classes.commentContent}>
-        {comment.message}
+        {DOMPurify.sanitize(comment.message)}
       </Typography>
 
       <Box className={classes.reactionSection}>

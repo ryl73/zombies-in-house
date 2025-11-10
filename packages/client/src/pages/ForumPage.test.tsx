@@ -26,6 +26,13 @@ jest.mock('uuid', () => ({
   v4: () => `test-uuid-${Date.now()}`,
 }))
 
+jest.mock('dompurify', () => ({
+  __esModule: true,
+  default: {
+    sanitize: (str: string) => str, // возвращает строку как есть
+  },
+}))
+
 console.error = jest.fn()
 console.log = jest.fn()
 

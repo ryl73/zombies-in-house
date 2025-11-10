@@ -5,6 +5,7 @@ import { makeStyles } from '@material-ui/core/styles'
 
 import { Comment as CommentIcon } from '@material-ui/icons'
 import { Topic } from '../../types/forum'
+import DOMPurify from 'dompurify'
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -68,12 +69,12 @@ export const TopicItem: React.FC<TopicItemProps> = ({
               className={classes.avatar}
               src={`https://ya-praktikum.tech/api/v2/resources${topic.authorAvatar}`}></Avatar>
             <Typography variant="caption" color="textSecondary">
-              {topic.authorLogin}
+              {DOMPurify.sanitize(topic.authorLogin)}
             </Typography>
           </Box>
           <Box display="flex" alignItems="center" mb={1}>
             <Typography variant="h6" className={classes.title}>
-              {topic.title}
+              {DOMPurify.sanitize(topic.title)}
             </Typography>
           </Box>
           {isContent !== false && (
@@ -82,7 +83,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({
               color="textSecondary"
               paragraph
               className={classes.contentPreview}>
-              {topic.description}
+              {DOMPurify.sanitize(topic.description)}
             </Typography>
           )}
           <Box display="flex" justifyContent="flex-start" alignItems="center">
