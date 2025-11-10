@@ -81,7 +81,35 @@ const useStyles = makeStyles(theme => ({
     height: '100%',
     borderRadius: 20,
   },
+  itemCountBadge: {
+    display: 'flex',
+    position: 'absolute',
+    backgroundColor: 'orange',
+    borderRadius: '50%',
+    fontSize: 12,
+    height: 20,
+    minWidth: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    right: 0,
+    bottom: 0,
+  },
 }))
+
+function groupItemsByName(
+  items: Item[]
+): Map<string, { item: Item; count: number }> {
+  const groupedMap = new Map<string, { item: Item; count: number }>()
+  for (const item of items) {
+    const existing = groupedMap.get(item.name)
+    if (existing) {
+      existing.count++
+    } else {
+      groupedMap.set(item.name, { item, count: 1 })
+    }
+  }
+  return groupedMap
+}
 
 export const Hud = () => {
   const dispatch = useAppDispatch()
@@ -137,18 +165,24 @@ export const Hud = () => {
         </Button>
       )}
       <Box className={classes.items}>
-        {player.items.map(item => (
-          <CellCard
-            $animation={isAnimation(item)}
-            key={item.id}
-            onClick={() => clickHandler(item)}>
-            <img
-              className={classes.cardImage}
-              src={item.image}
-              alt={item.name}
-            />
-          </CellCard>
-        ))}
+        {Array.from(groupItemsByName(player.items)).map(
+          ([, { item, count }]) => (
+            <CellCard
+              $animation={isAnimation(item)}
+              key={item.id}
+              style={{ position: 'relative', display: 'inline-block' }}
+              onClick={() => clickHandler(item)}>
+              <img
+                className={classes.cardImage}
+                src={item.image}
+                alt={item.name}
+              />
+              {count > 1 && (
+                <span className={classes.itemCountBadge}>{count}</span>
+              )}
+            </CellCard>
+          )
+        )}
         {canFight === 'grenade' && (
           <Button
             variant="contained"
