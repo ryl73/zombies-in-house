@@ -50,10 +50,6 @@ services:
       environment:
         - CLIENT_PORT=${CLIENT_PORT}
         - SERVER_PORT=${SERVER_PORT}
-        - EXTERNAL_SERVER_URL=${EXTERNAL_SERVER_URL}
-        - INTERNAL_SERVER_URL=${INTERNAL_SERVER_URL}
       depends_on:
-        postgres:
-          condition: service_healthy
         server:
           condition: service_started
