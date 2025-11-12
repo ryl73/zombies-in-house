@@ -27,6 +27,7 @@ import { useAppSelector } from '../hooks/useApp'
 import { selectUser } from '../slices/userSlice'
 import { forumAPI } from '../api/forumAPI'
 import { useNavigate } from 'react-router-dom'
+import { API_RESOURCES_URL } from '../constants'
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -356,7 +357,7 @@ export const ForumTopicPage = () => {
             <Box display="flex" alignItems="center">
               <Avatar
                 className={classes.avatar}
-                src={`https://ya-praktikum.tech/api/v2/resources${topic.authorAvatar}`}>
+                src={`${API_RESOURCES_URL}${topic.authorAvatar}`}>
                 {topic.authorLogin?.charAt(0).toUpperCase()}
               </Avatar>
               <Typography variant="caption" color="textSecondary">
