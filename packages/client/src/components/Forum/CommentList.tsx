@@ -19,6 +19,7 @@ import { CommentMenu } from './CommentMenu'
 import { EditCommentDialog } from './EditCommentDialog'
 import { MoreVert } from '@material-ui/icons'
 import DOMPurify from 'dompurify'
+import { API_RESOURCES_URL } from '../../constants'
 
 const useStyles = makeStyles(theme => ({
   comment: {
@@ -188,7 +189,7 @@ const CommentItem: React.FC<CommentItemProps> = ({
         <Box className={classes.authorInfo}>
           <Avatar
             className={classes.avatar}
-            src={`https://ya-praktikum.tech/api/v2/resources${comment.authorAvatar}`}>
+            src={`${API_RESOURCES_URL}${comment.authorAvatar}`}>
             {DOMPurify.sanitize(comment.authorLogin?.charAt(0).toUpperCase())}
           </Avatar>
           <Box>
