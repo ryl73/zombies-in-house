@@ -101,6 +101,4 @@ class WebSocketService {
 
 const isDev = process.env.NODE_ENV === 'development'
 
-export default new WebSocketService(
-  isDev ? 'ws://localhost:3001' : 'wss://localhost:3001/socket/'
-)
+export default new WebSocketService('ws://localhost:3001/socket')
