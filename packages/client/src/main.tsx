@@ -47,6 +47,6 @@ function Main() {
 
 ReactDOM.hydrateRoot(document.getElementById('root') as HTMLElement, <Main />)
 
-if (process.env.NODE_ENV === 'production') {
-  startServiceWorker()
-}
+// if (process.env.NODE_ENV === 'production') {
+//   startServiceWorker()
+// }
